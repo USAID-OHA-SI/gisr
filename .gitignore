@@ -37,3 +37,15 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+#no data
+*.csv
+*.xlsx
+*.png
+
+#no GIS Data
+GIS/*
+Data/*
+Dataout/*
+Images/*
+Graphics/*
