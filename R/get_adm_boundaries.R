@@ -15,7 +15,10 @@
 #' get_adm_boundaries("UGA", adm_level=2, local=FALSE)
 #' }
 #'
-get_adm_boundaries <- function(country_name, adm_level=0, local=TRUE, geo_path=NULL) {
+get_adm_boundaries <- function(country_name,
+                               adm_level=0,
+                               local=TRUE,
+                               geo_path=NULL) {
 
     # Read data form local dir first
         downlaod <- local != TRUE
