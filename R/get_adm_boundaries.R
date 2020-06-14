@@ -21,8 +21,6 @@ get_adm_boundaries <- function(country_name, adm_level=0, local=TRUE, geo_path=N
         downlaod <- local != TRUE
 
     # geodata location
-        path_gis = here::here()
-
         if (!is.null(geo_path) ) {
             geo_path <- here::here()
         }
@@ -36,12 +34,12 @@ get_adm_boundaries <- function(country_name, adm_level=0, local=TRUE, geo_path=N
 
     # Force a download
         if (is.null(geo_data)) {
-            geo_data <- get_geodata(country_name, adm_level, local = FALSE)
+            geo_data <- get_adm_boundaries(country_name, adm_level, local = FALSE)
         }
 
     # Convert data into sf format
         geo_data <- sf::st_as_sf(geo_data) %>%
-            dplyr::rename_at(vars(everything()), tolower)
+            dplyr::rename_at(dplyr::vars(everything()), tolower)
 
     # Return formatted data
     return(geo_data)
