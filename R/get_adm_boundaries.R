@@ -23,14 +23,14 @@ get_adm_boundaries <- function(country_code,
 
     # Extract data from GADM
         geo_data <- raster::getData("GADM",
-                                    country = country_name,
+                                    country = country_code,
                                     level = adm_level,
-                                    download = downlaod,
+                                    download = download,
                                     path = geo_path)
 
     # Convert data into sf format
-        geo_data <- sf::st_as_sf(geo_data) %>%
-            dplyr::rename_at(dplyr::vars(everything()), tolower)
+        geo_data <- sf::st_as_sf(geo_data)
+        geo_data <- dplyr::rename_at(geo_data, .vars = dplyr::vars(everything()), .funs = tolower)
 
     # Return formatted data
     return(geo_data)
