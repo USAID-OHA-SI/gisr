@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_hexbins.R
 \name{get_hexbins}
 \alias{get_hexbins}
-\title{Create an hexbins polygon feature class}
+\title{Get an hexbins polygon feature class for country ABC}
 \usage{
 get_hexbins(country_code, adm_level = 0, geo_path = NULL, size = NULL)
 }
@@ -19,5 +19,5 @@ get_hexbins(country_code, adm_level = 0, geo_path = NULL, size = NULL)
 country hex polygon as feature class
 }
 \description{
-Create an hexbins polygon feature class
+Get an hexbins polygon feature class for country ABC
 }
