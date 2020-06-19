@@ -7,8 +7,8 @@
 #' @return country hex polygon as feature class
 #' @export
 #' @example
-#' create_hexbins('LSO', 1)
-#' create_hexbins('UGA', 1)
+#' get_hexbins('LSO', 1)
+#' get_hexbins('UGA', 2)
 #'
 get_hexbins <- function(country_code, adm_level=0, geo_path=NULL, size=NULL) {
 
