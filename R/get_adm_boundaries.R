@@ -29,8 +29,8 @@ get_adm_boundaries <- function(country_code,
                                     path = geo_path)
 
     # Convert data into sf format
-        geo_data <- sf::st_as_sf(geo_data)
-        geo_data <- dplyr::rename_at(geo_data, .vars = dplyr::vars(everything()), .funs = tolower)
+        geo_data <- sf::st_as_sf(geo_data) %>%
+            dplyr::rename_at(.vars = dplyr::vars(dplyr::everything()), .funs = tolower)
 
     # Return formatted data
     return(geo_data)
