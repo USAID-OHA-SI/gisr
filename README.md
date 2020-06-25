@@ -8,7 +8,9 @@ install.packages("devtools")
 devtools::install_github("USAID-OHA-SI/gisr")
 ```
     
-## Get admin boundaries from [GADM](https://gadm.org/download_country_v3.html) through Raster package
+## Get admin boundaries 
+ 
+Get admin boundaries from [GADM](https://gadm.org/download_country_v3.html) through Raster package
 
 ```{r}
 library(gisr)
@@ -17,7 +19,10 @@ tgo0 <- get_adm_boundaries("TGO", adm_level=0, geo_path="./GIS")
 tgo1 <- get_adm_boundaries("TGO", adm_level=1, geo_path="./GIS")
 ```
 
-## Get admin boundaries from [Natural Earth Data](https://www.naturalearthdata.com/)
+## Get admin boundaries 
+
+Get target country admin boundaries + neighbor countries data from [Natural Earth Data](https://www.naturalearthdata.com/)
+
 
 ```{r}
 library(tidyverse)
@@ -38,7 +43,9 @@ ggplot(data = zambia_neighbors) +
 ```
 
 
-## Plot a terrain map from local DEM file
+## Plot a terrain map 
+
+Create a terrain map with vector + raster data from local DEM Tiff file
 
 ```{r}
 library(tidyverse)
