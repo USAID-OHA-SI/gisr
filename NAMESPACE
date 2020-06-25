@@ -2,7 +2,12 @@
 
 export("%>%")
 export(generate_hexbins)
+export(geo_neighbors)
 export(geo_viz)
 export(get_adm_boundaries)
+export(get_admin0)
+export(get_admin1)
 export(get_hexbins)
+export(get_terrain)
+export(terrain_map)
 importFrom(magrittr,"%>%")

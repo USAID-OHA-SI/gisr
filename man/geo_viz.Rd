@@ -12,3 +12,9 @@ geo_viz(geodata)
 \description{
 Plot polygon features
 }
+\examples{
+\dontrun{
+geo_viz(sf_data)
+}
+
+}

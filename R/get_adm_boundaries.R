@@ -5,11 +5,11 @@
 #'
 #' @param country_code ISO3 code
 #' @param adm_level country administrative boundaries level
-#' @param local save a copy?
+#' @param dowload save a copy?
 #' @param geo_path where to save / read data from
 #' @return geodata as sf with crs = 4326
 #' @export
-#' @example
+#' @examples
 #' \dontrun{
 #' get_adm_boundaries("UGA")
 #' get_adm_boundaries("UGA", adm_level=2, geo_path="GIS")

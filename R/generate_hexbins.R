@@ -4,9 +4,11 @@
 #' @param size size of each hex bin in meters
 #' @return country hex polygon as feature class
 #' @export
-#' @example
+#' @examples
+#' \dontrun{
 #' generate_hexbins(data)
 #' generate_hexbins(data, 10000)
+#' }
 #'
 generate_hexbins <- function(geodata, size=NULL) {
 

@@ -13,7 +13,7 @@ get_adm_boundaries(country_code, adm_level = 0, download = TRUE, geo_path = "")
 
 \item{geo_path}{where to save / read data from}
 
-\item{local}{save a copy?}
+\item{dowload}{save a copy?}
 }
 \value{
 geodata as sf with crs = 4326
@@ -21,4 +21,11 @@ geodata as sf with crs = 4326
 \description{
 This function extracts / reads geospatial data
 for specified country and administractive boundary levels
+}
+\examples{
+\dontrun{
+get_adm_boundaries("UGA")
+get_adm_boundaries("UGA", adm_level=2, geo_path="GIS")
+}
+
 }

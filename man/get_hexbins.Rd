@@ -9,15 +9,22 @@ get_hexbins(country_code, adm_level = 0, geo_path = NULL, size = NULL)
 \arguments{
 \item{country_code}{iso3 code}
 
+\item{adm_level}{country administrative unit level}
+
 \item{geo_path}{path to geodata}
 
 \item{size}{size of each hex bin in meters}
-
-\item{level}{country administrative unit level}
 }
 \value{
 country hex polygon as feature class
 }
 \description{
 Get an hexbins polygon feature class for country ABC
+}
+\examples{
+\dontrun{
+get_hexbins('LSO', 1)
+get_hexbins('UGA', 2)
+}
+
 }

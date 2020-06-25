@@ -17,3 +17,10 @@ country hex polygon as feature class
 \description{
 Generate an hexbins polygon sfc from another sfc
 }
+\examples{
+\dontrun{
+generate_hexbins(data)
+generate_hexbins(data, 10000)
+}
+
+}
