@@ -2,6 +2,7 @@
 #'
 #' @param countries list of countries to map
 #' @param terr_path path for terrain raster file
+#' @param mask should the extracted data match the exact boundary limits?
 #' @param add_neighbors should the map include the neighbor countries
 #' @return
 #' @export
@@ -13,6 +14,7 @@
 #'
 terrain_map <- function(countries,
                         terr_path = NULL,
+                        mask = FALSE,
                         add_neighbors = FALSE) {
 
     cntries <- {{countries}}
@@ -32,10 +34,9 @@ terrain_map <- function(countries,
     }
 
     ## Get terrain data
-    spdf <- get_terrain(countries = cntries, terr_path = {{terr_path}})
-
-    # Set the map range for centering the map in the ggplot call
-    mapRange <- c(range(sf::st_coordinates(admin0)[, 1]), range(sf::st_coordinates(admin0)[, 2]))
+    spdf <- get_terrain(countries = cntries,
+                        mask = {{mask}},
+                        terr_path = {{terr_path}})
 
     # Plot the map
     p <- ggplot2::ggplot() +

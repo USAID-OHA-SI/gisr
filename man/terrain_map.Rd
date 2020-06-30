@@ -4,12 +4,14 @@
 \alias{terrain_map}
 \title{Generate a terrain map}
 \usage{
-terrain_map(countries, terr_path = NULL, add_neighbors = FALSE)
+terrain_map(countries, terr_path = NULL, mask = FALSE, add_neighbors = FALSE)
 }
 \arguments{
 \item{countries}{list of countries to map}
 
 \item{terr_path}{path for terrain raster file}
+
+\item{mask}{should the extracted data match the exact boundary limits?}
 
 \item{add_neighbors}{should the map include the neighbor countries}
 }

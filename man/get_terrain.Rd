@@ -14,7 +14,7 @@ get_terrain(
 \arguments{
 \item{countries}{list of the country names}
 
-\item{mask}{should the extracted data match the exact bountries limits}
+\item{mask}{should the extracted data match the exact boundary limits?}
 
 \item{buffer}{extend AOI extent by x}
 

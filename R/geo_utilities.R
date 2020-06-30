@@ -103,7 +103,7 @@ get_admin1 <- function(countries, scale = "large", crs = 4326) {
 #' Get terrain data for an AOI (Countries)
 #'
 #' @param countries list of the country names
-#' @param mask should the extracted data match the exact bountries limits
+#' @param mask should the extracted data match the exact boundary limits?
 #' @param buffer extend AOI extent by x
 #' @param terr_path path to terrain raster file
 #' @return spdf spatial dataframe

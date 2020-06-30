@@ -1,6 +1,6 @@
 Package: gisr
 Title: Geospatial Analytics Utility functions
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person(given = "Baboyma",
            family = "Kagniniwa",
