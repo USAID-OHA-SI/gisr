@@ -1,6 +1,6 @@
 Package: gisr
 Title: Geospatial Analytics Utility functions
-Version: 0.1.3
+Version: 0.1.4
 Authors@R: 
     person(given = "Baboyma",
            family = "Kagniniwa",
@@ -15,7 +15,7 @@ BugReports: https://github.com/USAID-OHA-SI/gisr/issues
 Depends: 
     R (>= 3.1.0)
 Imports: 
-    dplyr,
+    dplyr (>= 1.0.0),
     magrittr,
     purrr,
     readr,

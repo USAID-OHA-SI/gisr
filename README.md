@@ -65,6 +65,38 @@ print(z_map2)
 ```
 
 
+## Assess Facilities Location data
+
+Extract Country OrgUnit Data and Assess Facalities Location data availability
+
+```{r}
+library(tidyverse)
+library(gisr)
+
+# Get results / targets data for country x
+
+ken_targets <- list.files(path = "../path-to-mer-data",
+                         pattern = "^HFR_FY20Q\\d{1}_KEN_\\d*_DATIM_\\d{8}.csv$",
+                         full.names = TRUE) %>% 
+                         map_dfr(read_csv)
+                         
+# Generate a report: Map + Bar chart showing available & missing location data
+
+## 1) No basemap
+generate_facilities_report(cntry = "Kenya",
+                      targets = ken_targets,
+                      user = "<username>",
+                      pass = glamr::mypwd("<credential-key>""))
+
+## 2) With basemap
+generate_facilities_report(cntry = "Kenya",
+                      targets = ken_targets,
+                      user = "<username>",
+                      pass = glamr::mypwd("<credential-key>""),
+                      terr_path = "<../path-to-terrain-raster-data>",
+                      output_folder = "<./path-to-ouput-folder>")
+                      
+```
 
 ---
 
