@@ -11,7 +11,7 @@ get_ouuid(country, username, password)
 
 \item{username}{Datim Account username}
 
-\item{label}{Keychain item name}
+\item{password}{Datim Password (use glamr::mypwd(...))}
 }
 \description{
 Get OU Identifiers

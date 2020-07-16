@@ -33,8 +33,8 @@ admins_map <- function(countries, add_neighbors = FALSE) {
 
     if ( !is.null(nghbrs) )
         p <- p +
-        ggplot2::geom_sf(data = nghbrs, fill = "#d9d9d9", alpha = 0.35, size = 0.25, colour = glitr::grey70k) +
-        ggplot2::geom_sf_text(data = nghbrs, ggplot2::aes(label = sovereignt), family = "Source Sans Pro" )
+            ggplot2::geom_sf(data = nghbrs, fill = "#d9d9d9", alpha = 0.35, size = 0.25, colour = glitr::grey70k) +
+            ggplot2::geom_sf_text(data = nghbrs, ggplot2::aes(label = sovereignt), family = "Source Sans Pro" )
 
     p <- p +
         ggplot2::geom_sf(data = admin0, colour = "white", fill = "grey93", size = 2, alpha = 0.25) +

@@ -2,7 +2,7 @@
 #'
 #' @param country Country name
 #' @param username Datim Account username
-#' @param label Keychain item name
+#' @param password Datim Password (use glamr::mypwd(...))
 #' @export
 #' @examples
 #' \dontrun{

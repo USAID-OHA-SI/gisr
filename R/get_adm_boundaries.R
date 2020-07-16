@@ -5,7 +5,7 @@
 #'
 #' @param country_code ISO3 code
 #' @param adm_level country administrative boundaries level
-#' @param dowload save a copy?
+#' @param dowload Save a copy
 #' @param geo_path where to save / read data from
 #' @return geodata as sf with crs = 4326
 #' @export

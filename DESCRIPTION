@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "bkagniniwa@usaid.gov")
 Description: Facilitate the use of R Spatial functions for Geospatial Analytics
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/USAID-OHA-SI/gisr

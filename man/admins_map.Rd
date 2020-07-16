@@ -19,8 +19,8 @@ Generate admin map
 }
 \examples{
 \dontrun{
-terrain_map(countries = list("Zambia"))
-terrain_map(countries = list("Zambia"), add_neighbors = TRUE)
+admins_map(countries = list("Zambia"))
+admins_map(countries = list("Zambia"), add_neighbors = TRUE)
 }
 
 }

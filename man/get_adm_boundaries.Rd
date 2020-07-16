@@ -13,7 +13,7 @@ get_adm_boundaries(country_code, adm_level = 0, download = TRUE, geo_path = "")
 
 \item{geo_path}{where to save / read data from}
 
-\item{dowload}{save a copy?}
+\item{dowload}{Save a copy}
 }
 \value{
 geodata as sf with crs = 4326
