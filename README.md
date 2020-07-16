@@ -93,25 +93,38 @@ Extract Country OrgUnit Data and Assess Facalities Location data availability
 ```{r}
 library(tidyverse)
 library(gisr)
+library(vroom)
 
 # Get results / targets data for country x
 
-ken_targets <- list.files(path = "../path-to-mer-data",
-                         pattern = "^HFR_FY20Q\\d{1}_KEN_\\d*_DATIM_\\d{8}.csv$",
+ken_sites <- list.files(path = "../path-to-mer-data",
+                         pattern = "^MER_.*_Site_IM_FY\\d{2}-\\d{2}_\\d{8}_.*_Kenya.txt$",
                          full.names = TRUE) %>% 
-                         map_dfr(read_csv)
+                         map_dfr(vroom)
+                         
+# Explore facilities
+
+extract_locations("Kenya", "<username>", glamr::mypwd("<credential-key>")) %>% 
+    extract_facilities(mer_sites = ken_sites) %>% 
+    explore_facilities("Zambia") 
+    
+# Assess facilities data
+
+extract_locations("Kenya", "<username>", glamr::mypwd("<credential-key>")) %>% 
+    extract_facilities(mer_sites = ken_sites) %>% 
+    assess_facilities()
                          
 # Generate a report: Map + Bar chart showing available & missing location data
 
 ## 1) No basemap
 generate_facilities_report(cntry = "Kenya",
-                      targets = ken_targets,
+                      mer_sites = ken_sites,
                       user = "<username>",
-                      pass = glamr::mypwd("<credential-key>""))
+                      pass = glamr::mypwd("<credential-key>"))
 
 ## 2) With basemap
 generate_facilities_report(cntry = "Kenya",
-                      targets = ken_targets,
+                      targets = ken_sites,
                       user = "<username>",
                       pass = glamr::mypwd("<credential-key>""),
                       terr_path = "<../path-to-terrain-raster-data>",

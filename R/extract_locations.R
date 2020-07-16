@@ -68,7 +68,7 @@ extract_locations <- function(country, username, password) {
 #' Extract facility sites
 #'
 #' @param .data Datim organisation units data frame
-#' @param targets Data Frame of MER Results / Targets
+#' @param mer_sites Data Frame of MER Sites by IM with Results and/or Targets [cols: orgunituid, sitename]
 #' @export
 #' @examples
 #' \dontrun{
@@ -76,7 +76,7 @@ extract_locations <- function(country, username, password) {
 #' df_orgunits %>% extract_facilities()
 #' }
 #'
-extract_facilities <- function(.data, targets = NULL) {
+extract_facilities <- function(.data, mer_sites = NULL) {
 
     .data <- .data %>%
         dplyr::filter(label == "facility") %>%
@@ -84,17 +84,12 @@ extract_facilities <- function(.data, targets = NULL) {
         janitor::clean_names() %>%
         dplyr::rename(longitude = "x1", latitude = "x2")
 
-    if ( !is.null(targets) ) {
+    if ( !is.null(mer_sites) & "orgnunituid" %in% names(mer_sites) & "sitename" %in% names(mer_sites) ) {
 
         .data <- .data %>%
-            dplyr::left_join(
-                targets %>%
-                    dplyr::filter(!is.na(mer_results)) %>%
-                    dplyr::distinct(orgunit, orgunituid),
-                by = c("id" = "orgunituid")
-            ) %>%
-            dplyr::filter(!is.na(orgunit)) %>%
-            dplyr::select(-orgunit)
+            dplyr::left_join(mer_sites, by = c("id" = "orgunituid")) %>%
+            dplyr::filter(!is.na(sitename)) %>%
+            dplyr::select(-sitename)
     }
 
     return(.data)

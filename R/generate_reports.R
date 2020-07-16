@@ -1,7 +1,7 @@
 #' Report locations data completeness
 #'
 #' @param cntry Country name
-#' @param targets Latest MER Results / Targets
+#' @param mer_sites Latest MER Sites Results / Targets [cols: orgunituid, sitename]
 #' @param user Datim account username
 #' @param pass Datim account password (glamr::mypwd is recommended)
 #' @param terr_path Path to terrain raster data
@@ -9,20 +9,19 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' generate_sites_report(cntry = "saturn", )
+#' generate_sites_report(cntry = "saturn", mer_sites = sites)
 #' }
 #'
-generate_facilities_report <- function(cntry, targets, user, pass,
+generate_facilities_report <- function(cntry, mer_sites, user, pass,
                                   terr_path = NULL, output_folder = NULL) {
 
     # Extract Site Location Data
     sites <- extract_locations(country = {{cntry}}, username = {{user}}, password = {{pass}}) %>%
-        extract_facilities(targets = {{targets}})
+        extract_facilities(mer_sites = {{mer_sites}})
 
     # Check data
     if (is.null(sites) | nrow(sites) == 0) {
-
-        cat("\n", cat(Wavelength::paint_red({{cntry}})), "\n")
+        cat("\n", Wavelength::paint_red({{cntry}}), "\n")
     }
 
     # Map sites locations

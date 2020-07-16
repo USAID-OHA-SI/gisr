@@ -4,12 +4,12 @@
 \alias{extract_facilities}
 \title{Extract facility sites}
 \usage{
-extract_facilities(.data, targets = NULL)
+extract_facilities(.data, sites = NULL)
 }
 \arguments{
 \item{.data}{Datim organisation units data frame}
 
-\item{targets}{Data Frame of MER Results / Targets}
+\item{sites}{Data Frame of MER Sites by IM with Results and/or Targets [cols: orgunituid, sitename]}
 }
 \description{
 Extract facility sites
