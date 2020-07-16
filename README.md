@@ -65,6 +65,27 @@ print(z_map2)
 ```
 
 
+## Plot an admin map 
+
+Create an administrative map with vector data from RNaturalEarth
+
+```{r}
+library(tidyverse)
+library(sf)
+library(glitr)
+library(gisr)
+
+z_map1 <- admins_map("Zambia")
+
+print(z_map1)
+
+z_map2 <- admins_map("Zambia", add_neighbors = TRUE) 
+    
+print(z_map2)
+
+```
+
+
 ## Assess Facilities Location data
 
 Extract Country OrgUnit Data and Assess Facalities Location data availability
@@ -97,6 +118,45 @@ generate_facilities_report(cntry = "Kenya",
                       output_folder = "<./path-to-ouput-folder>")
                       
 ```
+
+## Plot a Spatial Distribution Map of OVC_HIVSTAT_POS
+
+Create an administrative map with vector data from RNaturalEarth
+
+```{r}
+library(tidyverse)
+library(sf)
+library(glitr)
+library(gisr)
+
+# Geodata
+moz_districts <- list.files(
+        path = "path-to-shapefiles",
+        pattern = "name-of-country-psnu-shp",
+        recursive = TRUE,
+        full.names = TRUE
+    ) %>%
+    unlist() %>%
+    first() %>%
+    read_sf()
+        
+# PSNU by IM Data
+df_psnu <- read_rds(here("Data", "PSNU_IM_FY18-20_20200626_v1_1.rds"))
+        
+# Map without topo basemap
+moz <- spdist_ovc_hivstat_pos(country = "Mozambique", fy = 2020, df_psnu = df_psnu, geo_psnu = moz_districts)
+
+# Map with topo basemap
+moz <- spdist_ovc_hivstat_pos(country = "Mozambique", fy = 2020, df_psnu = df_psnu, geo_psnu = moz_districts, terr_path = dir_terr)
+
+# export map
+ggsave(here(dir_graphs, "MOZ-OVC_HIVSTAT_POS-Results.png"),
+      plot = last_plot(), scale = 1.2, dpi = 310,
+      width = 10, height = 7, units = "in")
+
+```
+
+
 
 ---
 
