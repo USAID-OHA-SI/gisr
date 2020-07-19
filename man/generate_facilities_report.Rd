@@ -6,7 +6,7 @@
 \usage{
 generate_facilities_report(
   cntry,
-  targets,
+  mer_sites,
   user,
   pass,
   terr_path = NULL,
@@ -16,7 +16,7 @@ generate_facilities_report(
 \arguments{
 \item{cntry}{Country name}
 
-\item{targets}{Latest MER Results / Targets}
+\item{mer_sites}{Latest MER Sites Results / Targets [cols: orgunituid, sitename]}
 
 \item{user}{Datim account username}
 
@@ -31,7 +31,7 @@ Report locations data completeness
 }
 \examples{
 \dontrun{
-generate_sites_report(cntry = "saturn", )
+generate_sites_report(cntry = "saturn", mer_sites = sites)
 }
 
 }
