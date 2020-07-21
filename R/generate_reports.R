@@ -41,22 +41,42 @@ generate_facilities_report <- function(cntry, mer_sites, user, pass,
         assess_facilities()
 
     # Combine plots
-    viz <- (viz_map + viz_bar) +
-        patchwork::plot_layout(widths = c(2,1)) +
-        patchwork::plot_annotation(
-            title = toupper({{cntry}}),
-            subtitle = "Facilities location data availability",
-            theme = ggplot2::theme(
-                plot.title = element_text(hjust = .5),
-                plot.subtitle = element_text(hjust = .5)
+    viz <- NULL
+
+    if ( !is.null(viz_bar) ) {
+
+        viz <- patchwork::wrap_plots(viz_map, viz_bar, nrow = 1, widths = c(2,1)) +
+            patchwork::plot_annotation(
+                title = toupper({{cntry}}),
+                subtitle = "Facilities location data availability",
+                theme = ggplot2::theme(
+                    plot.title = element_text(hjust = .5),
+                    plot.subtitle = element_text(hjust = .5)
+                )
             )
-        )
+    }
+    else {
+        cat("\n", Wavelength::paint_red({{cntry}}), " - bar chart is null\n")
+
+        viz <- viz_map +
+            patchwork::plot_annotation(
+                title = toupper({{cntry}}),
+                subtitle = "Facilities location data availability",
+                theme = ggplot2::theme(
+                    plot.title = element_text(hjust = .5),
+                    plot.subtitle = element_text(hjust = .5)
+                )
+            )
+    }
+
+    # Print viz
+    print(viz)
 
     # Export viz as png file
     if ( !is.null(output_folder) ) {
         ggplot2::ggsave(
             filename = paste0({{output_folder}}, "/", {{cntry}}, " - Sites location data availability.png"),
-            scale = 1.2, dpi = 310, width = 10, height = 7, units = "in")
+            plot = last_plot(), scale = 1.2, dpi = 310, width = 10, height = 7, units = "in")
     }
 
     return(viz)
