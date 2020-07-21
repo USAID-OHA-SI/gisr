@@ -69,11 +69,14 @@ geo_neighbors <- function(countries, scale = "large", crs = 4326) {
 #' get_admin0(counties = list("Zambia"))
 #' }
 #'
-get_admin0 <- function(countries, scale = "large", crs = 4326)  {
+get_admin0 <- function(countries, scale = "medium", crs = 4326)  {
 
-    admin0 <- rnaturalearth::ne_countries(scale = {{scale}}, returnclass = "sf") %>%
-        dplyr::filter(sovereignt %in% {{countries}}) %>%
+    admin0 <- rnaturalearth::ne_countries(country = {{countries}}, scale = {{scale}}, returnclass = "sf") %>%
         sf::st_transform(., crs = sf::st_crs({{crs}}))
+
+    # admin0 <- rnaturalearth::ne_countries(scale = {{scale}}, returnclass = "sf") %>%
+    #     dplyr::filter(sovereignt %in% {{countries}}) %>%
+    #     sf::st_transform(., crs = sf::st_crs({{crs}}))
 
     return(admin0)
 }
@@ -91,7 +94,7 @@ get_admin0 <- function(countries, scale = "large", crs = 4326)  {
 #' get_admin1(countries = list("Zambia"))
 #' }
 #'
-get_admin1 <- function(countries, scale = "large", crs = 4326) {
+get_admin1 <- function(countries, scale = "medium", crs = 4326) {
 
     admin1 <- rnaturalearth::ne_states(country = {{countries}}, returnclass = "sf") %>%
         sf::st_transform(., crs = sf::st_crs({{crs}}))
