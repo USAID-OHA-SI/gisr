@@ -84,12 +84,15 @@ extract_facilities <- function(.data, mer_sites = NULL) {
         janitor::clean_names() %>%
         dplyr::rename(longitude = "x1", latitude = "x2")
 
-    if ( !is.null(mer_sites) & "orgnunituid" %in% names(mer_sites) & "sitename" %in% names(mer_sites) ) {
+    if ( !is.null(mer_sites) & "orgunituid" %in% names(mer_sites) & "sitename" %in% names(mer_sites) ) {
 
         .data <- .data %>%
             dplyr::left_join(mer_sites, by = c("id" = "orgunituid")) %>%
             dplyr::filter(!is.na(sitename)) %>%
             dplyr::select(-sitename)
+    }
+    else {
+        cat(Wavelength::paint_red("\nMER Sites are missing or invalid. Make sure to include orgunituid and sitename columns."))
     }
 
     return(.data)
