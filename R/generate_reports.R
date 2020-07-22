@@ -25,16 +25,8 @@ generate_facilities_report <- function(cntry, mer_sites, user, pass,
     }
 
     # Map sites locations
-    viz_map <- NULL
-
-    if ( !is.null(terr_path) ) {
-        viz_map <- sites %>%
-            explore_facilities(cntry = {{cntry}}, terr_path = {{terr_path}})
-    }
-    else {
-        viz_map <- sites %>%
-            explore_facilities(cntry = {{cntry}})
-    }
+    viz_map <- sites %>%
+        explore_facilities(cntry = {{cntry}}, terr_path = {{terr_path}})
 
     # Plot completeness
     viz_bar <- sites %>%

@@ -16,7 +16,7 @@ explore_facilities <- function(.data, cntry, terr_path = NULL) {
     country <- dplyr::case_when(
         cntry == "Cote d'Ivoire" ~ "Ivory Coast",
         cntry == "Eswatini" ~ "Swaziland",
-        cntry == "United Republic of Tanzania" ~ "Tanzania",
+        cntry == "Tanzania" ~ "United Republic of Tanzania",
         TRUE ~ {{cntry}}
     )
 

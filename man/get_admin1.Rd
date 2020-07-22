@@ -4,7 +4,7 @@
 \alias{get_admin1}
 \title{Get admin level 1 boundaries sf data for a given country}
 \usage{
-get_admin1(countries, scale = "large", crs = 4326)
+get_admin1(countries, scale = "medium", crs = 4326)
 }
 \arguments{
 \item{countries}{list of country names}
