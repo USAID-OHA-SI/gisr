@@ -72,7 +72,8 @@ terrain_map <- function(countries,
     # Zoom to South Africa mainland
     if ("south africa" %in% tolower(cntries))
         p <- p +
-            ggplot2::coord_sf(xlim = c(), ylim = c())
+            ggplot2::xlim(15, 35) +
+            ggplot2::ylim(-38, -20)
 
     # apply theme
     p <- p + glitr::si_style() +
