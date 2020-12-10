@@ -33,4 +33,4 @@ Imports:
     Wavelength,
     glitr,
     ggplot2
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
