@@ -12,40 +12,57 @@ extract_locations <-
     function(country,
              level = NULL,
              add_geom = TRUE,
-             username, password) {
+             username = NULL,
+             password = NULL) {
 
     baseurl = "https://final.datim.org/"
 
     cntry <- {{country}}
     lvl <- {{level}}
 
-    user <- {{username}}
-    key <- {{password}}
+    user <- base::ifelse(base::is.null(username),
+                         glamr::datim_user(),
+                         {{username}})
+
+    pass <- base::ifelse(base::is.null(password),
+                         glamr::datim_pwd(),
+                         {{password}})
 
     # Get country uid
-    ouuid <- get_ouuid(cntry, username = user, password = key)
+    ouuid <- get_ouuid(cntry, username = user, password = pass)
 
     # Get country org levels
-    ou_levels <- Wavelength::identify_levels(ou = cntry, username = user, password = key) %>%
-        dplyr::relocate(dplyr::last_col(), .after = name4) %>%
-        tidyr::gather(key = "label", value = "level", -c(1:5))
+    ou_levels <- get_levels(username = user, password = pass) %>%
+        tidyr::pivot_longer(cols = country:prioritization,
+                            names_to = "label",
+                            values_to = "level") %>%
+        dplyr::filter(countryname == cntry)
 
     # Query OU Location data
     url <- baseurl %>%
-        paste0("api/organisationUnits?",
-               "fields=id,name,path,level,geometry",
-               "&filter=path:like:", ouuid)
+        base::paste0("api/organisationUnits?fields=id,name,path,level")
+
+    # Include geometry columns if needed
+    if (add_geom == TRUE) {
+       url <- url %>%
+           base::paste0(",geometry")
+    }
+
+    url <- url %>%
+        base::paste0("&filter=path:like:", ouuid)
 
     # Filter specific levels
     if (!is.null(lvl)) {
 
         url <- url %>%
-            paste0(url,
-                   "&filter=level:eq:", lvl,
-                   "&paging=false&format=json")
+            base::paste0("&filter=level:eq:", lvl)
 
-        ou_levels <- ou_levels %>% filter(level == lvl)
+        ou_levels <- ou_levels %>%
+            dplyr::filter(level == lvl)
     }
+
+    url <- url %>% base::paste0("&paging=false&format=json")
+
 
     # Check levels
     if (base::nrow(ou_levels) == 0) {
@@ -56,38 +73,61 @@ extract_locations <-
 
     # Query OU Location data
     df <- url %>%
-        httr::GET(httr::authenticate(user, key)) %>%
+        httr::GET(httr::authenticate(user, pass)) %>%
         httr::content("text") %>%
         jsonlite::fromJSON(flatten = T) %>%
         purrr::pluck("organisationUnits") %>%
-        tibble::as_tibble() %>%
-        dplyr::rename(
-            geom_type = geometry.type,          # NA or Geometry Type Value
-            coordinates = geometry.coordinates  # NA or list of 2 or more
-        ) %>%
-        dplyr::mutate(
-            gid = dplyr::row_number(),  # Geom ID (unique accross gid1 & gid2)
-            # gid1 = row_number(), # Geom ID
-            # gid2 = 1,            # Sub Geom ID (for MultiPolygon or MultiPoint)
-            nodes = base::as.integer(base::lengths(coordinates) / 2), # Geom is a pair of lon / lat
-            nested = base::lapply(coordinates, function(x) return(is.list(x))),
-            geom_type = base::ifelse(nested == TRUE & geom_type != "MultiPolygon", 'MultiPolygon', geom_type)
-        ) %>%
-        dplyr::relocate(coordinates, .after = last_col())
+        tibble::as_tibble()
+
+    if (add_geom == TRUE) {
+        df <- df %>%
+            dplyr::rename(
+                geom_type = geometry.type,          # NA or Geometry Type Value
+                coordinates = geometry.coordinates  # NA or list of 2 or more
+            ) %>%
+            dplyr::mutate(
+                gid = dplyr::row_number(),  # Geom ID (unique accross gid1 & gid2)
+                # gid1 = row_number(), # Geom ID
+                # gid2 = 1,            # Sub Geom ID (for MultiPolygon or MultiPoint)
+                nodes = base::as.integer(base::lengths(coordinates) / 2), # Geom is a pair of lon / lat
+                nested = base::lapply(coordinates, function(x) return(is.list(x))),
+                geom_type = base::ifelse(nested == TRUE & geom_type != "MultiPolygon", 'MultiPolygon', geom_type)
+            ) %>%
+            dplyr::relocate(coordinates, .after = last_col())
+    }
 
     # Flag org categories
     df <- df %>%
-        left_join(ou_levels, by = "level") %>%
-        dplyr::select(operatingunit = name3, country_name, label, level:coordinates) %>%
+        dplyr::left_join(ou_levels, by = "level")
+
+    # Parse geom
+    if (add_geom == TRUE) {
+        df <- df %>%
+            dplyr::select(operatingunit_iso, countryname_iso, operatingunit, countryname, label, level:coordinates) %>%
+            dplyr::mutate(
+                geom_type = dplyr::case_when(
+                    base::is.na(geom_type) & label == "facility" ~ "Point",
+                    base::is.na(geom_type) & label != "facility" ~ "Polygon",
+                    TRUE ~ geom_type
+                ),
+                geom_type = dplyr::if_else(label != "facility" & nested == TRUE, "MultiPolygon", geom_type)
+            )
+    }
+
+    # iso code
+    iso <- df %>%
+        dplyr::distinct(operatingunit_iso) %>%
+        dplyr::pull() %>%
+        dplyr::first()
+
+    # Cleanup data
+    df <- df %>%
         dplyr::mutate(
-            label = ifelse(is.na(label) & level == 4, "snu1", label),
-            geom_type = case_when(
-                is.na(geom_type) & label == "facility" ~ "Point",
-                is.na(geom_type) & label != "facility" ~ "Polygon",
-                TRUE ~ geom_type
-            ),
-            geom_type = ifelse(label != "facility" & nested == TRUE, "MultiPolygon", geom_type)
-        )
+            operatingunit = dplyr::if_else(base::is.na(operatingunit), cntry, operatingunit),
+            countryname = dplyr::if_else(base::is.na(countryname), cntry, countryname),
+            operatingunit_iso = dplyr::if_else(base::is.na(operatingunit_iso), iso, operatingunit_iso),
+            countryname_iso = dplyr::if_else(base::is.na(countryname_iso), iso, countryname_iso),
+            label = dplyr::if_else(base::is.na(label) & level == 4, "snu1", label))
 
     return(df)
 }
