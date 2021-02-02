@@ -248,8 +248,8 @@ get_levels <-
 #'
 #' @examples
 #' \dontrun{
-#' get_orglevel("Zambia")
-#' get_orglevel("Zambia", orgunit_type = "community")
+#' get_ouorglevel("Zambia")
+#' get_ouorglevel("Zambia", org_type = "community")
 #' }
 #'
 get_ouorglevel <-
@@ -306,26 +306,28 @@ get_ouorglevel <-
 
 #' Get Org level uids
 #'
-#' @param ou           Operatingunit name
-#' @param level        Org level
+#' @param ouuid        Operatingunit uid
+#' @param level        Orgunit level
 #' @param username     Datim Account username
 #' @param password     Datim Account Password
 #'
-#' @return uid
+#' @return list of uids
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' get_leveluids("Zambia", 4)
+#' get_ouleveluids("<ou-uid-goes-here>", level = 4)
 #' }
 #'
-get_leveluids <-
-  function(ou, level,
+get_ouleveluids <-
+  function(ouuid, level,
            username = NULL,
            password = NULL) {
 
     # params
-    ou <- {{ou}}
+    uid <- {{ouuid}}
+
+    lvl <- {{level}}
 
     user <- base::ifelse(base::is.null(username),
                          glamr::datim_user(),
@@ -335,22 +337,14 @@ get_leveluids <-
                          glamr::datim_pwd(),
                          {{password}})
 
-    lvl <- {{level}}
-
-    # Check level is name or number
-    if (!base::is.numeric(lvl) & base::nchar(lvl) > 1) {
-      lvl <- get_orglevel(ou, orgunit_type = lvl)
-    }
-
-    print(lvl)
-
-    # ou locations
-    uids <- gisr::extract_locations(ou, user, pass) %>%
-      dplyr::filter(level == lvl) %>%
-      dplyr::pull(id)
+    # Query orgunits
+    lvl_uids <- get_ouorguids(ouuid = uid,
+                             level = lvl,
+                             username = user,
+                             password = pass) %>% pull(uid)
 
     # return
-    return(uids)
+    return(lvl_uids)
   }
 
 
