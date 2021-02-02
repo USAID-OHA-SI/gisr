@@ -1,6 +1,6 @@
 Package: gisr
 Title: Geospatial Analytics Utility functions
-Version: 0.1.7
+Version: 0.1.8
 Authors@R: 
     person(given = "Baboyma",
            family = "Kagniniwa",
@@ -30,7 +30,9 @@ Imports:
     rgeos,
     rnaturalearth,
     rnaturalearthdata,
-    Wavelength,
-    glitr,
     ggplot2
+Remotes:
+    USAID-OHA-SI/Wavelength,
+    USAID-OHA-SI/glitr,
+    thomasp85/patchwork
 RoxygenNote: 7.1.0

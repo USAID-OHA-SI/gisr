@@ -1,4 +1,4 @@
-#' Generate a terrain map
+#' @title Generate a terrain map
 #'
 #' @param countries list of countries to map
 #' @param adm0 Admin 0 boundaries, optional sf geodata
@@ -81,3 +81,50 @@ terrain_map <- function(countries,
 
     return(p)
 }
+
+
+
+#' @title Get Terrain Raster dataset
+#'
+#' @param terr_path path to terrain raster file
+#' @param name Name of the raster file (.tif)
+#'
+#' @return RasterLayer
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' get_raster(terr_path = glamr::si_path("path_raster))
+#' }
+#'
+get_raster <-
+    function(terr_path = "../../GEODATA/RASTER",
+             name = "SR_LR.tif") {
+
+        # Params
+        dir_terr <- {{terr_path}}
+        file_name <- {{name}}
+
+        # Check directory
+        if (!base::dir.exists(dir_terr))
+            stop(base::cat("\nInvalid terrain directory: ",
+                     crayon::red(dir_terr),
+                     "\n"))
+
+        # Identify file path
+        terr_file <- base::list.files(
+            path = dir_terr,
+            pattern = base::paste0(file_name, "$"),
+            recursive = TRUE,
+            full.names = TRUE
+        )
+
+        # Check file
+        if (!base::file.exists(terr_file))
+            stop(base::cat("\nFile does not exist: ", terr_file, "\n"))
+
+        # Read file content
+        ras <- raster::raster(terr_file)
+
+        return(ras)
+    }

@@ -8,11 +8,17 @@
 #' \dontrun{
 #' extract_locations("saturn", "my_username", "my_password")
 #' }
-extract_locations <- function(country, username, password) {
+extract_locations <-
+    function(country,
+             level = NULL,
+             add_geom = TRUE,
+             username, password) {
 
     baseurl = "https://final.datim.org/"
 
     cntry <- {{country}}
+    lvl <- {{level}}
+
     user <- {{username}}
     key <- {{password}}
 
@@ -25,9 +31,31 @@ extract_locations <- function(country, username, password) {
         tidyr::gather(key = "label", value = "level", -c(1:5))
 
     # Query OU Location data
-    df <- baseurl %>%
-        paste0("api/organisationUnits?filter=path:like:", ouuid,
-               "&fields=id,name,path,level,geometry&paging=false&format=json") %>%
+    url <- baseurl %>%
+        paste0("api/organisationUnits?",
+               "fields=id,name,path,level,geometry",
+               "&filter=path:like:", ouuid)
+
+    # Filter specific levels
+    if (!is.null(lvl)) {
+
+        url <- url %>%
+            paste0(url,
+                   "&filter=level:eq:", lvl,
+                   "&paging=false&format=json")
+
+        ou_levels <- ou_levels %>% filter(level == lvl)
+    }
+
+    # Check levels
+    if (base::nrow(ou_levels) == 0) {
+        base::cat(crayon::red("\nNo records found!\n"))
+
+        return(NULL)
+    }
+
+    # Query OU Location data
+    df <- url %>%
         httr::GET(httr::authenticate(user, key)) %>%
         httr::content("text") %>%
         jsonlite::fromJSON(flatten = T) %>%
@@ -38,12 +66,12 @@ extract_locations <- function(country, username, password) {
             coordinates = geometry.coordinates  # NA or list of 2 or more
         ) %>%
         dplyr::mutate(
-            gid = row_number(),  # Geom ID (unique accross gid1 & gid2)
+            gid = dplyr::row_number(),  # Geom ID (unique accross gid1 & gid2)
             # gid1 = row_number(), # Geom ID
             # gid2 = 1,            # Sub Geom ID (for MultiPolygon or MultiPoint)
-            nodes = as.integer(lengths(coordinates) / 2), # Geom is a pair of lon / lat
-            nested = lapply(coordinates, function(x) return(is.list(x))),
-            geom_type = ifelse(nested == TRUE & geom_type != "MultiPolygon", 'MultiPolygon', geom_type)
+            nodes = base::as.integer(base::lengths(coordinates) / 2), # Geom is a pair of lon / lat
+            nested = base::lapply(coordinates, function(x) return(is.list(x))),
+            geom_type = base::ifelse(nested == TRUE & geom_type != "MultiPolygon", 'MultiPolygon', geom_type)
         ) %>%
         dplyr::relocate(coordinates, .after = last_col())
 
@@ -52,7 +80,7 @@ extract_locations <- function(country, username, password) {
         left_join(ou_levels, by = "level") %>%
         dplyr::select(operatingunit = name3, country_name, label, level:coordinates) %>%
         dplyr::mutate(
-            label = ifelse(is.na(label) & level == 4, "SNU1", label),
+            label = ifelse(is.na(label) & level == 4, "snu1", label),
             geom_type = case_when(
                 is.na(geom_type) & label == "facility" ~ "Point",
                 is.na(geom_type) & label != "facility" ~ "Polygon",

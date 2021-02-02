@@ -21,7 +21,7 @@ generate_facilities_report <- function(cntry, mer_sites, user, pass,
 
     # Check data
     if (is.null(sites) | nrow(sites) == 0) {
-        cat("\n", Wavelength::paint_red({{cntry}}), "\n")
+        cat("\n", crayon::red({{cntry}}), "\n")
     }
 
     # Map sites locations
@@ -48,7 +48,7 @@ generate_facilities_report <- function(cntry, mer_sites, user, pass,
             )
     }
     else {
-        cat("\n", Wavelength::paint_red({{cntry}}), " - bar chart is null\n")
+        cat("\n", crayon::red({{cntry}}), " - bar chart is null\n")
 
         viz <- viz_map +
             patchwork::plot_annotation(
