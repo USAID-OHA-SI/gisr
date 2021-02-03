@@ -1,5 +1,7 @@
 <img src='man/figures/logo.png' align="right" height="120" />
 
+[![R-CMD-check](https://github.com/USAID-OHA-SI/gisr/workflows/R-CMD-check/badge.svg)](https://github.com/USAID-OHA-SI/gisr/actions)
+
 # gisr
 OHA Geospatial Analytics Utilities
 
