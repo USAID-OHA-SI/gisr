@@ -6,7 +6,7 @@ Authors@R:
            family = "Kagniniwa",
            role = c("aut", "cre"),
            email = "bkagniniwa@usaid.gov")
-Description: Facilitate the use of R Spatial functions for Geospatial Analytics
+Description: Facilitate the use of R Spatial functions for HIV/AIDS related Geospatial Analytics
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -35,4 +35,4 @@ Remotes:
     USAID-OHA-SI/Wavelength,
     USAID-OHA-SI/glitr,
     thomasp85/patchwork
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

@@ -2,24 +2,26 @@
 % Please edit documentation in R/utilities.R
 \name{get_ouuid}
 \alias{get_ouuid}
-\title{Get OU Identifiers}
+\title{Get OU UID}
 \usage{
-get_ouuid(country, username, password)
+get_ouuid(operatingunit, username = NULL, password = NULL)
 }
 \arguments{
-\item{country}{Country name}
+\item{operatingunit}{Operatingunit name}
 
-\item{username}{Datim Account username}
+\item{username}{Datim Account username, recommend using `datim_user()`}
 
-\item{password}{Datim Password (use glamr::mypwd(...))}
+\item{password}{Datim Account Password, recommend using `datim_pwd()`}
+}
+\value{
+uid
 }
 \description{
-Get OU Identifiers
+Get OU UID
 }
 \examples{
 \dontrun{
-get_ouuid("Kenya", "my_username")
-get_ouuid("Kenya", username = "my_username", label = "my_keychain_label")
+get_ouuid(operatingunit = "Kenya")
 }
 
 }

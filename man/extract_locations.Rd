@@ -4,10 +4,20 @@
 \alias{extract_locations}
 \title{Extract location data}
 \usage{
-extract_locations(country, username, password)
+extract_locations(
+  country,
+  level = NULL,
+  add_geom = TRUE,
+  username = NULL,
+  password = NULL
+)
 }
 \arguments{
 \item{country}{PEPFAR Operating Unit or Regional Countries}
+
+\item{level}{PEPFAR Org Level}
+
+\item{add_geom}{Include geometry column}
 
 \item{username}{Datim Account Username}
 

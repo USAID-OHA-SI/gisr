@@ -22,8 +22,14 @@ Map the distribution of OVC TX_CURR Achievement by PSNU
 }
 \examples{
 \dontrun{
-spdist_ovc_hivstat_pos(country = "saturn", fy = 3030, df_psnu = psnu_by_im, geo_psnu = saturn_districts)
-spdist_ovc_hivstat_pos(country = "saturn", fy = 3030, df_psnu = psnu_by_im, geo_psnu = saturn_districts, terr_path = path_to_terr)
+spdist_ovc_hivstat_pos(country = "saturn",
+      fy = 3030,
+      df_psnu = psnu_by_im,
+      geo_psnu = saturn_districts)
+spdist_ovc_hivstat_pos(country = "saturn",
+      fy = 3030, df_psnu = psnu_by_im,
+      geo_psnu = saturn_districts,
+      terr_path = path_to_terr)
 }
 
 }

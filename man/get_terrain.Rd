@@ -7,18 +7,18 @@
 get_terrain(
   countries = list("Zambia"),
   mask = FALSE,
-  buffer = 0.2,
-  terr_path = NULL
+  buffer = 0.1,
+  terr = NULL
 )
 }
 \arguments{
-\item{countries}{list of the country names}
+\item{countries}{List of the country names or sf object}
 
-\item{mask}{should the extracted data match the exact boundary limits?}
+\item{mask}{Should the extracted data match the exact boundary limits?}
 
-\item{buffer}{extend AOI extent by x}
+\item{buffer}{Extend AOI extent by x}
 
-\item{terr_path}{path to terrain raster file}
+\item{terr}{RasterLayer or Path to terrain raster file}
 }
 \value{
 spdf spatial dataframe
@@ -30,6 +30,6 @@ Get terrain data for an AOI (Countries)
 \dontrun{
 get_terrain(countries = list("Zambia"))
 get_terrain(countries = list("Zambia"), mask = TRUE)
-get_terrain(countries = list("Zambia"), buffer = .5, terr_path = "../../HDX_Data")
+get_terrain(countries = list("Zambia"), buffer = .5, terr = "../../HDX_Data")
 }
 }

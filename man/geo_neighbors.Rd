@@ -4,14 +4,16 @@
 \alias{geo_neighbors}
 \title{Get neighbors of a given contry}
 \usage{
-geo_neighbors(countries, scale = "large", crs = 4326)
+geo_neighbors(countries, scale = "large", crs = 4326, crop = FALSE)
 }
 \arguments{
-\item{countries}{a list of country names}
+\item{countries}{Country or list of countries names}
 
-\item{scale}{spatial resolution of the geodata}
+\item{scale}{Spatial resolution of the geodata}
 
-\item{crs}{coordinates reference system}
+\item{crs}{Coordinates reference system, default is WGS84 (EPGS:4326)}
+
+\item{crop}{Crop sfc to focus countries extent?}
 }
 \value{
 simple feature class

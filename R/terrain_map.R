@@ -93,14 +93,14 @@ terrain_map <-
 #' @title Get Terrain Raster dataset
 #'
 #' @param terr_path path to terrain raster file
-#' @param name Name of the raster file (.tif)
+#' @param name Name of the raster file
 #'
 #' @return RasterLayer
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' get_raster(terr_path = glamr::si_path("path_raster))
+#' get_raster(terr_path = glamr::si_path("path_raster"))
 #' }
 #'
 get_raster <-

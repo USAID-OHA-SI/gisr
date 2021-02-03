@@ -1,5 +1,7 @@
 #' @title Standard SI Style for Thematic Maps
 #'
+#' @param ... Any other ggplot theme arguments
+#'
 #' @description This style borrows from Timo Grossenbacher's thematic maps to match OHA/SIEI Viz Products
 #' @export
 #' @examples

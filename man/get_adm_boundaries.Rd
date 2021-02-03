@@ -11,9 +11,9 @@ get_adm_boundaries(country_code, adm_level = 0, download = TRUE, geo_path = "")
 
 \item{adm_level}{country administrative boundaries level}
 
-\item{geo_path}{where to save / read data from}
+\item{download}{Save a copy}
 
-\item{dowload}{Save a copy}
+\item{geo_path}{where to save / read data from}
 }
 \value{
 geodata as sf with crs = 4326

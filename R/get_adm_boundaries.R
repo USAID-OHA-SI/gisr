@@ -4,10 +4,11 @@
 #' for specified country and administractive boundary levels
 #'
 #' @param country_code ISO3 code
-#' @param adm_level country administrative boundaries level
-#' @param dowload Save a copy
-#' @param geo_path where to save / read data from
-#' @return geodata as sf with crs = 4326
+#' @param adm_level    country administrative boundaries level
+#' @param download     Save a copy
+#' @param geo_path     where to save / read data from
+#'
+#' @return             geodata as sf with crs = 4326
 #' @export
 #' @examples
 #' \dontrun{
@@ -16,9 +17,9 @@
 #' }
 #'
 get_adm_boundaries <- function(country_code,
-                               adm_level=0,
-                               download=TRUE,
-                               geo_path="") {
+                               adm_level = 0,
+                               download = TRUE,
+                               geo_path = "") {
 
 
     # Extract data from GADM

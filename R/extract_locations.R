@@ -1,6 +1,8 @@
 #' Extract location data
 #'
-#' @param country PEPFAR Operating Unit or Regional Countries
+#' @param country  PEPFAR Operating Unit or Regional Countries
+#' @param level    PEPFAR Org Level
+#' @param add_geom Include geometry column
 #' @param username Datim Account Username
 #' @param password Datim Account Key
 #' @export

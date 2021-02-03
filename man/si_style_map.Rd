@@ -6,6 +6,9 @@
 \usage{
 si_style_map(...)
 }
+\arguments{
+\item{...}{Any other ggplot theme arguments}
+}
 \description{
 This style borrows from Timo Grossenbacher's thematic maps to match OHA/SIEI Viz Products
 }

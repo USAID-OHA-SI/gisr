@@ -11,7 +11,9 @@
 #' spdist_ovc_hivstat_pos(country = "saturn", fy = 3030,
 #'     df_psnu = psnu_by_im, geo_psnu = saturn_districts)
 #' spdist_ovc_hivstat_pos(country = "saturn", fy = 3030,
-#'     df_psnu = psnu_by_im, geo_psnu = saturn_districts, terr_path = path_to_terr)
+#'     df_psnu = psnu_by_im,
+#'     geo_psnu = saturn_districts,
+#'     terr_path = path_to_terr)
 #' }
 #'
 spdist_ovc_hivstat_pos <- function(country, fy, df_psnu, geo_psnu, terr_path = NULL) {
@@ -102,8 +104,14 @@ spdist_ovc_hivstat_pos <- function(country, fy, df_psnu, geo_psnu, terr_path = N
 #' @export
 #' @examples
 #' \dontrun{
-#' spdist_ovc_hivstat_pos(country = "saturn", fy = 3030, df_psnu = psnu_by_im, geo_psnu = saturn_districts)
-#' spdist_ovc_hivstat_pos(country = "saturn", fy = 3030, df_psnu = psnu_by_im, geo_psnu = saturn_districts, terr_path = path_to_terr)
+#' spdist_ovc_hivstat_pos(country = "saturn",
+#'       fy = 3030,
+#'       df_psnu = psnu_by_im,
+#'       geo_psnu = saturn_districts)
+#' spdist_ovc_hivstat_pos(country = "saturn",
+#'       fy = 3030, df_psnu = psnu_by_im,
+#'       geo_psnu = saturn_districts,
+#'       terr_path = path_to_terr)
 #' }
 #'
 spdist_ovc_tx_curr <- function(country, fy, df_psnu, geo_psnu, terr_path = NULL) {

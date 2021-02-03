@@ -9,22 +9,25 @@ terrain_map(
   adm0 = NULL,
   adm1 = NULL,
   add_neighbors = FALSE,
-  terr_path = NULL,
-  mask = FALSE
+  add_labels = FALSE,
+  mask = FALSE,
+  terr = NULL
 )
 }
 \arguments{
-\item{countries}{list of countries to map}
+\item{countries}{List of countries to map}
 
 \item{adm0}{Admin 0 boundaries, optional sf geodata}
 
 \item{adm1}{Admin 1 boundaries, optional sf geodata}
 
-\item{add_neighbors}{should the map include the neighbor countries}
+\item{add_neighbors}{Should the map include the neighbor countries}
 
-\item{terr_path}{path for terrain raster file}
+\item{add_labels}{Add neighbors countries's names (works only when add_neighbors is TRUE)}
 
-\item{mask}{should the extracted data match the exact boundary limits?}
+\item{mask}{Should the extracted data match the exact boundary limits?}
+
+\item{terr}{RasterLayer dataset or Path for terrain raster file}
 }
 \value{
 
