@@ -4,18 +4,18 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' geo_viz(sf_data)
+#' gview(sf_data)
 #' }
 #'
-geo_viz <- function(geodata) {
+gview <- function(geodata) {
 
     viz <- geodata %>%
         ggplot2::ggplot() +
-        ggplot2::geom_sf(fill=NA, lwd=.3, color="#BCBEC0") +
+        ggplot2::geom_sf(fill = NA, lwd = .3, color = "#6c6463") +
         ggplot2::coord_sf() +
         ggplot2::theme_void()
 
-    print(viz)
+    base::print(viz)
 
     return(viz)
 }
@@ -40,7 +40,7 @@ geo_viz <- function(geodata) {
 geo_neighbors <- function(countries,
                           scale = "large",
                           crs = 4326,
-                          crop = TRUE) {
+                          crop = FALSE) {
 
     # Get the world boundaries
     world <- rnaturalearth::ne_countries(scale = {{scale}},

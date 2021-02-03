@@ -21,75 +21,82 @@
     )
 
 
+# Datasets
 
-cntry <- "Zambia"
+  # Country boundaries
+  adm0 <- gisr::get_admin0(cntry)
+  adm1 <- gisr::get_admin1(cntry)
 
-z_adm0 <- gisr::get_admin0(cntry)
-z_nghbrs <- geo_neighbors(cntry, crop = TRUE)
+  # Neighbors
+  nghbrs <- geo_neighbors(cntry)
 
-z_nghbrs2 %>% glimpse()
+  nghbrs2 <- geo_neighbors(cntry, crop = TRUE)
 
-z_adm0 %>% geo_viz()
+  # RasterLayer
+  ras <- gisr::get_raster(terr_path = glamr::si_path("path_raster"))
 
-z_nghbrs %>% geo_viz()
+  # Get country extent & buffer by 50km
 
-box <- st_bbox(z_adm0) %>%
-  st_as_sfc() %>%
-  st_buffer(dist = 1,
-            endCapStyle = "SQUARE",
-            joinStyle = "MITRE",
-            mitreLimit = 2) %>%
-  st_as_sf()
+  box <- adm0 %>%
+    st_bbox() %>%
+    st_as_sfc() %>%
+    st_transform(crs = 3857) %>%
+    st_buffer(dist = 50000,
+              endCapStyle = "SQUARE",
+              joinStyle = "MITRE",
+              mitreLimit = 2) %>%
+    st_as_sf()
 
-z_nghbrs2 <- z_nghbrs %>%
-  st_crop(box)
+  # Crop neighors by country extent
+  nghbrs2 <- nghbrs %>%
+    st_transform(crs = 3857) %>%
+    st_crop(box) %>%
+    st_transform(crs = 4326)
 
-z_nghbrs2 %>%
-  geo_viz() +
-  geom_sf_text(data = z_nghbrs2, aes(label = sovereignt))
+# VIZ ----
 
+  # View admins
 
-box %>% geo_viz()
+  adm0 %>% gview()
 
-box %>%
-  geo_viz() +
-  geom_sf(data = z_adm0, fill = NA)
+  adm1 %>% gview()
 
+  nghbrs2 %>% gview()
 
-# Raster
-
-ras <- get_raster()
-
-class(ras)
-
-
-## Base map
-
-terrain_map("Zambia",
-            terr = si_path("path_raster"))
-
-terrain_map("Zambia",
-            mask = TRUE,
-            terr = ras)
-
-terrain_map("Zambia",
-            mask = TRUE,
-            terr = si_path("path_raster"))
+  # Add neighbor countries
+  adm1 %>%
+    gview() +
+    geom_sf(data = nghbrs2, fill = glitr::grey10k, lwd = .2, color = "white") +
+    geom_sf(data = adm0, fill = NA, size = 2, color = "white") +
+    geom_sf(data = adm0, fill = NA, size = .6, color = glitr::grey70k) +
+    geom_sf_text(data = nghbrs2,
+                 aes(label = sovereignt),
+                 color = glitr::grey80k,
+                 size = 3)
 
 
-terrain_map("Zambia",
-            add_neighbors = TRUE,
-            terr = si_path("path_raster"))
+  # Take advantage of terrain data
+  terrain_map(countries = cntry,
+              terr = si_path("path_raster"))
+
+  # Mask terrain behind country boundaries
+  terrain_map(countries = cntry,
+              mask = TRUE,
+              terr = si_path("path_raster"))
+
+  # Mask terrain and provide your own rasterlayer
+  terrain_map(countries = cntry,
+              mask = TRUE,
+              terr = ras)
+
+  # Provide your own polygons and rasterlayer
+  terrain_map(countries = NULL,
+              adm0 = adm0,
+              adm1 = adm1,
+              mask = TRUE,
+              terr = ras)
 
 
-terrain_map("Zambia",
-            add_neighbors = TRUE,
-            terr = ras)
-
-terrain_map("Zambia",
-            add_neighbors = TRUE,
-            add_labels = TRUE,
-            terr = ras)
 
 
 
