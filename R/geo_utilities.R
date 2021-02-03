@@ -21,29 +21,31 @@ geo_viz <- function(geodata) {
 }
 
 
-#' Get neighbors of a given contry
+#' @title Get neighbors of a given contry
 #'
-#' @param countries a list of country names
-#' @param scale spatial resolution of the geodata
-#' @param crs coordinates reference system
-#' @return simple feature class
+#' @param countries  Country or list of countries names
+#' @param scale      Spatial resolution of the geodata
+#' @param crs        Coordinates reference system, default is WGS84 (EPGS:4326)
+#' @param crop       Crop sfc to focus countries extent?
+#'
+#' @return           simple feature class
 #' @export
+#'
 #' @examples
 #' \dontrun{
 #' geo_neighors(countries = list("Zambia"))
 #' geo_neighors(countries = list("Zambia", "Malawi"))
 #' }
 #'
-geo_neighbors <- function(countries, scale = "large", crs = 4326) {
+geo_neighbors <- function(countries,
+                          scale = "large",
+                          crs = 4326,
+                          crop = TRUE) {
 
     # Get the world boundaries
-    world <- rnaturalearth::ne_countries(scale = {{scale}}, returnclass = "sf") %>%
+    world <- rnaturalearth::ne_countries(scale = {{scale}},
+                                         returnclass = "sf") %>%
         sf::st_transform(., crs = sf::st_crs({{crs}}))
-
-    #stopifnot({{country}} %in% world$sovereignt)
-    # if(!{{countries}} %in% world$sovereignt) {
-    #   stop('Country name is not the Natural Earth reference dataset. Please enter a name from dataset.')
-    # }
 
     # Get focus country(ies)
     focus_country <-  world %>%
@@ -51,7 +53,27 @@ geo_neighbors <- function(countries, scale = "large", crs = 4326) {
 
     # Filter based on neighbors touched by polygons of interest
     neighbors <- world %>%
-        dplyr::filter(lengths(sf::st_touches(., focus_country)) > 0)
+        dplyr::filter(base::lengths(sf::st_touches(., focus_country)) > 0)
+
+
+    # Crop specific extend of focus countries
+    if (crop == TRUE) {
+        # Focus country extent
+        box <- sf::st_bbox(focus_country) %>%
+            sf::st_as_sfc() %>%
+            sf::st_buffer(
+                dist = 1,
+                endCapStyle = "SQUARE",
+                joinStyle = "MITRE",
+                mitreLimit = 2) %>%
+            sf::st_as_sf()
+
+        print(box)
+
+        # Crop neighbors to extent
+        neighbors <- neighbors %>%
+            sf::st_crop(box)
+    }
 
     return(neighbors)
 }
@@ -69,9 +91,11 @@ geo_neighbors <- function(countries, scale = "large", crs = 4326) {
 #' get_admin0(counties = list("Zambia"))
 #' }
 #'
-get_admin0 <- function(countries, scale = "medium", crs = 4326)  {
+get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 
-    admin0 <- rnaturalearth::ne_countries(country = {{countries}}, scale = {{scale}}, returnclass = "sf") %>%
+    admin0 <- rnaturalearth::ne_countries(country = {{countries}},
+                                          scale = {{scale}},
+                                          returnclass = "sf") %>%
         sf::st_transform(., crs = sf::st_crs({{crs}}))
 
     # admin0 <- rnaturalearth::ne_countries(scale = {{scale}}, returnclass = "sf") %>%
@@ -105,51 +129,89 @@ get_admin1 <- function(countries, scale = "medium", crs = 4326) {
 
 #' Get terrain data for an AOI (Countries)
 #'
-#' @param countries list of the country names
-#' @param mask should the extracted data match the exact boundary limits?
-#' @param buffer extend AOI extent by x
-#' @param terr_path path to terrain raster file
-#' @return spdf spatial dataframe
+#' @param countries  List of the country names or sf object
+#' @param mask       Should the extracted data match the exact boundary limits?
+#' @param buffer     Extend AOI extent by x
+#' @param terr       RasterLayer or Path to terrain raster file
+#'
+#' @return           spdf spatial dataframe
 #' @export
+#'
 #' @examples
 #' \dontrun{
 #' get_terrain(countries = list("Zambia"))
 #' get_terrain(countries = list("Zambia"), mask = TRUE)
-#' get_terrain(countries = list("Zambia"), buffer = .5, terr_path = "../../HDX_Data")
+#' get_terrain(countries = list("Zambia"), buffer = .5, terr = "../../HDX_Data")
 #' }
 get_terrain <- function(countries = list("Zambia"),
                         mask = FALSE,
-                        buffer = .2,
-                        terr_path = NULL) {
+                        buffer = .1,
+                        terr = NULL) {
 
+    # Params
+    cntries <- {{countries}}
+
+    # SFC Object
+    aoi <- NULL
+
+    # Get country boundaries
+    if ( "sf" %in% base::class(cntries) ) {
+        aoi <- cntries
+    }
+    else {
+        aoi <- get_admin0(countries = cntries)
+    }
+
+    # Raster Data
     # DEM File location
     dem_url <- "https://drive.google.com/drive/u/0/folders/1M02ToX9AnkozOHtooxU7s4tCnOZBTvm_"
 
+    terr_ras <- NULL
+
     # Locate and retrieve terrain file
-    if ( is.null(terr_path) )
-        terr_path = "./GIS/"
+    if ( is.null(terr) ) {
+        terr = "./GIS/"
+    }
 
-    terr_file <- list.files(terr_path, pattern = "SR_LR.tif$", recursive = TRUE, full.names = TRUE)
+    # Use user provided rasterlayer
+    if ( !is.null(terr) & "RasterLayer" %in% base::class(terr)) {
+        terr_ras <- terr
+    }
 
-    if ( length(terr_file) < 1 )
-        stop(paste0("Could not find a TIFF file in: ", terr_path, "\nDownload file from: ", dem_url))
+    # Read raster from local or special location
+    if ( is.null(terr_ras) ) {
 
-    #TODO: Facilitate a download from google drive
-    #drive_download(dem_url)
+        # file path
+        terr_file <- base::list.files(
+            terr,
+            pattern = "SR_LR.tif$",
+            recursive = TRUE,
+            full.names = TRUE
+        )
 
-    # Get country boundaries
-    cntry <- get_admin0(countries = {{countries}})
+        if ( length(terr_file) < 1 )
+            stop(base::paste0("Could not find a TIFF file in: ",
+                              terr, "\nDownload file from: ",
+                              dem_url))
 
-    # Read raster file and crop it to boundaries extent
-    terr <- raster::raster(terr_file) %>%
-        raster::crop(raster::extend(raster::extent(cntry), {{buffer}}))
+        #TODO: Facilitate a download from google drive
+        #drive_download(dem_url)
+
+        # Read raster file
+        terr_ras <- raster::raster(terr_file) %>%
+            raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
+    }
+
+    # Crop raster to boundaries extent
+    terr_ras <- terr_ras %>%
+        raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
 
     # Crop to the exact limits if applicable
-    if ( isTRUE(mask) )
-        terr <- terr %>% raster::mask(cntry)
+    if ( mask == TRUE )
+        terr_ras <- terr_ras %>% raster::mask(aoi)
 
     # Convert raster data into a spatial data frame
-    spdf <- terr %>%
+    spdf <- terr_ras %>%
         as("SpatialPixelsDataFrame") %>%
         as.data.frame() %>%
         dplyr::rename(value = SR_LR)
