@@ -30,9 +30,9 @@ Imports:
     rgeos,
     rnaturalearth,
     rnaturalearthdata,
-    ggplot2
+    ggplot2,
+    patchwork
 Remotes:
     USAID-OHA-SI/Wavelength,
-    USAID-OHA-SI/glitr,
-    thomasp85/patchwork
+    USAID-OHA-SI/glitr
 RoxygenNote: 7.1.1
