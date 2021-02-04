@@ -27,12 +27,13 @@ terrain_map <-
     # Country name(s)
     cntries <- {{countries}}
 
-    # Country boundaries: Get from NE or provide sf objects
-    if (!is.null(adm0) & !is.null(adm1)) {
+    # Country boundaries:
+    # 1) Get from NE
+    if (!is.null(adm0) | !is.null(adm1)) {
         admin0 <- adm0
         admin1 <- adm1
     }
-    else {
+    else {#2) Provide sf objects
         admin0 <- get_admin0(cntries)
         admin1 <- get_admin1(cntries)
     }
@@ -40,6 +41,17 @@ terrain_map <-
     # Get neighbors id needed
     nghbrs <- NULL
 
+    # Validate options
+    if (TRUE == {{add_neighbors}} & is.null(cntries)) {
+        base::cat(
+            crayon::red(
+                base::paste0("\ncountry(ies) is required when",
+                             " adding neighbors\n")))
+
+        return(NULL)
+    }
+
+    # Get neighors
     if ( TRUE == {{add_neighbors}} & !is.null(cntries) ) {
 
         # Get neighbors
@@ -53,27 +65,55 @@ terrain_map <-
                         mask = {{mask}},
                         terr = {{terr}})
 
+    # check
+    if (base::is.null(spdf)) {
+        base::cat(
+            crayon::red(
+                base::paste0("\nCould not extract terrain data.",
+                             " Your AOI may be invalid.\n")))
+
+        return(NULL)
+    }
+
+
     # Plot the map
 
     # Get basemap
     p <- ggplot2::ggplot() +
-        ggplot2::geom_tile(data = dplyr::filter(spdf, value < 210), ggplot2::aes(x = x, y = y, alpha = value)) +
+        ggplot2::geom_tile(data = dplyr::filter(spdf, value < 210),
+                           ggplot2::aes(x = x, y = y, alpha = value)) +
         ggplot2::scale_alpha(name = "", range = c(0.6, 0), guide = F)
 
     # Add neighbors
     if ( !is.null(nghbrs) )
         p <- p +
-            ggplot2::geom_sf(data = nghbrs, fill = "#d9d9d9", alpha = 0.35, size = 0.25, colour = glitr::grey70k)
+            ggplot2::geom_sf(data = nghbrs,
+                             fill = "#d9d9d9",
+                             alpha = 0.35,
+                             size = 0.25,
+                             colour = glitr::grey70k)
 
     if ( !is.null(nghbrs) & add_labels == TRUE)
-        p <- p +
-            ggplot2::geom_sf_text(data = nghbrs, ggplot2::aes(label = sovereignt), family = "Source Sans Pro" )
+        p <- p + ggplot2::geom_sf_text(data = nghbrs,
+                                       ggplot2::aes(label = sovereignt),
+                                       family = "Source Sans Pro" )
 
-    # Add country and admin 1 layers
+    # Add country layers
     p <- p +
-        ggplot2::geom_sf(data = admin0, colour = "white", fill = "grey93", size = 2, alpha = 0.25) +
-        ggplot2::geom_sf(data = admin0, colour = "black", fill = "NA") +
-        ggplot2::geom_sf(data = admin1, fill = "NA", linetype = "dotted")
+        ggplot2::geom_sf(data = admin0,
+                         colour = "white",
+                         fill = "grey93",
+                         size = 2,
+                         alpha = 0.25) +
+        ggplot2::geom_sf(data = admin0,
+                         colour = "black",
+                         fill = "NA")
+
+    # Add admin 1 layer
+    if ( !is.null(admin1) )
+        p <- p + ggplot2::geom_sf(data = admin1,
+                                  fill = "NA",
+                                  linetype = "dotted")
 
     # Zoom to South Africa mainland
     if ("south africa" %in% stringr::str_to_lower(cntries))

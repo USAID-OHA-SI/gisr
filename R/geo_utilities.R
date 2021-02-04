@@ -143,16 +143,26 @@ get_admin1 <- function(countries, scale = "medium", crs = 4326) {
 #' get_terrain(countries = list("Zambia"), mask = TRUE)
 #' get_terrain(countries = list("Zambia"), buffer = .5, terr = "../../HDX_Data")
 #' }
-get_terrain <- function(countries = list("Zambia"),
-                        mask = FALSE,
-                        buffer = .1,
-                        terr = NULL) {
+get_terrain <-
+    function(countries = list("Zambia"),
+             mask = FALSE,
+             buffer = .1,
+             terr = NULL) {
 
     # Params
     cntries <- {{countries}}
 
     # SFC Object
     aoi <- NULL
+
+    if (base::is.null(cntries)) {
+        base::cat(
+            crayon::red(
+                base::paste0("\ncountry(ies) is required",
+                             " to extract Terrain RasterLayer\n")))
+
+        return(NULL)
+    }
 
     # Get country boundaries
     if ( "sf" %in% base::class(cntries) ) {
@@ -190,12 +200,9 @@ get_terrain <- function(countries = list("Zambia"),
         )
 
         if ( length(terr_file) < 1 )
-            stop(base::paste0("Could not find a TIFF file in: ",
+            base::stop(base::paste0("Could not find a TIFF file in: ",
                               terr, "\nDownload file from: ",
                               dem_url))
-
-        #TODO: Facilitate a download from google drive
-        #drive_download(dem_url)
 
         # Read raster file
         terr_ras <- raster::raster(terr_file) %>%

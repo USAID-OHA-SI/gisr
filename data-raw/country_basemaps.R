@@ -7,7 +7,9 @@
 # Libraries ----
 
   library(tidyverse)
+  library(glamr)
   library(gisr)
+  library(sf)
 
 # Variables ----
 
@@ -90,9 +92,28 @@
               terr = ras)
 
   # Provide your own polygons and rasterlayer
-  terrain_map(countries = NULL,
+  # TODO: re-test this
+  terrain_map(countries = cntry,
               adm0 = adm0,
-              adm1 = adm1,
+              #adm1 = adm1,
+              mask = TRUE,
+              terr = ras)
+
+  # Add neighbor countries
+  terrain_map(countries = cntry,
+              add_neighbors = TRUE,
+              mask = TRUE,
+              terr = ras)
+
+  terrain_map(countries = cntry,
+              add_neighbors = TRUE,
+              mask = FALSE,
+              terr = ras)
+
+  # Add neighbor countries with La
+  terrain_map(countries = cntry,
+              add_neighbors = TRUE,
+              add_labels = TRUE,
               mask = TRUE,
               terr = ras)
 
