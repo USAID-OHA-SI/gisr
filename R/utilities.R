@@ -43,7 +43,7 @@ get_orguids <-
   }
 
 
-#' @title Get OU Org UIDS
+#' @title Get OU Orgs by level
 #' @note  Use `get_orguids()` for levels above 4
 #'
 #' @param ouuid    OU uid
@@ -57,9 +57,9 @@ get_orguids <-
 #'
 #' @examples
 #' \dontrun{
-#'  orgs <- get_ouorguids(ouuid = "<ou-uid-goes-here>", level = 4)}
+#'  orgs <- get_ouorgs(ouuid = "<ou-uid-goes-here>", level = 4)}
 #'
-get_ouorguids <-
+get_ouorgs <-
   function(ouuid,
            level = 4,
            username = NULL,
@@ -81,7 +81,8 @@ get_ouorguids <-
     orgs <- baseurl %>%
       paste0("api/organisationUnits",
              "?filter=level:eq:", lvl,
-             "&filter=path:like:", uid) %>%
+             "&filter=path:like:", uid,
+             "&paging=false&format=json") %>%
       httr::GET(httr::authenticate(user, pass)) %>%
       httr::content("text") %>%
       jsonlite::fromJSON(flatten = TRUE) %>%
@@ -304,7 +305,7 @@ get_ouorglevel <-
   }
 
 
-#' Get Org level uids
+#' Get Orgs uids by level
 #'
 #' @param ouuid        Operatingunit uid
 #' @param level        Orgunit level
@@ -316,10 +317,10 @@ get_ouorglevel <-
 #'
 #' @examples
 #' \dontrun{
-#' get_ouleveluids("<ou-uid-goes-here>", level = 4)
+#' get_ouorgsuids("<ou-uid-goes-here>", level = 4)
 #' }
 #'
-get_ouleveluids <-
+get_ouorguids <-
   function(ouuid, level,
            username = NULL,
            password = NULL) {
@@ -338,7 +339,7 @@ get_ouleveluids <-
                          {{password}})
 
     # Query orgunits
-    lvl_uids <- get_ouorguids(ouuid = uid,
+    lvl_uids <- get_ouorgs(ouuid = uid,
                              level = lvl,
                              username = user,
                              password = pass) %>% pull(uid)
