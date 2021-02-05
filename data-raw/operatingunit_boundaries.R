@@ -21,15 +21,34 @@ library(sf)
       recursive = TRUE
     )
 
+  # Ou folder
+  dir_ou_bndries <- paste0(si_path("path_vector"), "/OU-Boundaries")
 
-# Functions
+  if (!dir.exists(dir_ou_bndries))
+    dir.create(dir_ou_bndries)
+
+  # psnu folder
+  dir_psnu_bndries <- paste0(si_path("path_vector"), "/OU-Prioritizations")
+
+  if (!dir.exists(dir_psnu_bndries))
+    dir.create(dir_psnu_bndries)
+
+  # communities folder
+  dir_comm_bndries <- paste0(si_path("path_vector"), "/OU-Communities")
+
+  if (!dir.exists(dir_comm_bndries))
+    dir.create(dir_comm_bndries)
+
+# Functions ----
 
   #' Extract boundaries
   extract_boundaries <-
     function(spdf, country,
              level = 3,
              username = NULL,
-             password = NULL) {
+             password = NULL,
+             export = FALSE,
+             name = NULL) {
 
     # Params
     cntry <- {{country}}
@@ -57,6 +76,15 @@ library(sf)
     spdf <- spdf %>%
       left_join(orgs, by = "uid") %>%
       filter(!is.na(orgunit))
+
+    # Export
+    if (export == TRUE & !is.null(name)) {
+
+      sf::st_write(spdf,
+                   delete_dsn = TRUE,
+                   dsn = paste0(name, ".shp"))
+
+    }
 
     return(spdf)
   }
@@ -130,11 +158,16 @@ library(sf)
 
   spdf_comm %>% gview()
 
-  # Extract all levels
-  extract_boundaries(spdf = pepfar_polygons,
-                     country = cntry,
-                     level = 3) %>% gview()
+  # Extract boundaries for all ou levels
+  # OU all
+  extract_boundaries(
+      spdf = pepfar_polygons,
+      country = cntry,
+      level = 3
+    ) %>%
+    gview()
 
+  # all
   levels %>%
     pivot_longer(cols = country:last_col(),
                  names_to = "level",
@@ -145,5 +178,48 @@ library(sf)
     map(.x, .f = ~ extract_boundaries(spdf = pepfar_polygons,
                                       country = cntry,
                                       level = .x))
+
+
+  # Export all OU Boundaries
+
+  ous <- get_levels(
+      username = glamr::datim_user(),
+      password = glamr::datim_pwd()) %>%
+    distinct(operatingunit) %>%
+    pull(operatingunit)
+
+  ous %>%
+    map(.x, .f = ~ extract_boundaries(spdf = pepfar_polygons,
+                                      country = .x,
+                                      level = 3,
+                                      export = TRUE,
+                                      name = file.path(
+                                        si_path("path_vector"),
+                                        dir_ou_bndries,
+                                        str_replace_all(.x, " ", "_") %>%
+                                          str_to_lower())))
+
+  # Export all psnu Boundaries - exclude Regional OUs
+  ous2 <- ous %>%
+    str_subset(pattern = " Region$",
+               negate = TRUE)
+
+  psnu_levels <- ous2 %>%
+    map(.x, .f = ~get_ouorglevel(
+      operatingunit = .x,
+      org_type = "prioritization")) %>%
+    unlist()
+
+    map2(ous2, psnu_levels, .x, .y,
+         .f = ~ extract_boundaries(spdf = pepfar_polygons,
+                                    country = .x,
+                                    level = .y,
+                                    export = TRUE,
+                                    name = file.path(
+                                      si_path("path_vector"),
+                                      dir_psnu_bndries,
+                                      paste0(str_replace_all(.x, " ", "_") %>%
+                                             str_to_lower(), "_psnu"))))
+
 
 
