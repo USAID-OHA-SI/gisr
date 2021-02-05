@@ -191,6 +191,7 @@ get_ouuid <-
 #' @param password DATIM password, recommend using `datim_pwd()`
 #' @param baseurl base API url, default = https://final.datim.org/
 #'
+#' @return df
 #' @export
 #'
 #' @examples

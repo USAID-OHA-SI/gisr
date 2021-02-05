@@ -10,6 +10,7 @@ library(tidyverse)
 library(glamr)
 library(gisr)
 library(sf)
+library(zip)
 
 # Variables ----
 
@@ -50,44 +51,74 @@ library(sf)
              export = FALSE,
              name = NULL) {
 
-    # Params
-    cntry <- {{country}}
+      # Params
+      cntry <- {{country}}
 
-    lvl <- {{level}}
+      lvl <- {{level}}
 
-    user <- base::ifelse(base::is.null(username),
-                         glamr::datim_user(),
-                         {{username}})
+      user <- base::ifelse(base::is.null(username),
+                           glamr::datim_user(),
+                           {{username}})
 
-    pass <- base::ifelse(base::is.null(password),
-                         glamr::datim_pwd(),
-                         {{password}})
+      pass <- base::ifelse(base::is.null(password),
+                           glamr::datim_pwd(),
+                           {{password}})
 
-    #ou uid
-    uid <- get_ouuid(operatingunit = cntry,
-                     username = user, password = pass)
+      #ou uid
+      uid <- get_ouuid(operatingunit = cntry,
+                       username = user, password = pass)
 
-    # list of orgs at the specified level
-    orgs <- get_ouorgs(ouuid = uid, level = lvl,
-                       username = user, password = pass) %>%
-      mutate(org_level = lvl)
+      # list of orgs at the specified level
+      orgs <- get_ouorgs(ouuid = uid, level = lvl,
+                         username = user, password = pass) %>%
+        mutate(org_level = lvl)
 
-    # filter sp df
-    spdf <- spdf %>%
-      left_join(orgs, by = "uid") %>%
-      filter(!is.na(orgunit))
+      # filter sp df
+      spdf <- spdf %>%
+        left_join(orgs, by = "uid") %>%
+        filter(!is.na(orgunit))
 
-    # Export
-    if (export == TRUE & !is.null(name)) {
+      # Export
+      if (export == TRUE & !is.null(name)) {
 
-      sf::st_write(spdf,
-                   delete_dsn = TRUE,
-                   dsn = paste0(name, ".shp"))
+        sf::st_write(spdf,
+                     delete_dsn = TRUE,
+                     dsn = paste0(name, ".shp"))
+
+      }
+
+      return(spdf)
+    }
+
+  #' @title Zip shapefile
+  #'
+  #' @param filename    Shapefile full name
+  #' @param dest_folder Where to place the zipped files
+  #'
+  zip_shapefiles <-
+    function(filename,
+             dest_folder = NULL) {
+
+      # File pattern
+      fileparts <- base::basename(filename) %>% stringr::str_remove(".shp")
+
+      # Where to place the zipped file
+      if (is.null(dest_folder)) {
+        dest_folder <- filename %>% stringr::str_remove(basename(.))
+      }
+
+      # Files to be zipped
+      zipfiles <- base::dir(path = dest_folder,
+                            pattern = fileparts,
+                            full.names = TRUE)
+
+      # Zip files
+      zip::zip(zipfile = file.path(dest_folder, paste0(fileparts, ".zip")),
+               files = zipfiles,
+               mode = "cherry-pick")
 
     }
 
-    return(spdf)
-  }
 
 # Data ----
 
@@ -222,4 +253,16 @@ library(sf)
                                              str_to_lower(), "_psnu"))))
 
 
+    # Zip shapefiles
 
+    # OU Boundaries
+    dir(path = dir_ou_bndries,
+        pattern = ".shp",
+        full.names = TRUE) %>%
+      map(.x, .f = ~ zip_shapefiles(filename = .x))
+
+    # PSNU Boundaries
+    dir(path = dir_psnu_bndries,
+        pattern = ".shp",
+        full.names = TRUE) %>%
+      map(.x, .f = ~ zip_shapefiles(filename = .x))

@@ -2,38 +2,28 @@
 % Please edit documentation in R/utilities.R
 \name{get_ouorguids}
 \alias{get_ouorguids}
-\title{Get OU Org UIDS}
+\title{Get Orgs uids by level}
 \usage{
-get_ouorguids(
-  ouuid,
-  level = 4,
-  username = NULL,
-  password = NULL,
-  baseurl = "https://final.datim.org/"
-)
+get_ouorguids(ouuid, level, username = NULL, password = NULL)
 }
 \arguments{
-\item{ouuid}{OU uid}
+\item{ouuid}{Operatingunit uid}
 
-\item{level}{org level}
+\item{level}{Orgunit level}
 
-\item{username}{DATIM Username}
+\item{username}{Datim Account username}
 
-\item{password}{DATIM password, recommend using `mypwd()`}
-
-\item{baseurl}{base url for the API, default = https://final.datim.org/}
+\item{password}{Datim Account Password}
 }
 \value{
-ORG UIDS as tibble
+list of uids
 }
 \description{
-Get OU Org UIDS
-}
-\note{
-Use `get_orguids()` for levels above 4
+Get Orgs uids by level
 }
 \examples{
 \dontrun{
- orgs <- get_ouorguids(ouuid = "<ou-uid-goes-here>", level = 4)}
+get_ouorgsuids("<ou-uid-goes-here>", level = 4)
+}
 
 }

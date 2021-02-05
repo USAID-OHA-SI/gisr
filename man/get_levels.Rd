@@ -17,6 +17,9 @@ get_levels(
 
 \item{baseurl}{base API url, default = https://final.datim.org/}
 }
+\value{
+df
+}
 \description{
 Get all orgunits levels in org hierarchy
 }
