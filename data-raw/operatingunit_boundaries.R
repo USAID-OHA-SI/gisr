@@ -23,13 +23,25 @@ library(zip)
     )
 
   # Ou folder
+  dir_ou_global <- paste0(si_path("path_vector"), "/OU-Global")
+
+  if (!dir.exists(dir_ou_global))
+    dir.create(dir_ou_global)
+
+  # Ou folder
   dir_ou_bndries <- paste0(si_path("path_vector"), "/OU-Boundaries")
 
   if (!dir.exists(dir_ou_bndries))
     dir.create(dir_ou_bndries)
 
   # psnu folder
-  dir_psnu_bndries <- paste0(si_path("path_vector"), "/OU-Prioritizations")
+  dir_snu_bndries <- paste0(si_path("path_vector"), "/OU-SNUs")
+
+  if (!dir.exists(dir_snu_bndries))
+    dir.create(dir_snu_bndries)
+
+  # psnu folder
+  dir_psnu_bndries <- paste0(si_path("path_vector"), "/OU-PSNUs")
 
   if (!dir.exists(dir_psnu_bndries))
     dir.create(dir_psnu_bndries)
@@ -89,6 +101,28 @@ library(zip)
 
       return(spdf)
     }
+
+
+  #' @title Save shapefile
+  #'
+  #' @param spdf sf object
+  #' @param name filename with full path
+  #'
+  #' @return boolean
+  #'
+  export_spdf <- function(spdf, name) {
+
+    name <- ifelse(!str_detect(name, ".shp$"),
+                   paste0(name, ".shp"),
+                   name)
+
+    delete <- ifelse(file.exists(name), TRUE, FALSE)
+
+    sf::st_write(obj = spdf,
+                 dsn = name,
+                 delete_dsn = delete)
+
+  }
 
   #' @title Zip shapefile
   #'
@@ -154,6 +188,8 @@ library(zip)
   spdf_psnu <- pepfar_polygons %>%
     filter(uid %in% psnu_uids)
 
+  spdf_psnu %>% gview()
+
   # psnu boundaries: join & filter
   psnus <- get_ouorgs(
       ouuid = ouuid,
@@ -190,7 +226,8 @@ library(zip)
   spdf_comm %>% gview()
 
   # Extract boundaries for all ou levels
-  # OU all
+
+  # OU Only
   extract_boundaries(
       spdf = pepfar_polygons,
       country = cntry,
@@ -198,12 +235,12 @@ library(zip)
     ) %>%
     gview()
 
-  # all
+  # OU - all levels
   levels %>%
     pivot_longer(cols = country:last_col(),
                  names_to = "level",
                  values_to = "val") %>%
-    filter(level != "facility") %>%
+    filter(level != "facility") %>% #View()
     pull(val) %>%
     sort() %>%
     map(.x, .f = ~ extract_boundaries(spdf = pepfar_polygons,
@@ -215,10 +252,11 @@ library(zip)
 
   ous <- get_levels(
       username = glamr::datim_user(),
-      password = glamr::datim_pwd()) %>%
+      password = glamr::datim_pwd()) %>% View()
     distinct(operatingunit) %>%
     pull(operatingunit)
 
+  ## Save as individual shapefile
   ous %>%
     map(.x, .f = ~ extract_boundaries(spdf = pepfar_polygons,
                                       country = .x,
@@ -230,10 +268,47 @@ library(zip)
                                         str_replace_all(.x, " ", "_") %>%
                                           str_to_lower())))
 
+  ## Save as single shapefile
+  shp_ous <- ous %>%
+    map(.x, .f = ~ extract_boundaries(
+        spdf = pepfar_polygons,
+        country = .x,
+        level = 3
+      )) %>%
+    bind_rows()
+
+  shp_ous %>% gview()
+
+  shp_ous_name <- file.path(dir_ou_global, "pepfar_operatingunits.shp")
+
+  export_spdf(shp_ous, shp_ous_name)
+
+  zip_shapefiles(basename(shp_ous_name), dir_ou_global)
+
+
+  # Export Country Boundaries
+
+  countries <- glamr::get_outable(
+    username = glamr::datim_user(),
+    password = glamr::datim_pwd()) %>%
+    select(starts_with(c("oper", "coun")))
+
+  shp_cntries <- pepfar_polygons %>%
+    left_join(countries, by = c("uid" = "countryname_uid")) %>%
+    filter(!is.na(countryname))
+
+  shp_cntries %>% gview()
+
+  shp_cntries_name <- file.path(dir_ou_global, "pepfar_countries.shp")
+
+  export_spdf(shp_cntries, shp_cntries_name)
+
+  zip_shapefiles(basename(shp_cntries_name), dir_ou_global)
+
+
   # Export all psnu Boundaries - exclude Regional OUs
   ous2 <- ous %>%
-    str_subset(pattern = " Region$",
-               negate = TRUE)
+    str_subset(pattern = " Region$", negate = TRUE)
 
   psnu_levels <- ous2 %>%
     map(.x, .f = ~get_ouorglevel(
