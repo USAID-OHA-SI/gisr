@@ -1,6 +1,6 @@
 #' Extract location data
 #'
-#' @param country  PEPFAR Operating Unit or Regional Countries
+#' @param country  PEPFAR Operatingunit
 #' @param level    PEPFAR Org Level
 #' @param add_geom Include geometry column
 #' @param username Datim Account Username
@@ -63,12 +63,13 @@ extract_locations <-
             dplyr::filter(level == lvl)
     }
 
+    # Remove pages and format as json
     url <- url %>% base::paste0("&paging=false&format=json")
 
 
     # Check levels
     if (base::nrow(ou_levels) == 0) {
-        base::cat(crayon::red("\nNo records found!\n"))
+        base::cat(crayon::red("\nUnable to retrieve org levels for this country!\n"))
 
         return(NULL)
     }
@@ -98,7 +99,7 @@ extract_locations <-
             dplyr::relocate(coordinates, .after = last_col())
     }
 
-    # Flag org categories
+    # Flag org levels
     df <- df %>%
         dplyr::left_join(ou_levels, by = "level")
 
@@ -129,7 +130,8 @@ extract_locations <-
             countryname = dplyr::if_else(base::is.na(countryname), cntry, countryname),
             operatingunit_iso = dplyr::if_else(base::is.na(operatingunit_iso), iso, operatingunit_iso),
             countryname_iso = dplyr::if_else(base::is.na(countryname_iso), iso, countryname_iso),
-            label = dplyr::if_else(base::is.na(label) & level == 4, "snu1", label))
+            label = dplyr::if_else(base::is.na(label) & level == 4, "snu1", label),
+            label = dplyr::if_else(base::is.na(label) & level == 5, "snu2", label))
 
     return(df)
 }

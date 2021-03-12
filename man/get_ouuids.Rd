@@ -5,12 +5,15 @@
 \title{Get OU UIDS}
 \usage{
 get_ouuids(
+  add_details = FALSE,
   username = NULL,
   password = NULL,
   baseurl = "https://final.datim.org/"
 )
 }
 \arguments{
+\item{add_details}{Add countries for regional ou, default is false}
+
 \item{username}{DATIM Username, recommend using `datim_user()`}
 
 \item{password}{DATIM password, recommend using `datim_pwd()`}

@@ -13,7 +13,7 @@ extract_locations(
 )
 }
 \arguments{
-\item{country}{PEPFAR Operating Unit or Regional Countries}
+\item{country}{PEPFAR Operatingunit}
 
 \item{level}{PEPFAR Org Level}
 

@@ -1,3 +1,4 @@
+
 # gisr 0.2.0
 
 * Improvement to basemap functions: crop neighbor countries, add labels on demand

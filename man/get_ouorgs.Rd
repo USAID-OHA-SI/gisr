@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{get_ouorgs}
 \alias{get_ouorgs}
-\title{Get OU Orgs by level}
+\title{Get list of OU Orgs at specific level}
 \usage{
 get_ouorgs(
   ouuid,
@@ -27,7 +27,7 @@ get_ouorgs(
 ORG UIDS as tibble
 }
 \description{
-Get OU Orgs by level
+Get list of OU Orgs at specific level
 }
 \note{
 Use `get_orguids()` for levels above 4

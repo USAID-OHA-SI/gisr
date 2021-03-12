@@ -147,20 +147,16 @@ get_raster <-
     function(terr_path = "../../GEODATA/RASTER",
              name = "SR_LR.tif") {
 
-        # Params
-        dir_terr <- {{terr_path}}
-        file_name <- {{name}}
-
         # Check directory
-        if (!base::dir.exists(dir_terr))
+        if (!base::dir.exists(terr_path))
             stop(base::cat("\nInvalid terrain directory: ",
-                           crayon::red(dir_terr),
+                           crayon::red(terr_path),
                            "\n"))
 
         # Identify file path
         terr_file <- base::list.files(
-            path = dir_terr,
-            pattern = base::paste0(file_name, "$"),
+            path = terr_path,
+            pattern = base::paste0(name, "$"),
             recursive = TRUE,
             full.names = TRUE
         )

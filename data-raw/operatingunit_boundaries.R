@@ -2,6 +2,7 @@
 ## PURPOSE: Extract OperatingUnir boundaries from PEPFAR VcPolygons
 ## AUTHOR:  B.Kagniniwa | USAID
 ## DATE:    2021-02-04
+## UPDATED: 2021-03-12
 
 
 # Libraries ----
@@ -34,7 +35,7 @@ library(zip)
   if (!dir.exists(dir_ou_bndries))
     dir.create(dir_ou_bndries)
 
-  # psnu folder
+  # SNU folder
   dir_snu_bndries <- paste0(si_path("path_vector"), "/OU-SNUs")
 
   if (!dir.exists(dir_snu_bndries))
@@ -134,11 +135,11 @@ library(zip)
              dest_folder = NULL) {
 
       # File pattern
-      fileparts <- base::basename(filename) %>% stringr::str_remove(".shp")
+      fileparts <- base::basename(filename) %>% str_remove(".shp")
 
       # Where to place the zipped file
       if (is.null(dest_folder)) {
-        dest_folder <- filename %>% stringr::str_remove(basename(.))
+        dest_folder <- filename %>% str_remove(basename(.))
       }
 
       # Files to be zipped
@@ -156,34 +157,91 @@ library(zip)
 
 # Data ----
 
+  # Get OUs
+  ouuids <- get_ouuids()
+
   # Get OU UID
-  ouuid <- get_ouuid(operatingunit = cntry,
-                   username = glamr::datim_user(),
-                   password = glamr::datim_pwd())
+  ouuid <- get_ouuid(operatingunit = cntry)
 
 
-  #Levels
+  # Levels
   levels <- get_levels(username = datim_user(), password = datim_pwd()) %>%
     filter(operatingunit == cntry)
 
   levels$country
   levels$prioritization
+  #levels$snu1
   levels$community
   levels$facility
 
   # Geodata
   pepfar_polygons <- file_shp %>% read_sf()
 
-  pepfar_polygons %>% glimpse()
-
   # Operatingunit boundaries
-  spdf_ou <- pepfar_polygons %>%
-    filter(uid == ouuid)
+  spdf_ou <- pepfar_polygons %>% filter(uid == ouuid)
 
   spdf_ou %>% gview()
 
+
+  # SNU1
+  df_locs <- extract_locations(country = "Ethiopia", add_geom = FALSE) %>%
+    separate(path,
+             into = paste0("path", 0:max(.$level)),
+             sep = "/",
+             remove = FALSE) %>%
+    select(-path0) %>%
+    rename(
+      global_uid = path1,
+      region_uid = path2,
+      operatingunit_uid = path3) %>%
+    pivot_wider(names_from = label,
+                values_from = level)
+
+
+  #' Get OrgUnit Attributes
+  #'
+  get_attributes <- function(ou) {
+
+    print(ou)
+
+    locs <- extract_locations(country = ou, add_geom = FALSE)
+
+    labels <- locs %>%
+      distinct(label) %>%
+      pull()
+
+    # Use psnu as snu1
+    if (!"snu1" %in% labels) {
+      df_psnu <- locs %>%
+        filter(label == "prioritization") %>%
+        mutate(label = "snu1")
+
+      locs <- locs %>%
+        bind_rows(df_psnu)
+    }
+
+    # Filter out facilities and communities
+    locs <- locs %>%
+      select(-path) %>%
+      filter(!label %in% c("facility", "community"))
+
+    return(locs)
+  }
+
+  df_locss <- ouuids %>%
+    filter(!str_detect(operatingunit, " Region$")) %>%
+    pull(operatingunit) %>%
+    map_dfr(.x, .f = ~get_attributes(ou = .x))
+
+  df_locss %>% glimpse()
+  df_locss %>% view()
+
+
+
+
   # psnu boundaries: uid lookup
-  psnu_uids <- get_ouorguids(ouuid = ouuid, level = levels$prioritization)
+  psnu_uids <- get_ouorguids(ouuid = ouuid,
+                             level = levels$prioritization)
 
   spdf_psnu <- pepfar_polygons %>%
     filter(uid %in% psnu_uids)
@@ -195,7 +253,11 @@ library(zip)
       ouuid = ouuid,
       level = levels$prioritization
     ) %>%
-    mutate(org_type = "psnu", org_level = levels$prioritization)
+    mutate(ou = cntry,
+           org_type = "psnu",
+           org_level = levels$prioritization)
+
+  psnus %>% glimpse()
 
   spdf_psnu <- pepfar_polygons %>%
     left_join(psnus, by = "uid") %>%
@@ -205,7 +267,8 @@ library(zip)
 
 
   # communities boundaries: uid lookup
-  comm_uids <- get_ouorguids(ouuid = ouuid, level = levels$community)
+  comm_uids <- get_ouorguids(ouuid = ouuid,
+                             level = levels$community)
 
   spdf_comm <- pepfar_polygons %>%
     filter(uid %in% comm_uids)
@@ -217,7 +280,11 @@ library(zip)
       ouuid = ouuid,
       level = levels$community
     ) %>%
-    mutate(org_type = "community", org_level = levels$community)
+    mutate(ou = cntry,
+           org_type = "community",
+           org_level = levels$community)
+
+  spdf_comm %>% glimpse()
 
   spdf_comm <- pepfar_polygons %>%
     left_join(comms, by = "uid") %>%
@@ -239,9 +306,9 @@ library(zip)
   levels %>%
     pivot_longer(cols = country:last_col(),
                  names_to = "level",
-                 values_to = "val") %>%
+                 values_to = "value") %>%
     filter(level != "facility") %>% #View()
-    pull(val) %>%
+    pull(value) %>%
     sort() %>%
     map(.x, .f = ~ extract_boundaries(spdf = pepfar_polygons,
                                       country = cntry,
@@ -252,7 +319,8 @@ library(zip)
 
   ous <- get_levels(
       username = glamr::datim_user(),
-      password = glamr::datim_pwd()) %>% View()
+      password = glamr::datim_pwd()
+    ) %>% #View()
     distinct(operatingunit) %>%
     pull(operatingunit)
 
@@ -289,8 +357,9 @@ library(zip)
   # Export Country Boundaries
 
   countries <- glamr::get_outable(
-    username = glamr::datim_user(),
-    password = glamr::datim_pwd()) %>%
+      username = glamr::datim_user(),
+      password = glamr::datim_pwd()
+    ) %>%
     select(starts_with(c("oper", "coun")))
 
   shp_cntries <- pepfar_polygons %>%
@@ -341,3 +410,9 @@ library(zip)
         pattern = ".shp",
         full.names = TRUE) %>%
       map(.x, .f = ~ zip_shapefiles(filename = .x))
+
+
+  # SNU1
+
+  df_locs <- extract_locations()
+

@@ -43,7 +43,7 @@ get_orguids <-
   }
 
 
-#' @title Get OU Orgs by level
+#' @title Get list of OU Orgs at specific level
 #' @note  Use `get_orguids()` for levels above 4
 #'
 #' @param ouuid    OU uid
@@ -96,9 +96,10 @@ get_ouorgs <-
 
 #' Get OU UIDS
 #'
-#' @param username DATIM Username, recommend using `datim_user()`
-#' @param password DATIM password, recommend using `datim_pwd()`
-#' @param baseurl base url for the API, default = https://final.datim.org/
+#' @param add_details Add countries for regional ou, default is false
+#' @param username    DATIM Username, recommend using `datim_user()`
+#' @param password    DATIM password, recommend using `datim_pwd()`
+#' @param baseurl     base url for the API, default = https://final.datim.org/
 #'
 #' @return OU UIDS as tibble
 #' @export
@@ -108,7 +109,8 @@ get_ouorgs <-
 #'  ous <- get_ouuids() }
 #'
 get_ouuids <-
-  function(username = NULL,
+  function(add_details = FALSE,
+           username = NULL,
            password = NULL,
            baseurl = "https://final.datim.org/"){
 
@@ -125,6 +127,33 @@ get_ouuids <-
                        password = pass,
                        baseurl = baseurl) %>%
       dplyr::rename(operatingunit = orgunit)
+
+    # Add details if needed
+    if (add_details == TRUE) {
+
+      # Query R OUs / Countries
+      countries <- ous %>%
+        dplyr::filter(stringr::str_detect(operatingunit, " Region$")) %>%
+        base::split(1:base::nrow(.)) %>%
+        purrr::map_dfr(function(obj){
+
+          cntries <- get_ouorgs(obj$uid, 4) %>%
+            dplyr::rename(countryname = orgunit) %>%
+            dplyr::mutate(operatingunit = obj$operatingunit) %>%
+            dplyr::relocate(operatingunit, .after = 1)
+
+          return(cntries)
+        })
+
+      # Combine
+      ous <- ous %>%
+        dplyr::mutate(
+          countryname = dplyr::case_when(
+            stringr::str_detect(operatingunit, " Region$") == TRUE ~ NA_character_,
+            TRUE ~ operatingunit)) %>%
+        dplyr::bind_rows(countries) %>%
+        dplyr::arrange(operatingunit, countryname)
+    }
 
     return(ous)
   }
@@ -161,24 +190,35 @@ get_ouuid <-
                          {{password}})
 
     # Get all ou uids
-    ous <- get_ouuids(username = user,
-                      password = pass)
-
-    ous <- ous %>%
-        dplyr::filter(stringr::str_to_upper(operatingunit) == ou)
+    ous <- get_ouuids(add_details = TRUE,
+                      username = user,
+                      password = pass) %>%
+        dplyr::filter(
+          stringr::str_to_upper(operatingunit) == ou |
+            stringr::str_to_upper(countryname) == ou)
 
 
     if (base::nrow(ous) == 0) {
-      base::cat("\nInvalid PEPFAR Operatingunit: ",
+      base::cat("\nInvalid PEPFAR Operatingunit / Operatingunit: ",
                 crayon::red(stringr::str_to_upper(cntry), "\n"))
 
       return(NULL)
     }
 
-    # OU uid
-    ouuid <- ous %>%
-      dplyr::pull(uid) %>%
-      dplyr::first()
+    # OU/Country uid
+    if (stringr::str_detect(ou, " region")) {
+
+      ouuid <- ous %>%
+        dplyr::filter(is.na(countryname)) %>%
+        dplyr::pull(uid) %>%
+        dplyr::first()
+
+    } else {
+
+      ouuid <- ous %>%
+        dplyr::pull(uid) %>%
+        dplyr::first()
+    }
 
     return(ouuid)
   }
