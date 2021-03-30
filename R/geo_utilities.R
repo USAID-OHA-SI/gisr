@@ -9,9 +9,36 @@
 #'
 gview <- function(geodata) {
 
+    # check of data is sf or sfc
+    base::stopifnot(base::any(class(geodata) %in% c('sf', 'sfg', 'sfc')))
+
+    # get geom type
+    geom_type <- sf::st_geometry_type(geodata, by_geometry = FALSE)
+
+    # vizualize the object
     viz <- geodata %>%
-        ggplot2::ggplot() +
-        ggplot2::geom_sf(fill = NA, lwd = .3, color = "#6c6463") +
+        ggplot2::ggplot()
+
+    # polygons
+    if (geom_type %in% c("POLYGON", "MULTIPOLYGON"))
+        viz <- viz + ggplot2::geom_sf(fill = NA, lwd = .3, color = "#6c6463")
+
+    # lines
+    if (geom_type %in% c("LINESTRING", "MULTILINESTRING"))
+        viz <- viz + ggplot2::geom_sf(size = 1, color = "#6c6463")
+
+    # points
+    if (geom_type %in% c("POINT", "MULTIPOINT"))
+        viz <- viz +
+            ggplot2::geom_sf(shape = 21, size = 4, stroke = .3,
+                             fill = "white", color = "#6c6463")
+
+    # collection
+    if (geom_type == "GEOMETRYCOLLECTION")
+        viz <- viz + ggplot2::geom_sf()
+
+    # Apply coordinates and theme
+    viz <- viz +
         ggplot2::coord_sf() +
         ggplot2::theme_void()
 
