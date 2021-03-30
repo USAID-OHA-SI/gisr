@@ -1,4 +1,36 @@
-#' Plot polygon features
+#' @title View feature attributes
+#'
+#' @param geodata spatial data data
+#' @param console view in console? default false
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' gview(sf_data)
+#' }
+#'
+dview <- function(geodata,
+                  console = FALSE) {
+
+    # check of data is sf or sfc
+    base::stopifnot(base::any(class(geodata) %in% c('sf')))
+
+    # Drop geometry and view data
+    geodata <- geodata %>%
+        sf::st_drop_geometry(x = .)
+
+    # print of view
+    if (console == TRUE) {
+        base::print(geodata, n = Inf)
+    } else {
+        tibble::view(geodata)
+    }
+}
+
+
+
+
+#' Plot sf features
 #'
 #' @param geodata r spatial data
 #' @export
@@ -30,8 +62,8 @@ gview <- function(geodata) {
     # points
     if (geom_type %in% c("POINT", "MULTIPOINT"))
         viz <- viz +
-            ggplot2::geom_sf(shape = 21, size = 4, stroke = .3,
-                             fill = "white", color = "#6c6463")
+        ggplot2::geom_sf(shape = 21, size = 4, stroke = .3,
+                         fill = "white", color = "#6c6463")
 
     # collection
     if (geom_type == "GEOMETRYCOLLECTION")
@@ -46,6 +78,7 @@ gview <- function(geodata) {
 
     return(viz)
 }
+
 
 
 #' @title Get neighbors of a given contry
