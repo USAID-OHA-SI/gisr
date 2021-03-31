@@ -79,11 +79,24 @@ library(zip)
 
       #ou uid
       uid <- get_ouuid(operatingunit = cntry,
-                       username = user, password = pass)
+                       username = user,
+                       password = pass)
 
       # list of orgs at the specified level
-      orgs <- get_ouorgs(ouuid = uid, level = lvl,
-                         username = user, password = pass) %>%
+      orgs <- get_ouorgs(
+          ouuid = uid,
+          level = lvl,
+          username = user,
+          password = pass)
+
+      # Check for valid data
+      if (is.null(orgs)) {
+        base::cat(crayon::red("\nNo geodata found for this request.\n"))
+
+        return(NULL)
+      }
+
+      orgs <- orgs %>%
         mutate(org_level = lvl)
 
       # filter sp df
@@ -93,7 +106,6 @@ library(zip)
 
       # Export
       if (export == TRUE & !is.null(name)) {
-
         sf::st_write(spdf,
                      delete_dsn = TRUE,
                      dsn = paste0(name, ".shp"))
@@ -102,6 +114,43 @@ library(zip)
 
       return(spdf)
     }
+
+
+  #' @title Get OU/Country orgs attributes
+  #'
+  #' @param country OU/Country name
+  #' @param username Datim Username
+  #' @param password Datim Password
+  #'
+  get_attributes <- function(country,
+                             username = NULL,
+                             password = NULL) {
+
+    print(country)
+
+    locs <- extract_locations(country = ou, add_geom = FALSE)
+
+    labels <- locs %>%
+      distinct(label) %>%
+      pull()
+
+    # Use psnu as snu1
+    if (!"snu1" %in% labels) {
+      df_psnu <- locs %>%
+        filter(label == "prioritization") %>%
+        mutate(label = "snu1")
+
+      locs <- locs %>%
+        bind_rows(df_psnu)
+    }
+
+    # Filter out facilities and communities
+    locs <- locs %>%
+      select(-path) %>%
+      filter(!label %in% c("facility", "community"))
+
+    return(locs)
+  }
 
 
   #' @title Save shapefile
@@ -165,7 +214,8 @@ library(zip)
 
 
   # Levels
-  levels <- get_levels(username = datim_user(), password = datim_pwd()) %>%
+  levels <- get_levels(username = datim_user(),
+                       password = datim_pwd()) %>%
     filter(operatingunit == cntry)
 
   levels$country
@@ -184,7 +234,7 @@ library(zip)
 
 
   # SNU1
-  df_locs <- extract_locations(country = "Ethiopia", add_geom = FALSE) %>%
+  df_locs <- extract_locations(country = cntry, add_geom = FALSE) %>%
     separate(path,
              into = paste0("path", 0:max(.$level)),
              sep = "/",
@@ -198,45 +248,10 @@ library(zip)
                 values_from = level)
 
 
-  #' Get OrgUnit Attributes
-  #'
-  get_attributes <- function(ou) {
-
-    print(ou)
-
-    locs <- extract_locations(country = ou, add_geom = FALSE)
-
-    labels <- locs %>%
-      distinct(label) %>%
-      pull()
-
-    # Use psnu as snu1
-    if (!"snu1" %in% labels) {
-      df_psnu <- locs %>%
-        filter(label == "prioritization") %>%
-        mutate(label = "snu1")
-
-      locs <- locs %>%
-        bind_rows(df_psnu)
-    }
-
-    # Filter out facilities and communities
-    locs <- locs %>%
-      select(-path) %>%
-      filter(!label %in% c("facility", "community"))
-
-    return(locs)
-  }
-
   df_locss <- ouuids %>%
     filter(!str_detect(operatingunit, " Region$")) %>%
     pull(operatingunit) %>%
-    map_dfr(.x, .f = ~get_attributes(ou = .x))
-
-  df_locss %>% glimpse()
-  df_locss %>% view()
-
-
+    map_dfr(.x, .f = ~get_attributes(country = .x))
 
 
   # psnu boundaries: uid lookup
@@ -297,8 +312,8 @@ library(zip)
   # OU Only
   extract_boundaries(
       spdf = pepfar_polygons,
-      country = cntry,
-      level = 3
+      country = "Ghana", #cntry,
+      level = 6
     ) %>%
     gview()
 

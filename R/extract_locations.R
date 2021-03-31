@@ -17,11 +17,14 @@ extract_locations <-
              username = NULL,
              password = NULL) {
 
+    # API
     baseurl = "https://final.datim.org/"
 
+    # OU / Country / levels
     cntry <- {{country}}
     lvl <- {{level}}
 
+    # Access
     user <- base::ifelse(base::is.null(username),
                          glamr::datim_user(),
                          {{username}})
@@ -38,7 +41,7 @@ extract_locations <-
         tidyr::pivot_longer(cols = country:prioritization,
                             names_to = "label",
                             values_to = "level") %>%
-        dplyr::filter(countryname == cntry)
+        dplyr::filter(stringr::str_to_lower(countryname) == stringr::str_to_lower(cntry))
 
     # Query OU Location data
     url <- baseurl %>%
@@ -50,10 +53,11 @@ extract_locations <-
            base::paste0(",geometry")
     }
 
+    # filter by ou/country uid, note: regional countries will also extract region info
     url <- url %>%
         base::paste0("&filter=path:like:", ouuid)
 
-    # Filter specific levels
+    # Filter specific level
     if (!is.null(lvl)) {
 
         url <- url %>%
@@ -123,10 +127,16 @@ extract_locations <-
         dplyr::pull() %>%
         dplyr::first()
 
+    ou <- df %>%
+        dplyr::filter(!is.na(operatingunit)) %>%
+        dplyr::distinct(operatingunit) %>%
+        dplyr::pull() %>%
+        dplyr::first()
+
     # Cleanup data
     df <- df %>%
         dplyr::mutate(
-            operatingunit = dplyr::if_else(base::is.na(operatingunit), cntry, operatingunit),
+            operatingunit = dplyr::if_else(base::is.na(operatingunit), ou, operatingunit),
             countryname = dplyr::if_else(base::is.na(countryname), cntry, countryname),
             operatingunit_iso = dplyr::if_else(base::is.na(operatingunit_iso), iso, operatingunit_iso),
             countryname_iso = dplyr::if_else(base::is.na(countryname_iso), iso, countryname_iso),

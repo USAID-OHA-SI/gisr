@@ -86,7 +86,20 @@ get_ouorgs <-
       httr::GET(httr::authenticate(user, pass)) %>%
       httr::content("text") %>%
       jsonlite::fromJSON(flatten = TRUE) %>%
-      purrr::pluck("organisationUnits") %>%
+      purrr::pluck("organisationUnits")
+
+    # Check data
+    if (base::is.null(orgs)) {
+      base::cat(
+        crayon::red(
+          paste0("\nNo orgunits found for uid = ",
+                 uid, " & level = ", lvl, "\n")))
+
+      return(NULL)
+    }
+
+    # Clean up
+    orgs <- orgs %>%
       dplyr::rename(uid = id, orgunit = displayName) %>%
       tibble::as_tibble()
 
@@ -190,35 +203,31 @@ get_ouuid <-
                          {{password}})
 
     # Get all ou uids
-    ous <- get_ouuids(add_details = TRUE,
-                      username = user,
-                      password = pass) %>%
-        dplyr::filter(
-          stringr::str_to_upper(operatingunit) == ou |
-            stringr::str_to_upper(countryname) == ou)
+    ous <- get_ouuids(
+        add_details = TRUE,
+        username = user,
+        password = pass) %>%
+      dplyr::filter(
+        stringr::str_to_upper(operatingunit) == ou |
+          stringr::str_to_upper(countryname) == ou)
 
 
     if (base::nrow(ous) == 0) {
       base::cat("\nInvalid PEPFAR Operatingunit / Operatingunit: ",
-                crayon::red(stringr::str_to_upper(cntry), "\n"))
+                crayon::red(stringr::str_to_upper(ou), "\n"))
 
       return(NULL)
     }
 
     # OU/Country uid
     if (stringr::str_detect(ou, " region")) {
-
-      ouuid <- ous %>%
-        dplyr::filter(is.na(countryname)) %>%
-        dplyr::pull(uid) %>%
-        dplyr::first()
-
-    } else {
-
-      ouuid <- ous %>%
-        dplyr::pull(uid) %>%
-        dplyr::first()
+      ous <- ous %>% dplyr::filter(is.na(countryname))
     }
+
+    # Get uid
+    ouuid <- ous %>%
+      dplyr::pull(uid) %>%
+      dplyr::first()
 
     return(ouuid)
   }
@@ -380,10 +389,22 @@ get_ouorguids <-
                          {{password}})
 
     # Query orgunits
-    lvl_uids <- get_ouorgs(ouuid = uid,
-                             level = lvl,
-                             username = user,
-                             password = pass) %>% pull(uid)
+    orgs <- get_ouorgs(ouuid = uid,
+                       level = lvl,
+                       username = user,
+                       password = pass)
+
+    # Check data
+    if (base::is.null(orgs)) {
+      base::cat(
+        crayon::red(
+          paste0("\nNo org uids found\n")))
+
+      return(NULL)
+    }
+
+    # extract list of uids
+    lvl_uids <- orgs %>% pull(uid)
 
     # return
     return(lvl_uids)
