@@ -1,7 +1,7 @@
-#' Report locations data completeness
+#' @title Report locations data completeness
 #'
 #' @param cntry Country name
-#' @param mer_sites Latest MER Sites Results / Targets [cols: orgunituid, sitename]
+#' @param mer_sites Latest MER Sites Results / Targets (cols: orgunituid, sitename)
 #' @param user Datim account username
 #' @param pass Datim account password (glamr::mypwd is recommended)
 #' @param terr_path Path to terrain raster data
@@ -13,10 +13,13 @@
 #' }
 #'
 generate_facilities_report <- function(cntry, mer_sites, user, pass,
-                                  terr_path = NULL, output_folder = NULL) {
+                                       terr_path = NULL,
+                                       output_folder = NULL) {
 
     # Extract Site Location Data
-    sites <- extract_locations(country = {{cntry}}, username = {{user}}, password = {{pass}}) %>%
+    sites <- extract_locations(country = {{cntry}},
+                               username = {{user}},
+                               password = {{pass}}) %>%
         extract_facilities(mer_sites = {{mer_sites}})
 
     # Check data
@@ -26,7 +29,8 @@ generate_facilities_report <- function(cntry, mer_sites, user, pass,
 
     # Map sites locations
     viz_map <- sites %>%
-        explore_facilities(cntry = {{cntry}}, terr_path = {{terr_path}})
+        explore_facilities(cntry = {{cntry}},
+                           terr_path = {{terr_path}})
 
     # Plot completeness
     viz_bar <- sites %>%
@@ -37,7 +41,9 @@ generate_facilities_report <- function(cntry, mer_sites, user, pass,
 
     if ( !is.null(viz_bar) ) {
 
-        viz <- patchwork::wrap_plots(viz_map, viz_bar, nrow = 1, widths = c(2,1)) +
+        viz <- patchwork::wrap_plots(viz_map, viz_bar,
+                                     nrow = 1,
+                                     widths = c(2,1)) +
             patchwork::plot_annotation(
                 title = toupper({{cntry}}),
                 subtitle = "Facilities location data availability",
@@ -62,13 +68,21 @@ generate_facilities_report <- function(cntry, mer_sites, user, pass,
     }
 
     # Print viz
-    print(viz)
+    #print(viz)
 
     # Export viz as png file
     if ( !is.null(output_folder) ) {
         ggplot2::ggsave(
-            filename = paste0({{output_folder}}, "/", {{cntry}}, " - Sites location data availability.png"),
-            plot = last_plot(), scale = 1.2, dpi = 310, width = 10, height = 7, units = "in")
+            filename = paste0({{output_folder}},
+                              "/",
+                              {{cntry}},
+                              " - Sites location data availability.png"),
+            plot = last_plot(),
+            scale = 1.2,
+            dpi = 310,
+            width = 10,
+            height = 7,
+            units = "in")
     }
 
     return(viz)

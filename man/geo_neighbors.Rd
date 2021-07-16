@@ -16,7 +16,8 @@ geo_neighbors(countries, scale = "large", crs = 4326, crop = FALSE)
 \item{crop}{Crop sfc to focus countries extent?}
 }
 \value{
-simple feature class
+\preformatted{      simple feature class
+}
 }
 \description{
 Get neighbors of a given contry

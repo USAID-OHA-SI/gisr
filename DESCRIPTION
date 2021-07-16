@@ -6,12 +6,14 @@ Authors@R:
            family = "Kagniniwa",
            role = c("aut", "cre"),
            email = "bkagniniwa@usaid.gov")
-Description: Facilitate the use of R Spatial functions for HIV/AIDS related Geospatial Analytics
+Description: R Spatial functions for HIV/AIDS related Geospatial Analytics.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/USAID-OHA-SI/gisr
 BugReports: https://github.com/USAID-OHA-SI/gisr/issues
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
 Depends: 
     R (>= 3.1.0)
 Imports: 
@@ -31,8 +33,21 @@ Imports:
     rnaturalearth,
     rnaturalearthdata,
     ggplot2,
-    patchwork
+    patchwork,
+    methods,
+    crayon,
+    httr,
+    janitor,
+    jsonlite,
+    Wavelength,
+    glitr,
+    glamr
+Suggests: 
+    knitr, 
+    rmarkdown
 Remotes:
     USAID-OHA-SI/Wavelength,
-    USAID-OHA-SI/glitr
-RoxygenNote: 7.1.1
+    USAID-OHA-SI/glitr,
+    USAID-OHA-SI/glamr
+VignetteBuilder: 
+    knitr

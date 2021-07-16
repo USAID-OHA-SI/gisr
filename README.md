@@ -74,6 +74,7 @@ print(z_map2)
 Create an administrative map with vector data from RNaturalEarth
 
 ```{r}
+library(extrafont)
 library(tidyverse)
 library(sf)
 library(glitr)
@@ -90,89 +91,40 @@ print(z_map2)
 ```
 
 
-## Assess Facilities Location data
+## Apply SI Style Guide to maps 
 
-Extract Country OrgUnit Data and Assess Facalities Location data availability
+Create an administrative map with vector data from RNaturalEarth and apply SI Style
 
 ```{r}
+library(extrafont)
 library(tidyverse)
 library(gisr)
-library(vroom)
-
-# Get results / targets data for country x
-
-ken_sites <- list.files(path = "../path-to-mer-data",
-                         pattern = "^MER_.*_Site_IM_FY\\d{2}-\\d{2}_\\d{8}_.*_Kenya.txt$",
-                         full.names = TRUE) %>% 
-                         map_dfr(vroom)
-                         
-# Explore facilities
-
-extract_locations("Kenya", "<username>", glamr::mypwd("<credential-key>")) %>% 
-    extract_facilities(mer_sites = ken_sites) %>% 
-    explore_facilities("Zambia") 
-    
-# Assess facilities data
-
-extract_locations("Kenya", "<username>", glamr::mypwd("<credential-key>")) %>% 
-    extract_facilities(mer_sites = ken_sites) %>% 
-    assess_facilities()
-                         
-# Generate a report: Map + Bar chart showing available & missing location data
-
-## 1) No basemap
-generate_facilities_report(cntry = "Kenya",
-                      mer_sites = ken_sites,
-                      user = "<username>",
-                      pass = glamr::mypwd("<credential-key>"))
-
-## 2) With basemap
-generate_facilities_report(cntry = "Kenya",
-                      targets = ken_sites,
-                      user = "<username>",
-                      pass = glamr::mypwd("<credential-key>""),
-                      terr_path = "<../path-to-terrain-raster-data>",
-                      output_folder = "<./path-to-ouput-folder>")
-                      
-```
-
-## Plot a Spatial Distribution Map of OVC_HIVSTAT_POS
-
-Create an administrative map with vector data from RNaturalEarth
-
-```{r}
-library(tidyverse)
 library(sf)
 library(glitr)
-library(gisr)
 
-# Geodata
-moz_districts <- list.files(
-        path = "path-to-shapefiles",
-        pattern = "name-of-country-psnu-shp",
-        recursive = TRUE,
-        full.names = TRUE
-    ) %>%
-    unlist() %>%
-    first() %>%
-    read_sf()
-        
-# PSNU by IM Data
-df_psnu <- read_rds(here("Data", "PSNU_IM_FY18-20_20200626_v1_1.rds"))
-        
-# Map without topo basemap
-moz <- spdist_ovc_hivstat_pos(country = "Mozambique", fy = 2020, df_psnu = df_psnu, geo_psnu = moz_districts)
 
-# Map with topo basemap
-moz <- spdist_ovc_hivstat_pos(country = "Mozambique", fy = 2020, df_psnu = df_psnu, geo_psnu = moz_districts, terr_path = dir_terr)
+sfdf <- gisr::get_admin1("Nigeria") %>%
+ select(name) %>%
+ mutate(value = runif(nrow(.), 0, 1))
 
-# export map
-ggsave(here(dir_graphs, "MOZ-OVC_HIVSTAT_POS-Results.png"),
-      plot = last_plot(), scale = 1.2, dpi = 310,
-      width = 10, height = 7, units = "in")
+ggplot() +
+   geom_sf(data = sfdf,
+           aes(fill = value),
+           color = grey10k,
+           size = .1) +
+   scale_fill_si(palette = "genoas",
+                 discrete = FALSE,
+                 limits = c(0, 1),
+                 labels = scales::percent) +
+   labs(title = "NIGERIA - % OF PLHIV BY STATE",
+        subtitle = "States from XYZ Region are the most hit by HIV/AIDS",
+        caption = base::paste0("Produced by OHA/SIEI/SI, ON ", base::Sys.Date())) +
+  si_style_map()
+  
 
 ```
 
+![image](https://user-images.githubusercontent.com/3952707/125997981-73a84f04-5f23-48f4-a77a-fceb4b158f76.png)
 
 
 ---

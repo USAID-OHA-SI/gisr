@@ -11,9 +11,9 @@ get_levels(
 )
 }
 \arguments{
-\item{username}{DATIM username, recommed using `datim_user()`}
+\item{username}{DATIM username, recommed using \code{datim_user()}}
 
-\item{password}{DATIM password, recommend using `datim_pwd()`}
+\item{password}{DATIM password, recommend using \code{datim_pwd()}}
 
 \item{baseurl}{base API url, default = https://final.datim.org/}
 }
@@ -24,7 +24,7 @@ df
 Get all orgunits levels in org hierarchy
 }
 \note{
-Same as `glamr::identify_levels()` or `Wavelength::identify_levels()`
+Same as \code{glamr::identify_levels()} or \code{Wavelength::identify_levels()}
 }
 \examples{
 \dontrun{

@@ -290,7 +290,7 @@ get_levels <-
 #'
 #' @param operatingunit Operatingunit name
 #' @param country       Country name (default = Operatingunit)
-#' @param org_type      Orgunit type [country_lvl, prioritization, community, facility_lvl]
+#' @param org_type      Orgunit type (country_lvl, prioritization, community, facility_lvl)
 #' @param username      Datim Account username
 #' @param password      Datim Account Password
 #'

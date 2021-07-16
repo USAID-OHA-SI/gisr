@@ -2,7 +2,7 @@
 % Please edit documentation in R/admins_map.R
 \name{admins_map}
 \alias{admins_map}
-\title{Generate admin map}
+\title{Generate administrative boundaries map}
 \usage{
 admins_map(countries, add_neighbors = FALSE)
 }
@@ -15,10 +15,11 @@ admins_map(countries, add_neighbors = FALSE)
 
 }
 \description{
-Generate admin map
+Generate administrative boundaries map
 }
 \examples{
 \dontrun{
+library(gisr)
 admins_map(countries = list("Zambia"))
 admins_map(countries = list("Zambia"), add_neighbors = TRUE)
 }

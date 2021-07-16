@@ -19,7 +19,7 @@ get_ouorgs(
 
 \item{username}{DATIM Username}
 
-\item{password}{DATIM password, recommend using `mypwd()`}
+\item{password}{DATIM password, recommend using \code{mypwd()}}
 
 \item{baseurl}{base url for the API, default = https://final.datim.org/}
 }
@@ -30,7 +30,7 @@ ORG UIDS as tibble
 Get list of OU Orgs at specific level
 }
 \note{
-Use `get_orguids()` for levels above 4
+Use \code{get_orguids()} for levels above 4
 }
 \examples{
 \dontrun{

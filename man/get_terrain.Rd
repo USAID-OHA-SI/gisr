@@ -21,7 +21,8 @@ get_terrain(
 \item{terr}{RasterLayer or Path to terrain raster file}
 }
 \value{
-spdf spatial dataframe
+\preformatted{      spdf spatial dataframe
+}
 }
 \description{
 Get terrain data for an AOI (Countries)

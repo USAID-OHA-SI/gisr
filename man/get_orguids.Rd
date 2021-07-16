@@ -14,9 +14,9 @@ get_orguids(
 \arguments{
 \item{level}{Org level}
 
-\item{username}{DATIM Username, recommend using `datim_user()`}
+\item{username}{DATIM Username, recommend using \code{datim_user()}}
 
-\item{password}{DATIM password, recommend using `datim_pwd()`}
+\item{password}{DATIM password, recommend using \code{datim_pwd()}}
 
 \item{baseurl}{base url for the API, default = https://final.datim.org/}
 }
@@ -27,7 +27,7 @@ ORG UIDS as tibble
 Get Org UIDS
 }
 \note{
-Use with caution. Use `get_ouorguids()` for levels below 3
+Use with caution. Use \code{get_ouorguids()} for levels below 3
 }
 \examples{
 \dontrun{

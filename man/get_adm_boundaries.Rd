@@ -16,7 +16,8 @@ get_adm_boundaries(country_code, adm_level = 0, download = TRUE, geo_path = "")
 \item{geo_path}{where to save / read data from}
 }
 \value{
-geodata as sf with crs = 4326
+\preformatted{        geodata as sf with crs = 4326
+}
 }
 \description{
 This function extracts / reads geospatial data

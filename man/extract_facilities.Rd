@@ -9,7 +9,7 @@ extract_facilities(.data, mer_sites = NULL)
 \arguments{
 \item{.data}{Datim organisation units data frame}
 
-\item{mer_sites}{Data Frame of MER Sites by IM with Results and/or Targets [cols: orgunituid, sitename]}
+\item{mer_sites}{Data Frame of MER Sites by IM with Results and/or Targets (cols: orgunituid, sitename)}
 }
 \description{
 Extract facility sites

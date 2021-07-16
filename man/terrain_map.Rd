@@ -37,6 +37,7 @@ Generate a terrain map
 }
 \examples{
 \dontrun{
+library(gisr)
 terrain_map(countries = list("Zambia"))
 terrain_map(countries = list("Zambia"), add_neighbors = TRUE)
 }

@@ -193,7 +193,7 @@ get_admin1 <- function(countries, scale = "medium", crs = 4326) {
 #' @param mask       Should the extracted data match the exact boundary limits?
 #' @param buffer     Extend AOI extent by x
 #' @param terr       RasterLayer or Path to terrain raster file
-#'
+#' @importFrom       methods as
 #' @return           spdf spatial dataframe
 #' @export
 #'

@@ -9,9 +9,9 @@ get_ouuid(operatingunit, username = NULL, password = NULL)
 \arguments{
 \item{operatingunit}{Operatingunit name}
 
-\item{username}{Datim Account username, recommend using `datim_user()`}
+\item{username}{Datim Account username, recommend using \code{datim_user()}}
 
-\item{password}{Datim Account Password, recommend using `datim_pwd()`}
+\item{password}{Datim Account Password, recommend using \code{datim_pwd()}}
 }
 \value{
 uid

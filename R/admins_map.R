@@ -1,4 +1,4 @@
-#' Generate admin map
+#' @title Generate administrative boundaries map
 #'
 #' @param countries list of countries to map
 #' @param add_neighbors should the map include the neighbor countries
@@ -6,14 +6,13 @@
 #' @export
 #' @examples
 #' \dontrun{
+#' library(gisr)
 #' admins_map(countries = list("Zambia"))
 #' admins_map(countries = list("Zambia"), add_neighbors = TRUE)
 #' }
 #'
 admins_map <- function(countries, add_neighbors = FALSE) {
-
     cntries <- {{countries}}
-
     admin0 <- get_admin0(cntries)
     admin1 <- get_admin1(cntries)
 
@@ -24,7 +23,7 @@ admins_map <- function(countries, add_neighbors = FALSE) {
         nghbrs <- geo_neighbors(cntries)
 
         cntries <- nghbrs %>%
-            sf::st_set_geometry(NULL) %>%
+            sf::st_drop_geometry() %>%
             dplyr::pull(sovereignt)
     }
 

@@ -150,7 +150,7 @@ extract_locations <-
 #' Extract facility sites
 #'
 #' @param .data Datim organisation units data frame
-#' @param mer_sites Data Frame of MER Sites by IM with Results and/or Targets [cols: orgunituid, sitename]
+#' @param mer_sites Data Frame of MER Sites by IM with Results and/or Targets (cols: orgunituid, sitename)
 #' @export
 #' @examples
 #' \dontrun{
@@ -166,7 +166,7 @@ extract_facilities <- function(.data, mer_sites = NULL) {
         janitor::clean_names() %>%
         dplyr::rename(longitude = "x1", latitude = "x2")
 
-    if ( !is.null(mer_sites) & "orgunituid" %in% names(mer_sites) & "sitename" %in% names(mer_sites) ) {
+    if ( !is.null(mer_sites) & ("orgunituid" %in% names(mer_sites)) & ("sitename" %in% names(mer_sites)) ) {
 
         .data <- .data %>%
             dplyr::left_join(mer_sites, by = c("id" = "orgunituid")) %>%

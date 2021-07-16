@@ -17,7 +17,7 @@ get_ouorglevel(
 
 \item{country}{Country name (default = Operatingunit)}
 
-\item{org_type}{Orgunit type [country_lvl, prioritization, community, facility_lvl]}
+\item{org_type}{Orgunit type (country_lvl, prioritization, community, facility_lvl)}
 
 \item{username}{Datim Account username}
 
