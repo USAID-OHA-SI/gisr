@@ -1,0 +1,57 @@
+---
+title: "create-terrain-basemap"
+autho: Baboyma Kagniniwa | USAID
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{create-terrain-basemap}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Terrain Basemap for thematic mapping
+
+Thematic maps are single-topics that focus on the spatial variability of a specific distribution. At USAID's Office of HIV/AIDs, we've used thematic maps to visualize the spatial distibution of HIV/AIDs Programs' key indicators at the PSNU level. ART Saturation of Nigeria at the psnu level is a good example one of these thematic maps. In most countries, HIV/AIDs programs are implemented only in specific districts by USAID, and creating such a thematic map usually leads to having to deal with empty states. To compensate for the non-presence in some of these districts, we used terrain rasterlayer as a basemap. These basemaps are generated in way to that the hillshape is used as a beautifier of the map.
+
+Below are how we go about creating these basemaps
+
+```{r setup}
+library(tidyverse)     # General data munging and visualisation
+library(gisr)          # OHA/SI in house package used to create these basemap
+library(glitr)         # OHA/SI in house package used to help standardize viz
+```
+
+We will be using Nigeria as our country of focus. Let's extract the country boundary and the states boundaries.
+
+```{r}
+
+countryname <- "Nigeria"
+
+adm0 <- gisr::get_admin0(countries = countryname) %>% 
+  select(sovereignt, admin, iso_a2, iso_a3)
+
+adm1 <- gisr::get_admin1(countries = countryname) %>% 
+  select(name, code_hasc)
+
+```
+
+What does country map look like?
+
+```{r}
+adm0 %>% gisr::gview()
+```
+
+What are the states?
+
+```{r}
+adm1 %>% 
+  gisr::gview() + 
+  geom_sf_text(data = adm1, aes(label = name), size = 3)
+```
