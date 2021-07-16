@@ -90,7 +90,6 @@ print(z_map2)
 
 ```
 
-
 ## Apply SI Style Guide to maps 
 
 Create an administrative map with vector data from RNaturalEarth and apply SI Style
@@ -101,7 +100,6 @@ library(tidyverse)
 library(gisr)
 library(sf)
 library(glitr)
-
 
 sfdf <- gisr::get_admin1("Nigeria") %>%
  select(name) %>%
@@ -121,11 +119,9 @@ ggplot() +
         caption = base::paste0("Produced by OHA/SIEI/SI, ON ", base::Sys.Date())) +
   si_style_map()
   
-
 ```
-
+  
 ![image](https://user-images.githubusercontent.com/3952707/125997981-73a84f04-5f23-48f4-a77a-fceb4b158f76.png)
-
 
 ---
 
