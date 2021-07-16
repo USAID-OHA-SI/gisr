@@ -2,7 +2,7 @@
 % Please edit documentation in R/geo_utilities.R
 \name{gview}
 \alias{gview}
-\title{Plot polygon features}
+\title{Plot sf features}
 \usage{
 gview(geodata)
 }
@@ -10,7 +10,7 @@ gview(geodata)
 \item{geodata}{r spatial data}
 }
 \description{
-Plot polygon features
+Plot sf features
 }
 \examples{
 \dontrun{

@@ -8,8 +8,11 @@
 # Libraries ----
 
 library(tidyverse)
+library(ggflags)
 library(glamr)
 library(gisr)
+library(glitr)
+library(scales)
 library(sf)
 library(zip)
 
@@ -208,6 +211,7 @@ library(zip)
 
   # Get OUs
   ouuids <- get_ouuids()
+  ouuids2 <- get_ouuids(add_details = TRUE)
 
   # Get OU UID
   ouuid <- get_ouuid(operatingunit = cntry)
