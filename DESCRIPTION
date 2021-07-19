@@ -31,7 +31,6 @@ Imports:
     sp,
     sf,
     ggplot2,
-    
     methods,
     crayon,
     httr,
