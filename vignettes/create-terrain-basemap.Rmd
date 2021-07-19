@@ -23,7 +23,10 @@ Thematic maps are single-topics maps that focus on the spatial variability of a 
 Below are how we go about creating these basemaps
 
 ```{r setup}
+library(tidyverse)     # General data munging and visualisation
 library(gisr)          # OHA/SI in house package used to create these basemap
+library(glitr)         # OHA/SI in house package used to help standardize viz
+library(sf)
 ```
 
 We will be using Nigeria as our country of focus. Let's extract the country boundary and the states boundaries.
@@ -33,10 +36,10 @@ We will be using Nigeria as our country of focus. Let's extract the country boun
 countryname <- "Nigeria"
 
 adm0 <- gisr::get_admin0(countries = countryname) %>% 
-  select(sovereignt, admin, iso_a2, iso_a3)
+  dplyr::select(sovereignt, admin, iso_a2, iso_a3)
 
 adm1 <- gisr::get_admin1(countries = countryname) %>% 
-  select(name, code_hasc)
+  dplyr::select(name, code_hasc)
 
 ```
 
@@ -51,5 +54,5 @@ What are the states?
 ```{r}
 adm1 %>% 
   gisr::gview() + 
-  geom_sf_text(data = adm1, aes(label = name), size = 3)
+  ggplot2::geom_sf_text(data = adm1, ggplot2::aes(label = name), size = 3)
 ```
