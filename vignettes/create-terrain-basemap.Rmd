@@ -1,6 +1,7 @@
 ---
 title: "create-terrain-basemap"
-autho: Baboyma Kagniniwa | USAID
+author: Baboyma Kagniniwa | USAID
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{create-terrain-basemap}
@@ -26,8 +27,8 @@ Below are how we go about creating these basemaps
 library(dplyr)         # General data munging and visualisation
 library(ggplot2)       # General plotting
 library(gisr)          # OHA/SI in house package used to create these basemap
-library(glitr)         # OHA/SI in house package used to help standardize viz
-library(sf)
+#library(glitr)         # OHA/SI in house package used to help standardize viz
+#library(sf)
 ```
 
 We will be using Nigeria as our country of focus. Let's extract the country boundary and the states boundaries.

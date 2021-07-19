@@ -41,6 +41,7 @@ Suggests:
     rmarkdown,
     here,
     rnaturalearthdata,
+    rnaturalearthhires,
     rnaturalearth,
     patchwork,
     Wavelength,
@@ -49,6 +50,9 @@ Suggests:
 Remotes:
     USAID-OHA-SI/Wavelength,
     USAID-OHA-SI/glitr,
-    USAID-OHA-SI/glamr
+    USAID-OHA-SI/glamr,
+    ropensci/rnaturalearthhires,
+    r-spatial/sf
+BuildVignettes: FALSE
 VignetteBuilder: 
     knitr
