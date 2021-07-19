@@ -35,8 +35,8 @@ jobs:
 
       - name: Install dependencies
         run: |
+          install.packages(c("remotes", "rcmdcheck"))
           remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran(c("remotes", "rcmdcheck"))
         shell: Rscript {0}
 
       - name: Check
