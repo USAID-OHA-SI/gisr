@@ -18,14 +18,12 @@ knitr::opts_chunk$set(
 
 # Terrain Basemap for thematic mapping
 
-Thematic maps are single-topics that focus on the spatial variability of a specific distribution. At USAID's Office of HIV/AIDs, we've used thematic maps to visualize the spatial distibution of HIV/AIDs Programs' key indicators at the PSNU level. ART Saturation of Nigeria at the psnu level is a good example one of these thematic maps. In most countries, HIV/AIDs programs are implemented only in specific districts by USAID, and creating such a thematic map usually leads to having to deal with empty states. To compensate for the non-presence in some of these districts, we used terrain rasterlayer as a basemap. These basemaps are generated in way to that the hillshape is used as a beautifier of the map.
+Thematic maps are single-topics maps that focus on the spatial variability of a specific distribution. At USAID's Office of HIV/AIDs, we've used thematic maps to visualize the spatial distibution of HIV/AIDs Programs' key indicators at the PSNU level. ART Saturation of Nigeria at the psnu level is a good example of one of these thematic maps. In most countries, HIV/AIDs programs are implemented only in specific districts by USAID, and creating such a thematic map usually leads to having to deal with empty states. To compensate for the non-presence in some of these districts, we used terrain rasterlayer as a basemap. These basemaps are generated in way to that the hillshape is used as a beautifier of the map.
 
 Below are how we go about creating these basemaps
 
 ```{r setup}
-library(tidyverse)     # General data munging and visualisation
 library(gisr)          # OHA/SI in house package used to create these basemap
-library(glitr)         # OHA/SI in house package used to help standardize viz
 ```
 
 We will be using Nigeria as our country of focus. Let's extract the country boundary and the states boundaries.
