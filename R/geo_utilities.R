@@ -169,7 +169,6 @@ get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 #' Get admin level 1 boundaries sf data for a given country
 #'
 #' @param countries list of country names
-#' @param scale spatial resolution of the geodata
 #' @param crs coordinates reference system
 #' @return simple feature class
 #' @export
@@ -178,9 +177,10 @@ get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 #' get_admin1(countries = list("Zambia"))
 #' }
 #'
-get_admin1 <- function(countries, scale = "medium", crs = 4326) {
+get_admin1 <- function(countries, crs = 4326) {
 
-    admin1 <- rnaturalearth::ne_states(country = {{countries}}, returnclass = "sf") %>%
+    admin1 <- rnaturalearth::ne_states(country = {{countries}},
+                                       returnclass = "sf") %>%
         sf::st_transform(., crs = sf::st_crs({{crs}}))
 
     return(admin1)

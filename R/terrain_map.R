@@ -7,13 +7,13 @@
 #' @param add_labels    Add neighbors countries's names (works only when add_neighbors is TRUE)
 #' @param mask          Should the extracted data match the exact boundary limits?
 #' @param terr          RasterLayer dataset or Path for terrain raster file
-#' @return
+#' @return ggplot basemap
 #' @export
 #' @examples
 #' \dontrun{
 #' library(gisr)
-#' terrain_map(countries = list("Zambia"))
-#' terrain_map(countries = list("Zambia"), add_neighbors = TRUE)
+#' gisr::terrain_map(countries = list("Zambia"))
+#' gisr::terrain_map(countries = list("Zambia"), add_neighbors = TRUE)
 #' }
 #'
 terrain_map <-
@@ -92,7 +92,7 @@ terrain_map <-
                              fill = "#d9d9d9",
                              alpha = 0.35,
                              size = 0.25,
-                             colour = glitr::grey70k)
+                             colour = "#6d6e71")
 
     if ( !is.null(nghbrs) & add_labels == TRUE)
         p <- p + ggplot2::geom_sf_text(data = nghbrs,
@@ -123,8 +123,7 @@ terrain_map <-
         ggplot2::ylim(-38, -20)
 
     # apply theme
-    p <- p + glitr::si_style() +
-        ggplot2::theme_void()
+    p <- p + ggplot2::theme_void()
 
     return(p)
 }

@@ -174,7 +174,7 @@ extract_facilities <- function(.data, mer_sites = NULL) {
             dplyr::select(-sitename)
     }
     else {
-        cat(Wavelength::paint_red("\nMER Sites are missing or invalid. Make sure to include orgunituid and sitename columns."))
+        cat(crayon::red("\nMER Sites are missing or invalid. Make sure to include orgunituid and sitename columns."))
     }
 
     return(.data)

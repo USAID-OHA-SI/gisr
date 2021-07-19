@@ -15,22 +15,19 @@ BugReports: https://github.com/USAID-OHA-SI/gisr/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Depends: 
-    R (>= 3.1.0)
+    R (>= 3.1.0),
+    sf
 Imports: 
     dplyr (>= 1.0.0),
+    tidyr,
     magrittr,
     purrr,
-    readr,
-    readxl,
     stringr,
     tibble,
-    tidyr,
-    rgdal (>= 1.5),
-    rgeos,
+    ggplot2,
     raster,
     sp,
-    sf,
-    ggplot2,
+    rnaturalearth,
     methods,
     crayon,
     httr,
@@ -41,19 +38,14 @@ Suggests:
     rmarkdown,
     testthat,
     here,
+    rgdal,
+    rgeos,
     rnaturalearthdata,
     rnaturalearthhires,
-    rnaturalearth,
     patchwork,
-    Wavelength,
-    glitr,
     glamr
 Remotes:
-    USAID-OHA-SI/Wavelength,
-    USAID-OHA-SI/glitr,
     USAID-OHA-SI/glamr,
-    ropensci/rnaturalearthhires,
-    r-spatial/sf
+    ropensci/rnaturalearthhires
 BuildVignettes: FALSE
-VignetteBuilder: 
-    knitr
+VignetteBuilder: knitr

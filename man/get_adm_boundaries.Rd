@@ -25,6 +25,7 @@ for specified country and administractive boundary levels
 }
 \examples{
 \dontrun{
+library(gisr)
 get_adm_boundaries("UGA")
 get_adm_boundaries("UGA", adm_level=2, geo_path="GIS")
 }

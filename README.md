@@ -12,20 +12,20 @@ install.packages("devtools")
 devtools::install_github("USAID-OHA-SI/gisr")
 ```
     
-## Get admin boundaries 
+## Get administrative boundaries 
  
-Get admin boundaries from [GADM](https://gadm.org/download_country_v3.html) through Raster package
+Admin boundaries from [GADM](https://gadm.org/download_country_v3.html) through Raster package
 
 ```{r}
 library(gisr)
 
 tgo0 <- get_adm_boundaries("TGO", adm_level=0, geo_path="./GIS")
 tgo1 <- get_adm_boundaries("TGO", adm_level=1, geo_path="./GIS")
+
+tgo0 %>% gview()
 ```
 
-## Get admin boundaries 
-
-Get target country admin boundaries + neighbor countries data from [Natural Earth Data](https://www.naturalearthdata.com/)
+Admin boundaries + neighbor countries data from [Natural Earth Data](https://www.naturalearthdata.com/)
 
 
 ```{r}

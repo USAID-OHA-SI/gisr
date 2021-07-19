@@ -30,7 +30,7 @@ terrain_map(
 \item{terr}{RasterLayer dataset or Path for terrain raster file}
 }
 \value{
-
+ggplot basemap
 }
 \description{
 Generate a terrain map
@@ -38,8 +38,8 @@ Generate a terrain map
 \examples{
 \dontrun{
 library(gisr)
-terrain_map(countries = list("Zambia"))
-terrain_map(countries = list("Zambia"), add_neighbors = TRUE)
+gisr::terrain_map(countries = list("Zambia"))
+gisr::terrain_map(countries = list("Zambia"), add_neighbors = TRUE)
 }
 
 }

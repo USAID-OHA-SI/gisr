@@ -12,7 +12,7 @@ admins_map(countries, add_neighbors = FALSE)
 \item{add_neighbors}{should the map include the neighbor countries}
 }
 \value{
-
+ggplot admin map
 }
 \description{
 Generate administrative boundaries map
