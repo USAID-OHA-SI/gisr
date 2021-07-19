@@ -35,17 +35,17 @@ Imports:
     crayon,
     httr,
     janitor,
-    jsonlite,
-    Wavelength,
-    glitr,
-    glamr
+    jsonlite
 Suggests: 
     knitr, 
     rmarkdown,
     here,
     rnaturalearthdata,
     rnaturalearth,
-    patchwork
+    patchwork,
+    Wavelength,
+    glitr,
+    glamr
 Remotes:
     USAID-OHA-SI/Wavelength,
     USAID-OHA-SI/glitr,
