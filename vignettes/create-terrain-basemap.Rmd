@@ -23,7 +23,8 @@ Thematic maps are single-topics maps that focus on the spatial variability of a 
 Below are how we go about creating these basemaps
 
 ```{r setup}
-library(tidyverse)     # General data munging and visualisation
+library(dplyr)         # General data munging and visualisation
+library(ggplot2)       # General plotting
 library(gisr)          # OHA/SI in house package used to create these basemap
 library(glitr)         # OHA/SI in house package used to help standardize viz
 library(sf)

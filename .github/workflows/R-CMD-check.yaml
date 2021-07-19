@@ -33,6 +33,10 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v1
 
+      - name: Install qpdf for ci build
+        run: |
+          brew install qpdf
+
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))

@@ -22,18 +22,16 @@ Imports:
     purrr,
     readr,
     readxl,
-    stats,
     stringr,
     tibble,
     tidyr,
-    here,
     raster,
-    sf,
+    rgdal (>= 1.5),
     rgeos,
-    rnaturalearth,
-    rnaturalearthdata,
+    sp,
+    sf,
     ggplot2,
-    patchwork,
+    
     methods,
     crayon,
     httr,
@@ -44,7 +42,11 @@ Imports:
     glamr
 Suggests: 
     knitr, 
-    rmarkdown
+    rmarkdown,
+    here,
+    rnaturalearthdata,
+    rnaturalearth,
+    patchwork
 Remotes:
     USAID-OHA-SI/Wavelength,
     USAID-OHA-SI/glitr,
