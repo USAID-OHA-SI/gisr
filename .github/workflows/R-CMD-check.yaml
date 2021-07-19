@@ -43,6 +43,8 @@ jobs:
           brew install gdal
 
       - name: Install dependencies
+        env:
+          _R_CHECK_FORCE_SUGGESTS_: false
         run: |
           install.packages(c("remotes", "rcmdcheck"))
           install.packages("rgdal", configure.args = c("--with-proj-lib=/usr/local/lib/", "--with-proj-include=/usr/local/include/"))
