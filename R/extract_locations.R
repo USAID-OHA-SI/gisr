@@ -110,7 +110,12 @@ extract_locations <-
     # Parse geom
     if (add_geom == TRUE) {
         df <- df %>%
-            dplyr::select(operatingunit_iso, countryname_iso, operatingunit, countryname, label, level:coordinates) %>%
+            dplyr::select(operatingunit_iso,
+                          countryname_iso,
+                          operatingunit,
+                          countryname,
+                          label,
+                          level:coordinates) %>%
             dplyr::mutate(
                 geom_type = dplyr::case_when(
                     base::is.na(geom_type) & label == "facility" ~ "Point",
@@ -179,3 +184,5 @@ extract_facilities <- function(.data, mer_sites = NULL) {
 
     return(.data)
 }
+
+

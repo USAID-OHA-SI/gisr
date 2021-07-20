@@ -316,7 +316,7 @@ library(zip)
   # OU Only
   extract_boundaries(
       spdf = pepfar_polygons,
-      country = "Ghana", #cntry,
+      country = "Guinea", #cntry,
       level = 6
     ) %>%
     gview()
@@ -385,7 +385,10 @@ library(zip)
     left_join(countries, by = c("uid" = "countryname_uid")) %>%
     filter(!is.na(countryname))
 
-  shp_cntries %>% gview()
+  shp_cntries %>% filter(countryname %in% cntries) %>%
+    st_drop_geometry()
+
+  #shp_cntries %>% gview()
 
   shp_cntries_name <- file.path(dir_ou_global, "pepfar_countries.shp")
 

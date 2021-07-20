@@ -411,3 +411,242 @@ get_ouorguids <-
   }
 
 
+#' @title Get Attributes Data for Orgunit Boundaries
+#'
+#' @param country    OU/country
+#' @param folderpath Local directory of files
+#'
+#' @return           OU Orgunit level as df
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'  library(tidyverse)
+#'  library(gisr)
+#'
+#'  get_attributes(country = "Nigeria")
+#'  get_attributes(country = "Nigeria", folderpath = glamr::si_path("path_vector"))
+#' }
+#'
+get_attributes <- function(country,
+                           folderpath = NULL) {
+
+  file_pattern <- base::paste0("^orghierarchy - ",
+                         stringr::str_to_lower(country),
+                         " - \\d{8}.csv$")
+
+  file_attrs <- NULL
+
+  # Attempt to locate file from local drive
+  if (!base::is.null(folderpath)) {
+
+    base::message(base::paste0("Searching for: ", file_pattern))
+
+    file_attrs <- glamr::return_latest(
+      folderpath,
+      pattern = file_pattern,
+      recursive = TRUE)
+  }
+
+  # Attempt to read attrs from local drive
+  if (!base::is.null(file_attrs) | base::length(file_attrs) != 0) {
+
+    base::message(glue::glue("Reading from: {basename(file_attrs)}"))
+
+    df_attrs <- file_attrs %>%
+      readr::read_csv(file = ., col_types = c(.default = "c"))
+
+    return(df_attrs)
+  }
+
+  base::message(country)
+
+  # Get attrs from datim
+  df_attrs <- extract_locations(country = country, add_geom = FALSE)
+
+  labels <- df_attrs %>%
+    distinct(label) %>%
+    pull()
+
+  # Use psnu as snu1
+  if (!"snu1" %in% labels) {
+    df_attrs <- df_attrs %>%
+      dplyr::filter(label == "prioritization") %>%
+      dplyr::mutate(label = "snu1") %>%
+      dplyr::bind_rows(df_attrs, .)
+  }
+
+  # Filter out facilities and communities
+  df_attrs <- df_attrs %>%
+    dplyr::select(-path) %>%
+    dplyr::filter(label != "facility") %>%
+    dplyr::select(id, level, label, name,
+                  operatingunit_iso, operatingunit,
+                  countryname_iso, countryname)
+
+  return(df_attrs)
+}
+
+
+#' @title Extract Orgunit Boundaries Attributes
+#'
+#' @param country    OU/country
+#' @param folderpath Local directory of files
+#'
+#' @return df
+#' @export
+#' @examples
+#' \dontrun{
+#'  library(tidyverse)
+#'  library(gisr)
+#'
+#'  extract_attributes(country = "Nigeria")
+#'  extract_attributes(country = "Nigeria", folderpath = glamr::si_path("path_vector"))
+#' }
+#'
+extract_attributes <-
+  function(country,
+           folderpath = NULL) {
+
+    # local dir & filename
+    dir <- folderpath
+
+    if (!base::is.null(dir) && !base::dir.exists(dir)) {
+      base::message(glue::glue("Directory does not exist: {folderpath}"))
+      base::stop("Invalid folderpath")
+    }
+
+    # Default folder
+    path_vector <- glamr::si_path("path_vector")
+
+    if (base::is.null(dir) && !base::is.null(path_vector) && base::dir.exists(path_vector)) {
+      base::message(base::glue("Data will be extracted to: {path_vector}"))
+      dir <- path_vector
+    }
+
+    # No folder identified
+    if (is.null(dir)) {
+
+      base::message("Destination folder is not set")
+      base::message("Consider using glamr::set_paths(folderpath_vector = '../<folder>')")
+
+      stop("folderpath is not set")
+    }
+
+    filename <- base::file.path(dir,
+                                glue::glue("orghierarchy - ",
+                                "{stringr::str_to_lower(country)} - ",
+                                "{base::format(base::Sys.Date(), '%Y%m%d')}",
+                                ".csv"))
+
+    #get and save country attributes
+    df_attrs <- base::tryCatch(
+      get_attributes(country = country),
+      error = function(err) {
+        base::message("See error(s) below:")
+        base::print(err)
+        return(NULL)
+      },
+      warning = function(warn) {
+        base::message("See warning(s) below:")
+        base::print(warn)
+      }
+    )
+
+    #Write to csv file
+    if (!base::is.null(df_attrs) && base::nrow(df_attrs) > 0) {
+      base::message(glue::glue("Found {base::nrow(df_attrs)} records for {country}"))
+      base::message(glue::glue("Writing data to: {base::basename(filename)}"))
+      readr::write_csv(x = df_attrs, file = filename)
+    } else {
+      base::message(glue::glue("No data found for: {country}"))
+    }
+  }
+
+
+#' @title Save shapefile
+#'
+#' @param spdf sf object
+#' @param name filename with full path
+#' @return     boolean
+#' @export
+#'
+#' @examples
+#' \dontrun {
+#'  library(gisr)
+#'  library(sf)
+#'
+#'  shp <- get_admin0(countries = "Nigeria")
+#'
+#'  export_spdf(spdf = shp, name = "./GIS/nga_country_boundaries")
+#'  export_spdf(spdf = shp, name = "./GIS/nga_country_boundaries.shp")
+#' }
+#'
+export_spdf <- function(spdf, name) {
+
+  # Check directory
+  dir <- base::dirname(name)
+
+  if (!base::dir.exists(dir)) {
+    base::message(glue::glue("{dir} does not seem to exist."))
+  }
+
+  name <- base::ifelse(!stringr::str_detect(name, ".shp$"),
+                 base::paste0(name, ".shp"),
+                 name)
+
+  delete <- base::ifelse(file.exists(name), TRUE, FALSE)
+
+  sf::st_write(obj = spdf,
+               dsn = name,
+               delete_dsn = delete)
+
+}
+
+
+#' @title Zip shapefile
+#'
+#' @param filename    Shapefile full name
+#' @param dest_folder Where to place the zipped files
+#' @return            Boolean
+#' @export
+#'
+#' @examples
+#' \dontrun {
+#'  library(gisr)
+#'  library(sf)
+#'
+#'  shp <- get_admin0(countries = "Nigeria")
+#'
+#'  fname <- ./GIS/nga_country_boundaries"
+#'
+#'  export_spdf(spdf = shp, name = fname)
+#'
+#'  zip_shapefiles(filename = fname, dest_folder = "./GIS/)
+#' }
+#'
+zip_shapefiles <-
+  function(filename,
+           dest_folder = NULL) {
+
+    # File pattern
+    fileparts <- base::basename(filename) %>%
+      stringr::str_remove(".shp$")
+
+    # Where to place the zipped file
+    if (base::is.null(dest_folder)) {
+      dest_folder <- filename %>%
+        base::dirname()
+    }
+
+    # Files to be zipped
+    zipfiles <- base::list.files(path = dest_folder,
+                                 pattern = fileparts,
+                                 full.names = TRUE)
+
+    # Zip files
+    zip::zip(zipfile = base::file.path(dest_folder, base::paste0(fileparts, ".zip")),
+             files = zipfiles,
+             mode = "cherry-pick")
+
+  }

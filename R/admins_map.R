@@ -13,6 +13,7 @@
 #'
 admins_map <- function(countries,
                        add_neighbors = FALSE) {
+
     cntries <- {{countries}}
     admin0 <- get_admin0(cntries)
     admin1 <- get_admin1(cntries)

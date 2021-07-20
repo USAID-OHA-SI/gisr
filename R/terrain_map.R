@@ -170,3 +170,225 @@ get_raster <-
 
         return(ras)
     }
+
+
+#' @title Get terrain data for an AOI (Countries)
+#'
+#' @param countries  List of the country names or sf object
+#' @param mask       Should the extracted data match the exact boundary limits?
+#' @param buffer     Extend AOI extent by x
+#' @param terr       RasterLayer or Path to terrain raster file
+#' @importFrom       methods as
+#' @return           spdf spatial dataframe
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'  library(gisr)
+#'  library(sf)
+#'
+#'  get_terrain(countries = list("Zambia"))
+#'  get_terrain(countries = list("Zambia"), mask = TRUE)
+#'  get_terrain(countries = list("Zambia"), buffer = .5, terr = "../../HDX_Data")
+#'
+#' }
+get_terrain <-
+    function(countries = list("Zambia"),
+             mask = FALSE,
+             buffer = .1,
+             terr = NULL) {
+
+        # Params
+        cntries <- {{countries}}
+
+        # SFC Object
+        aoi <- NULL
+
+        # Check AOI
+        if (base::is.null(cntries)) {
+            base::cat(
+                crayon::red(
+                    base::paste0("\ncountry(ies) is required",
+                                 " to extract Terrain RasterLayer\n")))
+
+            return(NULL)
+        }
+
+        # Country boundaries
+        if ( "sf" %in% base::class(cntries) ) {
+            aoi <- cntries
+        }
+        else {
+            aoi <- get_admin0(countries = cntries)
+        }
+
+        # Raster Data
+        # DEM File location
+        dem_url <- "https://drive.google.com/drive/u/0/folders/1M02ToX9AnkozOHtooxU7s4tCnOZBTvm_"
+
+        terr_ras <- NULL
+        terr_path <- "./GIS/"
+
+        # Locate and retrieve terrain file
+        if ( base::is.null(terr) ) {
+
+            if ( base::dir.exists(terr_path) ) {
+                terr = terr_path
+            } else {
+                stop(base::paste0("Path: ", terr_path, " does not exist"))
+            }
+        }
+
+        # Use user provided rasterlayer
+        if ( !base::is.null(terr) & "RasterLayer" %in% base::class(terr)) {
+            terr_ras <- terr
+        }
+
+        # Read raster from local or special location
+        if ( base::is.null(terr_ras)) {
+
+            # file path
+            terr_file <- base::list.files(
+                terr,
+                pattern = "SR_LR.tif$",
+                recursive = TRUE,
+                full.names = TRUE
+            )
+
+            if ( length(terr_file) == 0 )
+                base::stop(base::paste0("Could not locate a TIFF file in: ",
+                                        terr, "\nDownload file from: ",
+                                        dem_url))
+
+            # Read raster file
+            terr_ras <- raster::raster(terr_file) %>%
+                raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
+        }
+
+        # Crop raster to boundaries extent
+        terr_ras <- terr_ras %>%
+            raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
+
+        # Crop to the exact limits if applicable
+        if ( mask == TRUE )
+            terr_ras <- terr_ras %>% raster::mask(aoi)
+
+        # Convert raster data into a spatial data frame
+        spdf <- terr_ras %>%
+            as("SpatialPixelsDataFrame") %>%
+            as.data.frame() %>%
+            dplyr::rename(value = SR_LR)
+
+        return(spdf)
+    }
+
+
+#' @title Get Basemap
+#'
+#' @param spdf        PEPFAR ORGs Spatial Data
+#' @param country     OU or Country Name
+#' @param terr        RasterLayer
+#' @param add_admins  Should the sub-admins be added? Default is false
+#' @return            ggplot plot of base map
+#'
+#' @examples
+#' \dontrun{
+#' library(gisr)
+#' library(sf)
+#'
+#'  shp <- get_pepfar_shp(shp_path = glamr::si_path("path_vector"), add_attr = TRUE)
+#'  ras <- get_raster(terr_path = glamr::si_path("path_raster"))
+#'
+#'  get_basemap(spdf = shp, country = "Nigeria", terr = ras)
+#' }
+#'
+get_basemap <-
+    function(spdf,
+             country = NULL,
+             terr = NULL,
+             add_admins = FALSE) {
+
+        # Params
+        df_geo <- {{spdf}}
+        cntry <- {{country}}
+        dta_raster <- {{terr}}
+
+        # Filter by OU / Country
+        if (!is.null(cntry)) {
+            df_geo <- df_geo %>%
+                filter(operatingunit == cntry)
+        }
+
+        # Transform geodata
+        df_geo <- df_geo %>%
+            sf::st_as_sf() %>%
+            sf::st_transform(., crs = sf::st_crs(4326)) %>%
+            sf::st_zm()
+
+        # Get country boundaries
+        df_geo0 <- df_geo %>%
+            filter(type == "OU")
+
+        # Get snu1 or psnu boundaries
+        df_geo1 <- df_geo %>%
+            filter(type == "SNU1")
+
+
+        # Terrain
+        if (is.null(dta_raster))
+            stop("Terrain rasterlayer is required.")
+
+        # Crop
+        terr <- dta_raster %>%
+            raster::crop(x = ., y = raster::extend(raster::extent(df_geo0), .2)) %>%
+            raster::mask(x = ., mask = df_geo0)
+
+        # Convert raster data into a spatial data frame
+        trdf <- terr %>%
+            as("SpatialPixelsDataFrame") %>%
+            as.data.frame() %>%
+            dplyr::rename(value = SR_LR) %>%
+            dplyr::filter(value < 210)
+
+        # Basemap
+        m <- ggplot2::ggplot() +
+            ggplot2::geom_tile(data = trdf, aes(x, y, alpha = value)) +
+            ggplot2::scale_alpha(name = "", range = c(0.6, 0), guide = F) +
+            ggplot2::geom_sf(
+                data = df_geo0,
+                colour = "white",
+                fill = grey10k,
+                size = 2,
+                alpha = .25
+            )
+
+        # Add sub-admins boundaries
+        if (add_admins & nrow(df_geo1) > 0) {
+            m <- m +
+                ggplot2::geom_sf(
+                    data = df_geo1,
+                    fill = "NA",
+                    linetype = "dotted",
+                    size = .5
+                )
+        }
+
+        # Add country boundaries
+        m <- m +
+            ggplot2::geom_sf(
+                data = df_geo0,
+                colour = grey90k,
+                fill = "NA",
+                size = 1
+            ) +
+            ggplot2::theme_void()
+
+        # Zoom to South Africa mainland
+        if ("south africa" == tolower(country)) {
+            m <- m +
+                ggplot2::xlim(15, 35) +
+                ggplot2::ylim(-38,-20)
+        }
+
+        return(m)
+    }
