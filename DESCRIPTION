@@ -47,5 +47,5 @@ Suggests:
 Remotes:
     USAID-OHA-SI/glamr,
     ropensci/rnaturalearthhires
-BuildVignettes: FALSE
+BuildVignettes: true
 VignetteBuilder: knitr
