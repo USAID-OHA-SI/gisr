@@ -15,9 +15,9 @@ BugReports: https://github.com/USAID-OHA-SI/gisr/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Depends: 
-    R (>= 3.1.0),
-    dplyr (>= 1.0.0)
+    R (>= 3.5.0)
 Imports: 
+    dplyr (>= 1.0.0),
     tidyr,
     magrittr,
     purrr,
@@ -26,7 +26,7 @@ Imports:
     ggplot2,
     raster,
     sp,
-    sf,
+    #sf,
     rnaturalearth,
     methods,
     crayon,
