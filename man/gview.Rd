@@ -13,8 +13,14 @@ gview(geodata)
 Plot sf features
 }
 \examples{
-\dontrun{
-gview(sf_data)
+\donttest{
+ library(gisr)
+
+ adm0 <- get_admin0("Ghana")
+
+ adm0 \%>\%
+  dplyr::select(name) \%>\%
+  gview()
 }
 
 }

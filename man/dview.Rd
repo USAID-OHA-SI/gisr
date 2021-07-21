@@ -2,21 +2,25 @@
 % Please edit documentation in R/geo_utilities.R
 \name{dview}
 \alias{dview}
-\title{View feature attributes}
+\title{View attributes from simple feature object}
 \usage{
 dview(geodata, console = FALSE)
 }
 \arguments{
-\item{geodata}{spatial data data}
+\item{geodata}{spatial data}
 
 \item{console}{view in console? default false}
 }
 \description{
-View feature attributes
+View attributes from simple feature object
 }
 \examples{
 \dontrun{
-gview(sf_data)
+ library(gisr)
+
+ adm0 <- get_admin0("Ghana")
+
+ adm0 \%>\% dview(console = TRUE)
 }
 
 }

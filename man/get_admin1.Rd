@@ -2,7 +2,7 @@
 % Please edit documentation in R/geo_utilities.R
 \name{get_admin1}
 \alias{get_admin1}
-\title{Get admin level 1 boundaries sf data for a given country}
+\title{Get admin level 1 boundaries}
 \usage{
 get_admin1(countries, crs = 4326)
 }
@@ -15,11 +15,13 @@ get_admin1(countries, crs = 4326)
 simple feature class
 }
 \description{
-Get admin level 1 boundaries sf data for a given country
+sf boundaries data for a given country
 }
 \examples{
-\dontrun{
-get_admin1(countries = list("Zambia"))
+\donttest{
+ library(gisr)
+
+ get_admin1(countries = list("Zambia"))
 }
 
 }

@@ -31,6 +31,10 @@ Use with caution. Use \code{get_ouorguids()} for levels below 3
 }
 \examples{
 \dontrun{
- orgs <- get_orguids(level = 3)}
+ library(gisr)
+
+ # All orgunit level 3 uids + names
+ orgs <- get_orguids(level = 3)
+}
 
 }

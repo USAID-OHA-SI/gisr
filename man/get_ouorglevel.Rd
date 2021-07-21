@@ -31,8 +31,15 @@ Get OU Org level
 }
 \examples{
 \dontrun{
-get_ouorglevel("Zambia")
-get_ouorglevel("Zambia", org_type = "community")
+ library(gisr)
+
+ cntry <- "Zambia"
+
+ # Get country org level
+ get_ouorglevel(cntry)
+
+ # Get community org level
+ get_ouorglevel(cntry, org_type = "community")
 }
 
 }

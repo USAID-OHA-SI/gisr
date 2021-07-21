@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>View feature attributes — dview • gisr</title>
+<title>View attributes from simple feature object — dview • gisr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="View feature attributes — dview" />
-<meta property="og:description" content="View feature attributes" />
+<meta property="og:title" content="View attributes from simple feature object — dview" />
+<meta property="og:description" content="View attributes from simple feature object" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -131,13 +131,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>View feature attributes</h1>
+    <h1>View attributes from simple feature object</h1>
     <small class="dont-index">Source: <a href='https://github.com/USAID-OHA-SI/gisr/blob/master/R/geo_utilities.R'><code>R/geo_utilities.R</code></a></small>
     <div class="hidden name"><code>dview.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>View feature attributes</p>
+    <p>View attributes from simple feature object</p>
     </div>
 
     <pre class="usage"><span class='fu'>dview</span><span class='op'>(</span><span class='va'>geodata</span>, console <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
@@ -147,7 +147,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>geodata</th>
-      <td><p>spatial data data</p></td>
+      <td><p>spatial data</p></td>
     </tr>
     <tr>
       <th>console</th>
@@ -158,7 +158,11 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='gview.html'>gview</a></span><span class='op'>(</span><span class='va'>sf_data</span><span class='op'>)</span>
+ <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/USAID-OHA-SI/gisr'>gisr</a></span><span class='op'>)</span>
+
+ <span class='va'>adm0</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_admin0.html'>get_admin0</a></span><span class='op'>(</span><span class='st'>"Ghana"</span><span class='op'>)</span>
+
+ <span class='va'>adm0</span> <span class='op'>%&gt;%</span> <span class='fu'>dview</span><span class='op'>(</span>console <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='op'>}</span>
 
 </div></pre>

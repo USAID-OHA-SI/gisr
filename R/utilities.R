@@ -11,7 +11,11 @@
 #'
 #' @examples
 #' \dontrun{
-#'  orgs <- get_orguids(level = 3)}
+#'  library(gisr)
+#'
+#'  # All orgunit level 3 uids + names
+#'  orgs <- get_orguids(level = 3)
+#' }
 #'
 get_orguids <-
   function(level = 3,
@@ -57,7 +61,16 @@ get_orguids <-
 #'
 #' @examples
 #' \dontrun{
-#'  orgs <- get_ouorgs(ouuid = "<ou-uid-goes-here>", level = 4)}
+#'  library(gisr)
+#'
+#'  cntry <- "Zambia"
+#'
+#'  uid <- get_ouuid(cntry)
+#'
+#'  lvl <- get_ouorglevel(cntry, org_type = "prioritization")
+#'
+#'  orgs <- get_ouorgs(ouuid = uid, level = lvl)
+#' }
 #'
 get_ouorgs <-
   function(ouuid,
@@ -107,7 +120,7 @@ get_ouorgs <-
   }
 
 
-#' Get OU UIDS
+#' @title Get OU Org UIDS
 #'
 #' @param add_details Add countries for regional ou, default is false
 #' @param username    DATIM Username, recommend using `datim_user()`
@@ -119,7 +132,11 @@ get_ouorgs <-
 #'
 #' @examples
 #' \dontrun{
-#'  ous <- get_ouuids() }
+#'  library(gisr)
+#'
+#'  # OU Org UIDs
+#'  ous <- get_ouuids()
+#' }
 #'
 get_ouuids <-
   function(add_details = FALSE,
@@ -172,7 +189,7 @@ get_ouuids <-
   }
 
 
-#' Get OU UID
+#' @title Get Operatingunit / Country Org UID
 #'
 #' @param operatingunit Operatingunit name
 #' @param username      Datim Account username, recommend using `datim_user()`
@@ -183,7 +200,10 @@ get_ouuids <-
 #'
 #' @examples
 #' \dontrun{
-#' get_ouuid(operatingunit = "Kenya")
+#'   library(gisr)
+#'
+#'   # get orgunit for specific OU/Country: kenya
+#'   get_ouuid(operatingunit = "Kenya")
 #' }
 #'
 get_ouuid <-
@@ -245,7 +265,11 @@ get_ouuid <-
 #'
 #' @examples
 #' \dontrun{
-#'   get_levels() }
+#'   library(gisr)
+#'
+#'   # Get PEPFAR Org Levels
+#'   get_levels()
+#'  }
 #'
 get_levels <-
   function(username = NULL,
@@ -299,8 +323,15 @@ get_levels <-
 #'
 #' @examples
 #' \dontrun{
-#' get_ouorglevel("Zambia")
-#' get_ouorglevel("Zambia", org_type = "community")
+#'  library(gisr)
+#'
+#'  cntry <- "Zambia"
+#'
+#'  # Get country org level
+#'  get_ouorglevel(cntry)
+#'
+#'  # Get community org level
+#'  get_ouorglevel(cntry, org_type = "community")
 #' }
 #'
 get_ouorglevel <-
@@ -362,12 +393,24 @@ get_ouorglevel <-
 #' @param username     Datim Account username
 #' @param password     Datim Account Password
 #'
-#' @return list of uids
+#' @return             list of uids
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' get_ouorgsuids("<ou-uid-goes-here>", level = 4)
+#'  library(gisr)
+#'
+#'  # Set country of interest
+#'  cntry <- "Zambia"
+#'
+#'  # Get OU/Country orgunit uid
+#'  uid <- get_ouuid(cntry)
+#'
+#'  # Get org level for psnu
+#'  lvl <- get_ouorglevel(cntry, org_type = "prioritization")
+#'
+#'  # Retreived all uids for level 4 (SNU1)
+#'  get_ouorguids(ouuid = uid, level = 4)
 #' }
 #'
 get_ouorguids <-
@@ -404,7 +447,7 @@ get_ouorguids <-
     }
 
     # extract list of uids
-    lvl_uids <- orgs %>% pull(uid)
+    lvl_uids <- orgs %>% dplyr::pull(uid)
 
     # return
     return(lvl_uids)
@@ -421,11 +464,9 @@ get_ouorguids <-
 #'
 #' @examples
 #' \dontrun{
-#'  library(tidyverse)
 #'  library(gisr)
 #'
 #'  get_attributes(country = "Nigeria")
-#'  get_attributes(country = "Nigeria", folderpath = glamr::si_path("path_vector"))
 #' }
 #'
 get_attributes <- function(country,
@@ -520,7 +561,7 @@ extract_attributes <-
     path_vector <- glamr::si_path("path_vector")
 
     if (base::is.null(dir) && !base::is.null(path_vector) && base::dir.exists(path_vector)) {
-      base::message(base::glue("Data will be extracted to: {path_vector}"))
+      base::message(glue::glue("Data will be extracted to: {path_vector}"))
       dir <- path_vector
     }
 
@@ -572,7 +613,7 @@ extract_attributes <-
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #'  library(gisr)
 #'  library(sf)
 #'
@@ -604,7 +645,7 @@ export_spdf <- function(spdf, name) {
 }
 
 
-#' @title Zip shapefile
+#' @title Compress all shapefile components into a zipped file
 #'
 #' @param filename    Shapefile full name
 #' @param dest_folder Where to place the zipped files
@@ -612,7 +653,7 @@ export_spdf <- function(spdf, name) {
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #'  library(gisr)
 #'  library(sf)
 #'

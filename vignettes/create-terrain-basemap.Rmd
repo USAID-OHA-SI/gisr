@@ -38,10 +38,10 @@ We will be using Nigeria as our country of focus. Let's extract the country boun
 countryname <- "Nigeria"
 
 adm0 <- gisr::get_admin0(countries = countryname) %>% 
-  dplyr::select(sovereignt, admin, iso_a2, iso_a3)
+  dplyr::select(admin)
 
 adm1 <- gisr::get_admin1(countries = countryname) %>% 
-  dplyr::select(name, code_hasc)
+  dplyr::select(name)
 
 ```
 

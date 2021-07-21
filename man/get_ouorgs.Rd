@@ -34,6 +34,15 @@ Use \code{get_orguids()} for levels above 4
 }
 \examples{
 \dontrun{
- orgs <- get_ouorgs(ouuid = "<ou-uid-goes-here>", level = 4)}
+ library(gisr)
+
+ cntry <- "Zambia"
+
+ uid <- get_ouuid(cntry)
+
+ lvl <- get_ouorglevel(cntry, org_type = "prioritization")
+
+ orgs <- get_ouorgs(ouuid = uid, level = lvl)
+}
 
 }

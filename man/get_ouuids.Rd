@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{get_ouuids}
 \alias{get_ouuids}
-\title{Get OU UIDS}
+\title{Get OU Org UIDS}
 \usage{
 get_ouuids(
   add_details = FALSE,
@@ -24,10 +24,14 @@ get_ouuids(
 OU UIDS as tibble
 }
 \description{
-Get OU UIDS
+Get OU Org UIDS
 }
 \examples{
 \dontrun{
- ous <- get_ouuids() }
+ library(gisr)
+
+ # OU Org UIDs
+ ous <- get_ouuids()
+}
 
 }

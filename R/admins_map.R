@@ -6,9 +6,10 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' library(gisr)
-#' admins_map(countries = list("Zambia"))
-#' admins_map(countries = list("Zambia"), add_neighbors = TRUE)
+#'  library(gisr)
+#'
+#'  admins_map(countries = list("Zambia"))
+#'  admins_map(countries = list("Zambia"), add_neighbors = TRUE)
 #' }
 #'
 admins_map <- function(countries,

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get terrain data for an AOI (Countries) — get_terrain • gisr</title>
+<title>Get attributes from feature class — attributes • gisr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Get terrain data for an AOI (Countries) — get_terrain" />
-<meta property="og:description" content="Get terrain data for an AOI (Countries)" />
+<meta property="og:title" content="Get attributes from feature class — attributes" />
+<meta property="og:description" content="Get attributes from feature class" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -131,60 +131,52 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get terrain data for an AOI (Countries)</h1>
-    <small class="dont-index">Source: <a href='https://github.com/USAID-OHA-SI/gisr/blob/master/R/terrain_map.R'><code>R/terrain_map.R</code></a></small>
-    <div class="hidden name"><code>get_terrain.Rd</code></div>
+    <h1>Get attributes from feature class</h1>
+    <small class="dont-index">Source: <a href='https://github.com/USAID-OHA-SI/gisr/blob/master/R/geo_utilities.R'><code>R/geo_utilities.R</code></a></small>
+    <div class="hidden name"><code>attributes.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Get terrain data for an AOI (Countries)</p>
+    <p>Get attributes from feature class</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_terrain</span><span class='op'>(</span>
-  countries <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"Zambia"</span><span class='op'>)</span>,
-  mask <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  buffer <span class='op'>=</span> <span class='fl'>0.1</span>,
-  terr <span class='op'>=</span> <span class='cn'>NULL</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>attributes</span><span class='op'>(</span><span class='va'>geodata</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>countries</th>
-      <td><p>List of the country names or sf object</p></td>
-    </tr>
-    <tr>
-      <th>mask</th>
-      <td><p>Should the extracted data match the exact boundary limits?</p></td>
-    </tr>
-    <tr>
-      <th>buffer</th>
-      <td><p>Extend AOI extent by x</p></td>
-    </tr>
-    <tr>
-      <th>terr</th>
-      <td><p>RasterLayer or Path to terrain raster file</p></td>
+      <th>geodata</th>
+      <td><p>spatial data</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     
-<pre>      spdf spatial dataframe
+<pre>    attribures as data frame
 </pre>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
  <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/USAID-OHA-SI/gisr'>gisr</a></span><span class='op'>)</span>
- <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://r-spatial.github.io/sf/'>sf</a></span><span class='op'>)</span>
 
- <span class='fu'>get_terrain</span><span class='op'>(</span>countries <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"Zambia"</span><span class='op'>)</span><span class='op'>)</span>
- <span class='fu'>get_terrain</span><span class='op'>(</span>countries <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"Zambia"</span><span class='op'>)</span>, mask <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
- <span class='fu'>get_terrain</span><span class='op'>(</span>countries <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"Zambia"</span><span class='op'>)</span>, buffer <span class='op'>=</span> <span class='fl'>.5</span>, terr <span class='op'>=</span> <span class='st'>"../../HDX_Data"</span><span class='op'>)</span>
+ <span class='co'># Admin level 0 [country] geodata</span>
+ <span class='va'>adm0</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_admin0.html'>get_admin0</a></span><span class='op'>(</span><span class='st'>"Ghana"</span><span class='op'>)</span>
 
-<span class='op'>}</span>
+ <span class='co'># Extract attrs from geodata</span>
+ <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>attributes</span><span class='op'>(</span>geodata <span class='op'>=</span> <span class='va'>adm0</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in attributes(geodata = adm0): supplied argument name 'geodata' does not match 'x'</span></div><div class='input'>
+ <span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;                                               
+#&gt; 1 function (x, df1, df2, ncp, log = FALSE)    
+#&gt; 2 {                                           
+#&gt; 3     if (missing(ncp))                       
+#&gt; 4         .Call(C_df, x, df1, df2, log)       
+#&gt; 5     else .Call(C_dnf, x, df1, df2, ncp, log)
+#&gt; 6 }                                           </div><div class='input'><span class='co'># }</span>
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

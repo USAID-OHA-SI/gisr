@@ -2,7 +2,7 @@
 % Please edit documentation in R/geo_utilities.R
 \name{get_admin0}
 \alias{get_admin0}
-\title{Get country boundary sf data for a given country}
+\title{Get admin level 0 boundary}
 \usage{
 get_admin0(countries, scale = "medium", crs = 4326)
 }
@@ -14,14 +14,17 @@ get_admin0(countries, scale = "medium", crs = 4326)
 \item{crs}{coordinates reference system}
 }
 \value{
-simple feature class
+\preformatted{     simple feature class
+}
 }
 \description{
-Get country boundary sf data for a given country
+sf boundaries data for a given country
 }
 \examples{
-\dontrun{
-get_admin0(counties = list("Zambia"))
+\donttest{
+  library(gisr)
+
+  get_admin0(countries = list("Zambia"))
 }
 
 }

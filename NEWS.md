@@ -1,3 +1,13 @@
+# gisr 0.2.1
+
+* Improvement and documentation of utility functions
+* Adding vignettes and package site
+* `attributes()` extract attributes from sf object
+* `get_attributes()` extract OU/Country orgunits attributes for VcPolygons
+* `extract_boundaries()` extract specific boundaries from VcPolygons
+* `export_spdf()` export sf objects to shapefiles
+* `zip_shapefiles()` compress all shapefile component into a zipped file
+
 
 # gisr 0.2.0
 

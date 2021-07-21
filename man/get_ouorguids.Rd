@@ -16,14 +16,27 @@ get_ouorguids(ouuid, level, username = NULL, password = NULL)
 \item{password}{Datim Account Password}
 }
 \value{
-list of uids
+\preformatted{        list of uids
+}
 }
 \description{
 Get Orgs uids by level
 }
 \examples{
 \dontrun{
-get_ouorgsuids("<ou-uid-goes-here>", level = 4)
+ library(gisr)
+
+ # Set country of interest
+ cntry <- "Zambia"
+
+ # Get OU/Country orgunit uid
+ uid <- get_ouuid(cntry)
+
+ # Get org level for psnu
+ lvl <- get_ouorglevel(cntry, org_type = "prioritization")
+
+ # Retreived all uids for level 4 (SNU1)
+ get_ouorguids(ouuid = uid, level = 4)
 }
 
 }

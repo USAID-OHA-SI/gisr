@@ -1,12 +1,44 @@
-#' @title View feature attributes
+#' @title Get attributes from feature class
 #'
-#' @param geodata spatial data data
+#' @param  geodata spatial data
+#' @return         attribures as data frame
+#'
+#' @export
+#' @examples
+#' \donttest{
+#'  library(gisr)
+#'
+#'  # Admin level 0 [country] geodata
+#'  adm0 <- get_admin0("Ghana")
+#'
+#'  # Extract attrs from geodata
+#'  df <- attributes(geodata = adm0)
+#'
+#'  df %>% head()
+#' }
+#'
+attributes <- function(geodata) {
+
+    # check of data is sf or sfc
+    base::stopifnot(base::any(class(geodata) %in% c('sf')))
+
+    # Drop geometry and view data
+    geodata %>% sf::st_drop_geometry(x = .)
+}
+
+#' @title View attributes from simple feature object
+#'
+#' @param geodata spatial data
 #' @param console view in console? default false
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' gview(sf_data)
+#'  library(gisr)
+#'
+#'  adm0 <- get_admin0("Ghana")
+#'
+#'  adm0 %>% dview(console = TRUE)
 #' }
 #'
 dview <- function(geodata,
@@ -28,15 +60,20 @@ dview <- function(geodata,
 }
 
 
-
-
-#' Plot sf features
+#' @title Plot sf features
 #'
 #' @param geodata r spatial data
+#'
 #' @export
 #' @examples
-#' \dontrun{
-#' gview(sf_data)
+#' \donttest{
+#'  library(gisr)
+#'
+#'  adm0 <- get_admin0("Ghana")
+#'
+#'  adm0 %>%
+#'   dplyr::select(name) %>%
+#'   gview()
 #' }
 #'
 gview <- function(geodata) {
@@ -92,9 +129,20 @@ gview <- function(geodata) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' geo_neighors(countries = list("Zambia"))
-#' geo_neighors(countries = list("Zambia", "Malawi"))
+#' \donttest{
+#'  library(gisr)
+#'
+#'  cntry <- "Zambia"
+#'
+#'  # Country + neighbors boundaries
+#'  cntries <- geo_neighbors(countries = cntry)
+#'
+#'  # Country + neighbors boundaries: crop to country extent
+#'  cntries <- geo_neighbors(countries = cntry, crop = TRUE)
+#'
+#'  cntries %>%
+#'    dplyr::select(name) %>%
+#'    attributes()
 #' }
 #'
 geo_neighbors <- function(countries,
@@ -139,16 +187,21 @@ geo_neighbors <- function(countries,
 }
 
 
-#' Get country boundary sf data for a given country
+#' @title Get admin level 0 boundary
+#'
+#' @description sf boundaries data for a given country
 #'
 #' @param countries list of country names
-#' @param scale spatial resolution of the geodata
-#' @param crs coordinates reference system
-#' @return simple feature class
+#' @param scale     spatial resolution of the geodata
+#' @param crs       coordinates reference system
+#'
+#' @return          simple feature class
 #' @export
 #' @examples
-#' \dontrun{
-#' get_admin0(counties = list("Zambia"))
+#' \donttest{
+#'   library(gisr)
+#'
+#'   get_admin0(countries = list("Zambia"))
 #' }
 #'
 get_admin0 <- function(countries, scale = "medium", crs = 4326) {
@@ -166,15 +219,19 @@ get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 }
 
 
-#' Get admin level 1 boundaries sf data for a given country
+#' @title Get admin level 1 boundaries
+#'
+#' @description sf boundaries data for a given country
 #'
 #' @param countries list of country names
 #' @param crs coordinates reference system
 #' @return simple feature class
 #' @export
 #' @examples
-#' \dontrun{
-#' get_admin1(countries = list("Zambia"))
+#' \donttest{
+#'  library(gisr)
+#'
+#'  get_admin1(countries = list("Zambia"))
 #' }
 #'
 get_admin1 <- function(countries, crs = 4326) {
@@ -187,7 +244,7 @@ get_admin1 <- function(countries, crs = 4326) {
 }
 
 
-#' @title Extract PEPFAR Orgunit Boundaries
+#' @title          Extract PEPFAR Orgunit Boundaries
 #'
 #' @description    PEPFAR VcPolygons are shared with orgunit uids only,
 #'                 making hard for analysts to identify specific polygon
@@ -207,7 +264,7 @@ get_admin1 <- function(countries, crs = 4326) {
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #'
 #'  library(gisr)
 #'  library(sf)
@@ -284,7 +341,7 @@ extract_boundaries <-
         }
 
         orgs <- orgs %>%
-            dplyrr::mutate(org_level = lvl)
+            dplyr::mutate(org_level = lvl)
 
         # filter sp df
         spdf <- spdf %>%

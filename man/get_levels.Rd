@@ -28,6 +28,10 @@ Same as \code{glamr::identify_levels()} or \code{Wavelength::identify_levels()}
 }
 \examples{
 \dontrun{
-  get_levels() }
+  library(gisr)
+
+  # Get PEPFAR Org Levels
+  get_levels()
+ }
 
 }

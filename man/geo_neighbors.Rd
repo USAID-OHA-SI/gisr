@@ -23,9 +23,20 @@ geo_neighbors(countries, scale = "large", crs = 4326, crop = FALSE)
 Get neighbors of a given contry
 }
 \examples{
-\dontrun{
-geo_neighors(countries = list("Zambia"))
-geo_neighors(countries = list("Zambia", "Malawi"))
+\donttest{
+ library(gisr)
+
+ cntry <- "Zambia"
+
+ # Country + neighbors boundaries
+ cntries <- geo_neighbors(countries = cntry)
+
+ # Country + neighbors boundaries: crop to country extent
+ cntries <- geo_neighbors(countries = cntry, crop = TRUE)
+
+ cntries \%>\%
+   dplyr::select(name) \%>\%
+   attributes()
 }
 
 }

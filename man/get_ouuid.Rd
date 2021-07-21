@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{get_ouuid}
 \alias{get_ouuid}
-\title{Get OU UID}
+\title{Get Operatingunit / Country Org UID}
 \usage{
 get_ouuid(operatingunit, username = NULL, password = NULL)
 }
@@ -17,11 +17,14 @@ get_ouuid(operatingunit, username = NULL, password = NULL)
 uid
 }
 \description{
-Get OU UID
+Get Operatingunit / Country Org UID
 }
 \examples{
 \dontrun{
-get_ouuid(operatingunit = "Kenya")
+  library(gisr)
+
+  # get orgunit for specific OU/Country: kenya
+  get_ouuid(operatingunit = "Kenya")
 }
 
 }
