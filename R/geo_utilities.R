@@ -187,3 +187,123 @@ get_admin1 <- function(countries, crs = 4326) {
 }
 
 
+#' @title Extract PEPFAR Orgunit Boundaries
+#'
+#' @description    PEPFAR VcPolygons are shared with orgunit uids only,
+#'                 making hard for analysts to identify specific polygon
+#'                 each orgunit level. This function extract orgunt attributes
+#'                 from Datim and append them to the global shapefile, allowing
+#'                 analysts to filter and work only with subset.
+#'
+#' @param spdf     PEPFAR Global Shapefile
+#' @param country  Country name
+#' @param level    Orgunit level
+#' @param username Datim username
+#' @param password Datim password
+#' @param export   Export extract as shapefile?
+#' @param name     Export filename
+#'
+#' @return         sf object with orgunit attributes
+#' @export
+#'
+#' @examples
+#' \dontrun {
+#'
+#'  library(gisr)
+#'  library(sf)
+#'  library(glamr)
+#'
+#'  cntry <- "Tanzania"
+#'
+#'  shp_pepfar <- return_latest(
+#'      folderpath = si_path("path_vector"),
+#'      pattern = "VcPepfarPolygons.*.shp",
+#'      recursive = TRUE
+#'    ) %>%
+#'    read_sf()
+#'
+#'  cntry_level <- get_ouorglevel(cntry, org_type = "country")
+#'
+#'  shp_country <- extract_boundaries(
+#'    spdf = shp_pepfar,
+#'    country = cntry,
+#'    level = cntry_level
+#'  )
+#'
+#'  shp_country %>% gview()
+#'
+#'  psnu_level <- get_ouorglevel(cntry, org_type = "prioritization")
+#'
+#'  shp_psnu <- extract_boundaries(
+#'    spdf = shp_pepfar,
+#'    country = cntry,
+#'    level = psnu_level
+#'  )
+#'
+#'  shp_psnu %>% gview()
+#' }
+#'
+extract_boundaries <-
+    function(spdf, country,
+             level = 3,
+             username = NULL,
+             password = NULL,
+             export = FALSE,
+             name = NULL) {
+
+        # Params
+        cntry <- {{country}}
+
+        lvl <- {{level}}
+
+        user <- base::ifelse(base::is.null(username),
+                             glamr::datim_user(),
+                             {{username}})
+
+        pass <- base::ifelse(base::is.null(password),
+                             glamr::datim_pwd(),
+                             {{password}})
+
+        #ou/country orgunit uid
+        uid <- get_ouuid(operatingunit = cntry,
+                         username = user,
+                         password = pass)
+
+        # list of orgs at the specified level
+        orgs <- get_ouorgs(
+            ouuid = uid,
+            level = lvl,
+            username = user,
+            password = pass)
+
+        # Check for valid data
+        if (base::is.null(orgs)) {
+            base::cat(crayon::red("\nNo geodata found for this request.\n"))
+
+            return(NULL)
+        }
+
+        orgs <- orgs %>%
+            dplyrr::mutate(org_level = lvl)
+
+        # filter sp df
+        spdf <- spdf %>%
+            left_join(orgs, by = "uid") %>%
+            filter(!is.na(orgunit))
+
+        # Export
+        if (export == TRUE & !is.null(name)) {
+            # validate name
+            name <- base::ifelse(!stringr::str_detect(name, ".shp$"),
+                                 base::paste0(name, ".shp"),
+                                 name)
+
+            # Export shapefile
+            sf::st_write(spdf,
+                         delete_dsn = TRUE,
+                         dsn = paste0(name, ".shp"))
+
+        }
+
+        return(spdf)
+    }

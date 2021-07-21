@@ -213,8 +213,8 @@ get_ouuid <-
 
 
     if (base::nrow(ous) == 0) {
-      base::cat("\nInvalid PEPFAR Operatingunit / Operatingunit: ",
-                crayon::red(stringr::str_to_upper(ou), "\n"))
+      base::cat("\nInvalid PEPFAR Operatingunit / Countryname: ",
+                crayon::red(ou, "\n"))
 
       return(NULL)
     }
