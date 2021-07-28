@@ -7,6 +7,7 @@
 * `extract_boundaries()` extract specific boundaries from VcPolygons
 * `export_spdf()` export sf objects to shapefiles
 * `zip_shapefiles()` compress all shapefile component into a zipped file
+* `download_shapefeles()` download compressed shapefiles from googledrive
 
 
 # gisr 0.2.0

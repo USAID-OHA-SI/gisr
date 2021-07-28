@@ -1,8 +1,8 @@
 ## PROJECT: Geospatial Analytics Utility functions
-## PURPOSE: Extract OperatingUnir boundaries from PEPFAR VcPolygons
+## PURPOSE: Extract OperatingUnit boundaries from PEPFAR VcPolygons
 ## AUTHOR:  B.Kagniniwa | USAID
 ## DATE:    2021-02-04
-## UPDATED: 2021-03-12
+## UPDATED: 2021-07-28
 
 
 # Libraries ----
@@ -18,7 +18,8 @@ library(zip)
 
 # Variables ----
 
-  cntry <- "Nigeria"
+  #cntry <- "Nigeria"
+  cntry <- "Zambia"
 
   file_shp <- return_latest(
       folderpath = glamr::si_path("path_vector"),
@@ -33,7 +34,7 @@ library(zip)
     dir.create(dir_ou_global)
 
   # Ou folder
-  dir_ou_bndries <- paste0(si_path("path_vector"), "/OU-Boundaries")
+  dir_ou_bndries <- paste0(si_path("path_vector"), "/OU-Country-Boundaries")
 
   if (!dir.exists(dir_ou_bndries))
     dir.create(dir_ou_bndries)
@@ -131,7 +132,7 @@ library(zip)
 
     print(country)
 
-    locs <- extract_locations(country = ou, add_geom = FALSE)
+    locs <- extract_locations(country = country, add_geom = FALSE)
 
     labels <- locs %>%
       distinct(label) %>%
@@ -218,13 +219,13 @@ library(zip)
 
 
   # Levels
-  levels <- get_levels(username = datim_user(),
+  df_levels <- get_levels(username = datim_user(),
                        password = datim_pwd()) %>%
     filter(operatingunit == cntry)
 
   levels$country
   levels$prioritization
-  #levels$snu1
+  #levels$snu1 # this does not exist in api/dataStore/dataSetAssignments/orgUnitLevels
   levels$community
   levels$facility
 
@@ -243,7 +244,9 @@ library(zip)
              into = paste0("path", 0:max(.$level)),
              sep = "/",
              remove = FALSE) %>%
-    select(-path0) %>%
+    select(-path0)
+
+  df_locs <- df_locs %>%
     rename(
       global_uid = path1,
       region_uid = path2,
@@ -322,7 +325,7 @@ library(zip)
     gview()
 
   # OU - all levels
-  levels %>%
+  df_levels %>%
     pivot_longer(cols = country:last_col(),
                  names_to = "level",
                  values_to = "value") %>%
@@ -339,7 +342,7 @@ library(zip)
   ous <- get_levels(
       username = glamr::datim_user(),
       password = glamr::datim_pwd()
-    ) %>% #View()
+    ) %>%
     distinct(operatingunit) %>%
     pull(operatingunit)
 
@@ -413,7 +416,6 @@ library(zip)
                                     level = .y,
                                     export = TRUE,
                                     name = file.path(
-                                      si_path("path_vector"),
                                       dir_psnu_bndries,
                                       paste0(str_replace_all(.x, " ", "_") %>%
                                              str_to_lower(), "_psnu"))))
@@ -436,5 +438,72 @@ library(zip)
 
   # SNU1
 
-  df_locs <- extract_locations()
+    # Extract country location attributes
+    cntry_attrs <- get_attributes(country = cntry)
+
+    # Identify SNU1 level
+    lvl_snu1 <- cntry_attrs %>%
+      filter(label == 'snu1') %>%
+      pull(level) %>%
+      first()
+
+    snu1_filename <- cntry %>%
+      str_replace_all(" ", "_") %>%
+      str_replace_all("[^[:alnum:]]", "_") %>%
+      str_to_lower() %>%
+      paste0("_snu1") %>%
+      file.path(dir_snu_bndries, .)
+
+    extract_boundaries(spdf = pepfar_polygons,
+                       country = cntry,
+                       level = lvl_snu1,
+                       export = TRUE,
+                       name = snu1_filename)
+
+    zip_shapefiles(filename = snu1_filename)
+
+    # Extract all snu1
+
+    snu1_levels <- ous %>%
+      str_subset(pattern = " Region$", negate = TRUE) %>%
+      map_dfr(~get_attributes(country = .x))
+
+    snu1_levels <- snu1_levels %>%
+      filter(label %in% c("snu1", "prioritization")) %>%
+      group_by(countryname) %>%
+      mutate(no_snu1 = identical(id[label == 'snu1'],
+                                 id[label == 'prioritization'])) %>%
+      ungroup() %>%
+      filter(no_snu1 == FALSE, label == "snu1") %>%
+      distinct(countryname, level) %>%
+      select(countryname, level)
+
+    extract_snu1 <- function(countryname, level){
+      print(glue::glue("{countryname}: {level}"))
+
+      fname <- countryname %>%
+        str_replace_all(" ", "_") %>%
+        str_replace_all("[^[:alnum:]]", "_") %>%
+        str_to_lower() %>%
+        paste0("_snu1") %>%
+        file.path(dir_snu_bndries, .)
+
+      extract_boundaries(spdf = pepfar_polygons,
+                         country = countryname,
+                         level = level,
+                         export = TRUE,
+                         name = fname)
+
+      return(countryname)
+    }
+
+    snu1_levels %>%
+      pmap(extract_snu1)
+
+    # Zip snu1 shapefiles
+
+    list.files(path = dir_snu_bndries,
+               pattern = ".shp$",
+               full.names = TRUE) %>%
+      map(~zip_shapefiles(filename = .x))
 

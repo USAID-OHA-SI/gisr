@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Report locations data completeness — generate_facilities_report • gisr</title>
+<title>Download shapefile zipfile from googledrive — download_shapefiles • gisr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Report locations data completeness — generate_facilities_report" />
-<meta property="og:description" content="Report locations data completeness" />
+<meta property="og:title" content="Download shapefile zipfile from googledrive — download_shapefiles" />
+<meta property="og:description" content="Download shapefile zipfile from googledrive" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -131,57 +131,64 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Report locations data completeness</h1>
-    <small class="dont-index">Source: <a href='https://github.com/USAID-OHA-SI/gisr/blob/master/R/generate_reports.R'><code>R/generate_reports.R</code></a></small>
-    <div class="hidden name"><code>generate_facilities_report.Rd</code></div>
+    <h1>Download shapefile zipfile from googledrive</h1>
+    <small class="dont-index">Source: <a href='https://github.com/USAID-OHA-SI/gisr/blob/master/R/geo_utilities.R'><code>R/geo_utilities.R</code></a></small>
+    <div class="hidden name"><code>download_shapefiles.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Report locations data completeness</p>
+    <p>Download shapefile zipfile from googledrive</p>
     </div>
 
-    <pre class="usage"><span class='fu'>generate_facilities_report</span><span class='op'>(</span>
-  <span class='va'>cntry</span>,
-  <span class='va'>mer_sites</span>,
-  <span class='va'>user</span>,
-  <span class='va'>pass</span>,
-  terr_path <span class='op'>=</span> <span class='cn'>NULL</span>,
-  output_folder <span class='op'>=</span> <span class='cn'>NULL</span>
+    <pre class="usage"><span class='fu'>download_shapefiles</span><span class='op'>(</span>
+  <span class='va'>country</span>,
+  org_label <span class='op'>=</span> <span class='st'>"country"</span>,
+  drive_folder <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dest_file <span class='op'>=</span> <span class='cn'>NULL</span>,
+  overwrite <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  unzip <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>cntry</th>
-      <td><p>Country name</p></td>
+      <th>country</th>
+      <td><p>PEPFAR Countryname</p></td>
     </tr>
     <tr>
-      <th>mer_sites</th>
-      <td><p>Latest MER Sites Results / Targets (cols: orgunituid, sitename)</p></td>
+      <th>org_label</th>
+      <td><p>Orgunit label, default is set to country</p></td>
     </tr>
     <tr>
-      <th>user</th>
-      <td><p>Datim account username</p></td>
+      <th>drive_folder</th>
+      <td><p>Googledrive id for all PEPFAR Spatial files</p></td>
     </tr>
     <tr>
-      <th>pass</th>
-      <td><p>Datim account password (glamr::mypwd is recommended)</p></td>
+      <th>dest_file</th>
+      <td><p>Local directory where to download zipped shapefile</p></td>
     </tr>
     <tr>
-      <th>terr_path</th>
-      <td><p>Path to terrain raster data</p></td>
+      <th>overwrite</th>
+      <td><p>Should the process overwrite existing files</p></td>
     </tr>
     <tr>
-      <th>output_folder</th>
-      <td><p>Output folder</p></td>
+      <th>unzip</th>
+      <td><p>Should the zipfile be unzipped</p></td>
     </tr>
     </table>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'>generate_sites_report</span><span class='op'>(</span>cntry <span class='op'>=</span> <span class='st'>"saturn"</span>, mer_sites <span class='op'>=</span> <span class='va'>sites</span><span class='op'>)</span>
+
+  <span class='va'>cntry</span> <span class='op'>&lt;-</span> <span class='st'>"Zambia"</span>
+
+  <span class='fu'>download_shapefiles</span><span class='op'>(</span>country <span class='op'>=</span> <span class='va'>cntry</span><span class='op'>)</span>
+
+  <span class='fu'>download_shapefiles</span><span class='op'>(</span>country <span class='op'>=</span> <span class='va'>cntry</span>, org_label <span class='op'>=</span> <span class='st'>"snu1"</span>, unzip <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+  <span class='fu'>download_shapefiles</span><span class='op'>(</span>country <span class='op'>=</span> <span class='va'>cntry</span>, org_label <span class='op'>=</span> <span class='st'>"psnu"</span>, unzip <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='op'>}</span>
 
 </div></pre>

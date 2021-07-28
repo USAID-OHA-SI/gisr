@@ -1,6 +1,6 @@
 Package: gisr
 Title: Geospatial Analytics Utility functions
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: 
     person(given = "Baboyma",
            family = "Kagniniwa",
@@ -47,7 +47,9 @@ Suggests:
     rnaturalearthhires,
     patchwork,
     glamr,
-    glitr
+    glitr,
+    googledrive,
+    googlesheets4
 Remotes:
     USAID-OHA-SI/glamr,
     USAID-OHA-SI/glitr,

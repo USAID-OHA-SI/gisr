@@ -8,8 +8,8 @@ OHA Geospatial Analytics Utilities
 ## Installation
 
 ```{r}
-install.packages("devtools")
-devtools::install_github("USAID-OHA-SI/gisr")
+install.packages("remotes")
+remotes::install_github("USAID-OHA-SI/gisr", build_vignettes = TRUE)
 ```
     
 ## Get administrative boundaries 

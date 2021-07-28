@@ -54,13 +54,14 @@ get_orguids <-
 #' @param level    org level
 #' @param username DATIM Username
 #' @param password DATIM password, recommend using `mypwd()`
-#' @param baseurl base url for the API, default = https://final.datim.org/
+#' @param baseurl  base url for the API, default = https://final.datim.org/
 #'
 #' @return ORG UIDS as tibble
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#'
 #'  library(gisr)
 #'
 #'  cntry <- "Zambia"
@@ -258,7 +259,7 @@ get_ouuid <-
 #'
 #' @param username DATIM username, recommed using `datim_user()`
 #' @param password DATIM password, recommend using `datim_pwd()`
-#' @param baseurl base API url, default = https://final.datim.org/
+#' @param baseurl  base API url, default = https://final.datim.org/
 #'
 #' @return df
 #' @export
@@ -691,3 +692,6 @@ zip_shapefiles <-
              mode = "cherry-pick")
 
   }
+
+
+

@@ -34,6 +34,7 @@ Use \code{get_orguids()} for levels above 4
 }
 \examples{
 \dontrun{
+
  library(gisr)
 
  cntry <- "Zambia"

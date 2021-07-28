@@ -244,7 +244,7 @@ get_admin1 <- function(countries, crs = 4326) {
 }
 
 
-#' @title          Extract PEPFAR Orgunit Boundaries
+#' @title Extract PEPFAR Orgunit Boundaries
 #'
 #' @description    PEPFAR VcPolygons are shared with orgunit uids only,
 #'                 making hard for analysts to identify specific polygon
@@ -260,7 +260,7 @@ get_admin1 <- function(countries, crs = 4326) {
 #' @param export   Export extract as shapefile?
 #' @param name     Export filename
 #'
-#' @return         sf object with orgunit attributes
+#' @return sf object with orgunit attributes
 #' @export
 #'
 #' @examples
@@ -363,4 +363,168 @@ extract_boundaries <-
         }
 
         return(spdf)
+    }
+
+
+#' @title Download shapefile zipfile from googledrive
+#'
+#' @param country      PEPFAR Countryname
+#' @param org_label    Orgunit label, default is set to country
+#' @param drive_folder Googledrive id for all PEPFAR Spatial files
+#' @param dest_file    Local directory where to download zipped shapefile
+#' @param overwrite    Should the process overwrite existing files
+#' @param unzip        Should the zipfile be unzipped
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#'   cntry <- "Zambia"
+#'
+#'   download_shapefiles(country = cntry)
+#'
+#'   download_shapefiles(country = cntry, org_label = "snu1", unzip = TRUE)
+#'
+#'   download_shapefiles(country = cntry, org_label = "psnu", unzip = TRUE)
+#' }
+#'
+download_shapefiles <-
+    function(country,
+             org_label = "country",
+             drive_folder = NULL,
+             dest_file = NULL,
+             overwrite = TRUE,
+             unzip = FALSE) {
+
+        # country
+        cntry <- stringr::str_to_lower(country)
+
+        # default google drive folder
+        sp_folder <- "1KQACKdo7b-M_Un2Fe1x0ZSJkhkNNPTqa"
+
+        # detault local folder
+        dest_folder <- "./GIS"
+
+        gdrive <- base::ifelse(base::is.null(drive_folder),
+                               sp_folder,
+                               drive_folder)
+
+        # labels
+        org_labels <- c("global", "region",
+                        "country", "snu1", "psnu",
+                        "community", "site")
+
+        if (!org_label %in% org_labels) {
+            base::message(glue::glue("{org_label} is not available. Valid options are: "))
+            base::message(base::paste(org_labels, collapse = ", "))
+
+            return(NULL)
+        }
+
+        # target sub-folder
+        folder <- case_when(
+            org_label == "global" ~ "Global",
+            org_label == "region" ~ "Regional-Countries-Boundaries",
+            org_label == "country" ~ "OU-Country-Boundaries",
+            org_label == "snu1" ~ "SNU1",
+            org_label == "psnu" ~ "PSNU",
+            org_label == "community" ~ "Communities",
+            org_label == "site" ~ "Sites",
+            TRUE ~ NA_character_
+        )
+
+        # Download URL
+        zfile_url <- "https://drive.google.com/uc?export=download&id="
+
+        # authentication
+        if (!glamr::is_loaded("email")) {
+            glamr::load_secrets()
+        }
+
+        user <- base::getOption("email")
+
+        if (base::is.null(user)) {
+            base::message("Unable to identify current user. Please make your googledrive account is set to email")
+            return(NULL)
+        }
+
+        googledrive::drive_auth(email = user)
+        googlesheets4::gs4_auth(email = user)
+
+        # List gdrive objects
+        df_drives <- googledrive::drive_ls(path = googledrive::as_id(gdrive))
+
+        if (base::nrow(df_drives) == 0) {
+            base::message(glue::glue("{drive_folder} seems to be empty"))
+
+            return(NULL)
+        }
+
+        # Identify sub-folder
+        df_drive <- df_drives %>%
+            dplyr::filter(str_detect(name, folder))
+
+        if (base::nrow(df_drive) == 0) {
+            base::message(glue::glue("Could not find a folder for {org_label}"))
+
+            return(NULL)
+        }
+
+        if (base::nrow(df_drive) != 1) {
+            base::message(glue::glue("There seems to be duplicate folders for {org_label}"))
+
+            return(NULL)
+        }
+
+        # Identify zipfile
+        df_files <- df_drive %>%
+            dplyr::pull(id) %>%
+            googledrive::as_id() %>%
+            googledrive::drive_ls(path = ., pattern = cntry)
+
+        if (base::nrow(df_files) == 0) {
+            base::message(glue::glue("Could not find a match for {country} / {org_label}. Check if item was not removed or renamed."))
+
+            return(NULL)
+        }
+
+        if (base::nrow(df_files) != 1) {
+            base::message(glue::glue("There seems to be duplicate files for {country} / {org_label}. Check if item was not duplicated."))
+
+            return(NULL)
+        }
+
+        zfile <- df_files %>%
+            dplyr::pull(id) %>%
+            base::paste0(zfile_url, .)
+
+        base::print(glue::glue("Download link: {zfile}"))
+
+        # Generate destination file
+        if (base::is.null(dest_file) & base::dir.exists(dest_folder)) {
+            dest_file <- base::file.path(dest_folder,
+                                         glue::glue("{stringr::str_to_lower(country)}_{org_label}_shapefile.zip"))
+        }
+
+        if (base::is.null(dest_file)) {
+            base::message("Could not identify the destination folder / file")
+            return(NULL)
+        }
+
+        base::print(glue::glue("File is downloaded to: {dest_file}"))
+
+        # Download zipped file to local drive
+        zfile %>%
+            googledrive::drive_download(
+                file = .,
+                path = dest_file,
+                overwrite = overwrite)
+
+        # Unzip file
+        if (unzip == TRUE & base::file.exists(dest_file)) {
+            zip::unzip(zipfile = dest_file,
+                       exdir = base::dirname(dest_file))
+        }
+
     }

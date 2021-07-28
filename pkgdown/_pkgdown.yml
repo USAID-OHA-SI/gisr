@@ -1,0 +1,26 @@
+# Reference sections
+reference:
+- title: Extract reference datasets
+  desc:  These functions are datim api helpers used to extract reference datasets
+- contents:
+  - has_keyword("get_ou")
+  - starts_with("extract")
+  - starts_with("get_attr")
+- title: Extract geodata from local directories or external sources
+- contents:
+  - has_keyword("admin")
+  - get_raster
+  - get_terrain
+  - extract_boundaries
+  - get_hexbins
+  - generate_hexbins
+- title: Plot sf objects and generate maps
+- contents:
+  - ends_with("map")
+  - gview
+- title: Utilities
+- contents:
+  - starts_with("zip")
+  - attributes
+  - dview
+  - export_spdf

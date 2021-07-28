@@ -2,8 +2,7 @@
 % Please edit documentation in R/geo_utilities.R
 \name{extract_boundaries}
 \alias{extract_boundaries}
-\title{\preformatted{     Extract PEPFAR Orgunit Boundaries
-}}
+\title{Extract PEPFAR Orgunit Boundaries}
 \usage{
 extract_boundaries(
   spdf,
@@ -31,8 +30,7 @@ extract_boundaries(
 \item{name}{Export filename}
 }
 \value{
-\preformatted{    sf object with orgunit attributes
-}
+sf object with orgunit attributes
 }
 \description{
 PEPFAR VcPolygons are shared with orgunit uids only,
