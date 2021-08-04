@@ -140,14 +140,18 @@
     <p>Plot sf features</p>
     </div>
 
-    <pre class="usage"><span class='fu'>gview</span><span class='op'>(</span><span class='va'>geodata</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>gview</span><span class='op'>(</span><span class='va'>geodata</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>geodata</th>
-      <td><p>r spatial data</p></td>
+      <td><p>spatial data as sf object</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>arguments passed to geom_sf</p></td>
     </tr>
     </table>
 
@@ -161,7 +165,7 @@
  <span class='va'>adm0</span> <span class='op'>%&gt;%</span>
   <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>name</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'>gview</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='img'><img src='gview-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='gview-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+</div><div class='img'><img src='gview-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 
 </div></pre>
   </div>

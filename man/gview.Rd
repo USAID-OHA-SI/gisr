@@ -4,10 +4,12 @@
 \alias{gview}
 \title{Plot sf features}
 \usage{
-gview(geodata)
+gview(geodata, ...)
 }
 \arguments{
-\item{geodata}{r spatial data}
+\item{geodata}{spatial data as sf object}
+
+\item{...}{arguments passed to geom_sf}
 }
 \description{
 Plot sf features

@@ -62,7 +62,8 @@ dview <- function(geodata,
 
 #' @title Plot sf features
 #'
-#' @param geodata r spatial data
+#' @param geodata spatial data as sf object
+#' @param ...     arguments passed to geom_sf
 #'
 #' @export
 #' @examples
@@ -76,7 +77,7 @@ dview <- function(geodata,
 #'   gview()
 #' }
 #'
-gview <- function(geodata) {
+gview <- function(geodata, ...) {
 
     # check of data is sf or sfc
     base::stopifnot(base::any(class(geodata) %in% c('sf', 'sfg', 'sfc')))
@@ -90,28 +91,38 @@ gview <- function(geodata) {
 
     # polygons
     if (geom_type %in% c("POLYGON", "MULTIPOLYGON"))
-        viz <- viz + ggplot2::geom_sf(fill = NA, lwd = .3, color = "#6c6463")
+        viz <- viz + ggplot2::geom_sf(fill = NA,
+                                      lwd = .3,
+                                      color = "#6c6463",
+                                      ...)
 
     # lines
-    if (geom_type %in% c("LINESTRING", "MULTILINESTRING"))
-        viz <- viz + ggplot2::geom_sf(size = 1, color = "#6c6463")
+    if (geom_type %in% c("LINESTRING", "MULTILINESTRING")) {
+        viz <- viz + ggplot2::geom_sf(size = 1,
+                                      color = "#6c6463",
+                                      ...)
+    }
 
     # points
-    if (geom_type %in% c("POINT", "MULTIPOINT"))
+    if (geom_type %in% c("POINT", "MULTIPOINT")) {
         viz <- viz +
-        ggplot2::geom_sf(shape = 21, size = 4, stroke = .3,
-                         fill = "white", color = "#6c6463")
+        ggplot2::geom_sf(shape = 21,
+                         size = 4,
+                         stroke = .3,
+                         fill = "white",
+                         color = "#6c6463",
+                         ...)
+    }
 
     # collection
-    if (geom_type == "GEOMETRYCOLLECTION")
+    if (geom_type == "GEOMETRYCOLLECTION") {
         viz <- viz + ggplot2::geom_sf()
+    }
 
     # Apply coordinates and theme
     viz <- viz +
         ggplot2::coord_sf() +
         ggplot2::theme_void()
-
-    base::print(viz)
 
     return(viz)
 }
@@ -244,6 +255,54 @@ get_admin1 <- function(countries, crs = 4326) {
 }
 
 
+#' @title Generate a buffer around an Area of Interest
+#'
+#' @param aoi     Area of Interest as sf object
+#' @param radius  Buffer redius in meters, default = 1000m
+#' @param append  Should the buffered area be appended to the AOI? Default is TRUE
+#'
+#' @return simple feature class
+#'
+#' @export
+#' @examples
+#' \donttest{
+#'  library(gisr)
+#'
+#'  adm <- get_admin0(countries = "Zambia")
+#'
+#'  adm %>% geo_fence(radius = 5000, append = TRUE) %>% gview()
+#'
+#'  adm %>% geo_fence(radius = 5000, append = FALSE) %>% gview()
+#' }
+#'
+geo_fence <- function(aoi,
+                      radius = 1000,
+                      append = TRUE) {
+
+    # CRS
+    from_crs <- aoi %>% sf::st_crs()
+    to_crs <- sf::st_crs(3857)
+
+    if (base::is.null(from_crs)) {
+        crayon::red("There are no coordinates system attached to your spatial data")
+        return(NULL)
+    }
+
+    # Create buffer
+    aoi_area <- aoi %>%
+        sf::st_transform(crs = to_crs) %>%
+        sf::st_buffer(dist = radius) %>%
+        sf::st_transform(crs = from_crs)
+
+    # clip off input
+    if (!append) {
+        aoi_area <- aoi_area %>% sf::st_difference(aoi)
+    }
+
+    return(aoi)
+}
+
+
 #' @title Extract PEPFAR Orgunit Boundaries
 #'
 #' @description    PEPFAR VcPolygons are shared with orgunit uids only,
@@ -364,6 +423,74 @@ extract_boundaries <-
 
         return(spdf)
     }
+
+
+#' @title Extract Road Network data from OSM
+#'
+#' @param aoi     Area of Interest as sf object
+#' @param radius  Buffer redius in meters, default = 1000m
+#' @param clip    Should the output be clipped to the AOI? Default is FALSE
+#'
+#' @export
+#'
+#' @examples
+#' \donttest{
+#'
+#'  library(gisr)
+#'
+#'  adm_zmb <- get_admin1(countries = "Zambia") %>%
+#'    dplyr::select(name) %>%
+#'    dplyr::filter(name == 'Lusaka')
+#'
+#'  adm_zmb %>%
+#'    extract_roads() %>%
+#'    gview()
+#' }
+#'
+extract_roads <- function(aoi,
+                          radius = NULL,
+                          clip = FALSE) {
+
+    # Buffer areas
+    if (!base::is.null(radius)) {
+        aoi <- aoi %>% geo_fence(radius = radius)
+    }
+
+    # Get area bounding box
+    aoi_bbox <- aoi %>%
+        sf::st_bbox()
+
+    # Build query
+    aoi_query <- aoi_bbox %>%
+        base::unname() %>%
+        osmdata::opq(bbox = .) %>%
+        osmdata::add_osm_feature(key = "highway")
+
+    # Query data
+    sfdf <- aoi_query %>%
+        osmdata::osmdata_sf()
+
+    # Extract lines only
+    sldf <- NULL
+
+    if (!base::is.null(sfdf) & !base::is.null(sfdf$osm_lines)) {
+        #sldf <- sfdf %>% osmdata::osm_lines()
+        sldf <- sfdf$osm_lines
+    }
+
+    # Extract data matching aoi
+    if (!base::is.null(sfdf) & clip == TRUE) {
+        sldf <- sldf %>%
+            sf::st_intersection(aoi)
+    }
+
+    # Notification for no-data
+    if (base::is.null(sldf)) {
+        crayon::red("No network data found for this area.")
+    }
+
+    return(sldf)
+}
 
 
 #' @title Download shapefile zipfile from googledrive
