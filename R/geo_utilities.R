@@ -180,8 +180,7 @@ geo_neighbors <- function(countries,
                           crop = FALSE) {
 
     # Get the world boundaries
-    world <- rnaturalearth::ne_countries(scale = {{scale}},
-                                         returnclass = "sf") %>%
+    world <- rnaturalearth::ne_countries(scale = {{scale}}, returnclass = "sf") %>%
         sf::st_transform(., crs = sf::st_crs({{crs}}))
 
     # Get focus country(ies)
@@ -204,8 +203,6 @@ geo_neighbors <- function(countries,
                 joinStyle = "MITRE",
                 mitreLimit = 2) %>%
             sf::st_as_sf()
-
-        print(box)
 
         # Crop neighbors to extent
         neighbors <- neighbors %>%

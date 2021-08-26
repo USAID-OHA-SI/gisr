@@ -4,12 +4,14 @@
 \alias{get_raster}
 \title{Get Terrain Raster dataset}
 \usage{
-get_raster(terr_path = "../../GEODATA/RASTER", name = "SR_LR.tif")
+get_raster(path = NULL, name = NULL, ...)
 }
 \arguments{
-\item{terr_path}{path to terrain raster file}
+\item{path}{Path to raster file, default will be \code{si_path('path_raster')}}
 
-\item{name}{Name of the raster file}
+\item{name}{Name of the raster file (with extension), default is set to terrain raster \code{SR_LR.tif}}
+
+\item{...}{Additional arguments to be passed to \code{base::list.files}. Eg: \verb{Use ignore.case = TRUE} for non case sensitive search}
 }
 \value{
 RasterLayer

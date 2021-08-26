@@ -656,13 +656,13 @@ export_spdf <- function(spdf, name) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'  library(gisr)
 #'  library(sf)
 #'
 #'  shp <- get_admin0(countries = "Nigeria")
 #'
-#'  fname <- ./GIS/nga_country_boundaries"
+#'  fname <- "./GIS/nga_country_boundaries"
 #'
 #'  export_spdf(spdf = shp, name = fname)
 #'

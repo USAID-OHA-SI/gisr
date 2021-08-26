@@ -103,7 +103,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/create-terrain-basemap.html">create-terrain-basemap</a>
+      <a href="../articles/create-terrain-basemap.html">Create Terrain Basemap</a>
     </li>
   </ul>
 </li>
@@ -169,26 +169,25 @@
  <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>attributes</span><span class='op'>(</span>geodata <span class='op'>=</span> <span class='va'>adm0</span><span class='op'>)</span>
 
  <span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    scalerank      featurecla labelrank sovereignt sov_a3 adm0_dif level
-#&gt; 79         1 Admin-0 country         3      Ghana    GHA        0     2
-#&gt;                 type admin adm0_a3 geou_dif geounit gu_a3 su_dif subunit su_a3
-#&gt; 79 Sovereign country Ghana     GHA        0   Ghana   GHA      0   Ghana   GHA
-#&gt;    brk_diff  name name_long brk_a3 brk_name brk_group abbrev postal
-#&gt; 79        0 Ghana     Ghana    GHA    Ghana      &lt;NA&gt;  Ghana     GH
-#&gt;            formal_en formal_fr note_adm0 note_brk name_sort name_alt mapcolor7
-#&gt; 79 Republic of Ghana      &lt;NA&gt;      &lt;NA&gt;     &lt;NA&gt;     Ghana     &lt;NA&gt;         5
-#&gt;    mapcolor8 mapcolor9 mapcolor13  pop_est gdp_md_est pop_year lastcensus
-#&gt; 79         3         1          4 23832495      34200       NA       2010
-#&gt;    gdp_year              economy             income_grp wikipedia fips_10
-#&gt; 79       NA 6. Developing region 4. Lower middle income        NA    &lt;NA&gt;
-#&gt;    iso_a2 iso_a3 iso_n3 un_a3 wb_a2 wb_a3 woe_id adm0_a3_is adm0_a3_us
-#&gt; 79     GH    GHA    288   288    GH   GHA     NA        GHA        GHA
-#&gt;    adm0_a3_un adm0_a3_wb continent region_un      subregion          region_wb
-#&gt; 79         NA         NA    Africa    Africa Western Africa Sub-Saharan Africa
-#&gt;    name_len long_len abbrev_len tiny homepart
-#&gt; 79        5        5          5   NA        1</div><div class='input'><span class='co'># }</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 1 x 63</span><span>
+#&gt;   scalerank featurecla  labelrank sovereignt sov_a3 adm0_dif level type    admin
+#&gt;       </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>         1 Admin-0 co~         3 Ghana      GHA           0     2 Sovere~ Ghana
+#&gt; </span><span style='color: #949494;'># ... with 54 more variables: adm0_a3 &lt;chr&gt;, geou_dif &lt;dbl&gt;, geounit &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   gu_a3 &lt;chr&gt;, su_dif &lt;dbl&gt;, subunit &lt;chr&gt;, su_a3 &lt;chr&gt;, brk_diff &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   name &lt;chr&gt;, name_long &lt;chr&gt;, brk_a3 &lt;chr&gt;, brk_name &lt;chr&gt;, brk_group &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   abbrev &lt;chr&gt;, postal &lt;chr&gt;, formal_en &lt;chr&gt;, formal_fr &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   note_adm0 &lt;chr&gt;, note_brk &lt;chr&gt;, name_sort &lt;chr&gt;, name_alt &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   mapcolor7 &lt;dbl&gt;, mapcolor8 &lt;dbl&gt;, mapcolor9 &lt;dbl&gt;, mapcolor13 &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   pop_est &lt;dbl&gt;, gdp_md_est &lt;dbl&gt;, pop_year &lt;dbl&gt;, lastcensus &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   gdp_year &lt;dbl&gt;, economy &lt;chr&gt;, income_grp &lt;chr&gt;, wikipedia &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   fips_10 &lt;chr&gt;, iso_a2 &lt;chr&gt;, iso_a3 &lt;chr&gt;, iso_n3 &lt;chr&gt;, un_a3 &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   wb_a2 &lt;chr&gt;, wb_a3 &lt;chr&gt;, woe_id &lt;dbl&gt;, adm0_a3_is &lt;chr&gt;, adm0_a3_us &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   adm0_a3_un &lt;dbl&gt;, adm0_a3_wb &lt;dbl&gt;, continent &lt;chr&gt;, region_un &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   subregion &lt;chr&gt;, region_wb &lt;chr&gt;, name_len &lt;dbl&gt;, long_len &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   abbrev_len &lt;dbl&gt;, tiny &lt;dbl&gt;, homepart &lt;dbl&gt;</span><span></div><div class='input'><span class='co'># }</span>
 
-</div></pre>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

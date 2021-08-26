@@ -18,18 +18,3 @@ zip_shapefiles(filename, dest_folder = NULL)
 \description{
 Compress all shapefile components into a zipped file
 }
-\examples{
-\dontrun{
- library(gisr)
- library(sf)
-
- shp <- get_admin0(countries = "Nigeria")
-
- fname <- ./GIS/nga_country_boundaries"
-
- export_spdf(spdf = shp, name = fname)
-
- zip_shapefiles(filename = fname, dest_folder = "./GIS/)
-}
-
-}

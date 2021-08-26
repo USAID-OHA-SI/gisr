@@ -3,6 +3,7 @@
 * Improvement and documentation of utility functions
 * Adding vignettes and package site
 * `attributes()` extract attributes from sf object
+* `get_raster()` read terrain raster file and other raster file
 * `get_attributes()` extract OU/Country orgunits attributes for VcPolygons
 * `extract_boundaries()` extract specific boundaries from VcPolygons
 * `extract_roads` extract road networks from osm repository

@@ -4,7 +4,7 @@
 \alias{get_adm_boundaries}
 \title{Get geospatial data from GADM}
 \usage{
-get_adm_boundaries(country_code, adm_level = 0, download = TRUE, geo_path = "")
+get_adm_boundaries(country_code, adm_level = 0, download = TRUE, path = NULL)
 }
 \arguments{
 \item{country_code}{ISO3 code}
@@ -13,21 +13,20 @@ get_adm_boundaries(country_code, adm_level = 0, download = TRUE, geo_path = "")
 
 \item{download}{Save a copy}
 
-\item{geo_path}{where to save / read data from}
+\item{path}{where to save / read data from}
 }
 \value{
-\preformatted{        geodata as sf with crs = 4326
-}
+geodata as sf with crs = 4326
 }
 \description{
 This function extracts / reads geospatial data
-for specified country and administractive boundary levels
+for specified country and administrative boundary levels
 }
 \examples{
 \dontrun{
 library(gisr)
 get_adm_boundaries("UGA")
-get_adm_boundaries("UGA", adm_level=2, geo_path="GIS")
+get_adm_boundaries("UGA", adm_level = 2, path = "GIS")
 }
 
 }

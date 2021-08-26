@@ -12,8 +12,7 @@ export_spdf(spdf, name)
 \item{name}{filename with full path}
 }
 \value{
-\preformatted{boolean
-}
+boolean
 }
 \description{
 Save shapefile

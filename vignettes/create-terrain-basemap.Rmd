@@ -1,5 +1,5 @@
 ---
-title: "create-terrain-basemap"
+title: "Create Terrain Basemap"
 author: Baboyma Kagniniwa | USAID
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -12,7 +12,10 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE,
+  fig.retina = 2
 )
 ```
 
@@ -23,7 +26,7 @@ Thematic maps are single-topics maps that focus on the spatial variability of a 
 
 Below are how we go about creating these basemaps
 
-```{r setup}
+```{r setup, echo = T, eval = T}
 library(dplyr)         # General data munging and visualisation
 library(ggplot2)       # General plotting
 library(gisr)          # OHA/SI in house package used to create these basemap
@@ -33,7 +36,7 @@ library(glitr)         # OHA/SI in house package used to help standardize viz
 
 We will be using Nigeria as our country of focus. Let's extract the country boundary and the states boundaries.
 
-```{r}
+```{r echo = T, eval = T}
 
 countryname <- "Nigeria"
 
@@ -45,16 +48,65 @@ adm1 <- gisr::get_admin1(countries = countryname) %>%
 
 ```
 
-What does country map look like?
+What does the country map look like?
 
-```{r}
+```{r echo = T, eval = T}
 adm0 %>% gisr::gview()
 ```
 
-What are the states?
+What does the states map look like?
 
-```{r}
+```{r warning=FALSE, echo = T, eval = T}
 adm1 %>% 
   gisr::gview() + 
   ggplot2::geom_sf_text(data = adm1, ggplot2::aes(label = name), size = 3)
 ```
+
+Let's create a basemap for Nigeria. 
+
+For this, We will need to downlaod the raster file into `si_path("path_raster")`
+
+This option uses `rnaturalearth` to extract admin0 and admin1 boundaries as `sf` objects.
+
+```{r warning=FALSE, echo = T, eval = F}
+terrain_map(countries = countryname, 
+            mask = TRUE,
+            glamr::si_path("path_raster"))
+```
+
+We could also provide you own admins boundaries. This is a classic case where official country names don't match with `rnaturalearth` names. Tanzania is good example where the country name is `United Republic of Tanzania`.
+
+```{r warning=FALSE, echo = T, eval = F}
+terrain_map(countries = adm0,
+            adm0 = adm0,
+            adm1 = adm1,
+            terr = glamr::si_path("path_raster"))
+```
+
+![](../docs/articles/create-terrain-basemap_files/figure-html/basemap-with-admin.png)
+
+We could also decide to use only the country boundaries
+
+```{r warning=FALSE, echo = T, eval = F}
+terrain_map(countries = adm0,
+            adm0 = adm0,
+            terr = glamr::si_path("path_raster"))
+```
+
+![](../docs/articles/create-terrain-basemap_files/figure-html/basemap-with-no-admin.png)
+
+
+It's also possible to add neighbor countries to your basemap. See below.
+
+```{r warning=FALSE, echo = T, eval = F}
+ras <- glamr::si_path("path_raster")
+
+terrain_map(countries = adm0,
+            adm0 = adm0,
+            adm1 = adm1,
+            add_neighbors = TRUE,
+            add_labels = TRUE,
+            terr = ras)
+```
+
+![](../docs/articles/create-terrain-basemap_files/figure-html/basemap-with-neighbors.png)

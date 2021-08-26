@@ -117,10 +117,13 @@ terrain_map <-
                                   linetype = "dotted")
 
     # Zoom to South Africa mainland
-    if ("south africa" %in% stringr::str_to_lower(cntries))
-        p <- p +
-        ggplot2::xlim(15, 35) +
-        ggplot2::ylim(-38, -20)
+    if (base::is.character(cntries)) {
+        if ("south africa" %in% stringr::str_to_lower(cntries)) {
+            p <- p +
+                ggplot2::xlim(15, 35) +
+                ggplot2::ylim(-38, -20)
+        }
+    }
 
     # apply theme
     p <- p + ggplot2::theme_void()
