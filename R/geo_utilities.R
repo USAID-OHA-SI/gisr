@@ -20,10 +20,28 @@
 attributes <- function(geodata) {
 
     # check of data is sf or sfc
-    base::stopifnot(base::any(class(geodata) %in% c('sf')))
+    #base::stopifnot(base::any(class(geodata) %in% c('sf')))
 
-    # Drop geometry and view data
-    geodata %>% sf::st_drop_geometry(x = .)
+    gclass <- base::class(geodata)
+
+    if (length(gclass) == 1) {
+        if (stringr::str_detect(gclass, "Spatial.*DataFrame")) {
+            # Convert to sf and drop geometry
+            geodata %>%
+                sf::st_as_sf() %>%
+                sf::st_drop_geometry(x = .) %>%
+                tibble::as_tibble()
+        }
+    }
+    else if (length(gclass) > 1 & "sf" %in% gclass) {
+        # Drop geometry and view data
+        geodata %>%
+            sf::st_drop_geometry(x = .) %>%
+            tibble::as_tibble()
+    }
+    else {
+        base::stop("Input does not seem to be a sf or sp spatial object")
+    }
 }
 
 #' @title View attributes from simple feature object
