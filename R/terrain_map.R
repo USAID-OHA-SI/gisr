@@ -132,8 +132,9 @@ terrain_map <-
 
 #' @title Get Terrain Raster dataset
 #'
-#' @param terr_path path to terrain raster file
-#' @param name Name of the raster file
+#' @param path Path to raster file, default will be `si_path('path_raster')`
+#' @param name Name of the raster file (with extension), default is set to terrain raster `SR_LR.tif`
+#' @param ...  Additional arguments to be passed to `base::list.files`. Eg: `Use ignore.case = TRUE` for non case sensitive search
 #'
 #' @return RasterLayer
 #' @export
@@ -143,27 +144,37 @@ terrain_map <-
 #' get_raster(terr_path = glamr::si_path("path_raster"))
 #' }
 #'
-get_raster <-
-    function(terr_path = "../../GEODATA/RASTER",
-             name = "SR_LR.tif") {
+get_raster <- function(path = NULL, name = NULL, ...) {
+
+        # Check params
+        if (base::is.null(path)) {
+            path <- glamr::si_path("path_raster")
+        }
+
+        if (base::is.null(name)) {
+            name <- "SR_LR.tif"
+        }
 
         # Check directory
-        if (!base::dir.exists(terr_path))
+        if (!base::dir.exists(path)) {
             stop(base::cat("\nInvalid terrain directory: ",
-                           crayon::red(terr_path),
+                           crayon::red(path),
                            "\n"))
+        }
 
         # Identify file path
         terr_file <- base::list.files(
-            path = terr_path,
+            path = path,
             pattern = base::paste0(name, "$"),
             recursive = TRUE,
-            full.names = TRUE
+            full.names = TRUE,
+            ...
         )
 
         # Check file
-        if (!base::file.exists(terr_file))
+        if (!base::file.exists(terr_file)) {
             stop(base::cat("\nFile does not exist: ", terr_file, "\n"))
+        }
 
         # Read file content
         ras <- raster::raster(terr_file)
