@@ -45,7 +45,6 @@ inst/doc
 #no data
 *.csv
 *.xlsx
-*.png
 
 #no GIS Data
 GIS/*
