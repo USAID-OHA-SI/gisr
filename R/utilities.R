@@ -7,7 +7,7 @@
 #' @param baseurl base url for the API, default = https://final.datim.org/
 #'
 #' @return ORG UIDS as tibble
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -57,7 +57,7 @@ get_orguids <-
 #' @param baseurl  base url for the API, default = https://final.datim.org/
 #'
 #' @return ORG UIDS as tibble
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -129,7 +129,7 @@ get_ouorgs <-
 #' @param baseurl     base url for the API, default = https://final.datim.org/
 #'
 #' @return OU UIDS as tibble
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -197,7 +197,7 @@ get_ouuids <-
 #' @param password      Datim Account Password, recommend using `datim_pwd()`
 #'
 #' @return uid
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -262,7 +262,7 @@ get_ouuid <-
 #' @param baseurl  base API url, default = https://final.datim.org/
 #'
 #' @return df
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -320,7 +320,7 @@ get_levels <-
 #' @param password      Datim Account Password
 #'
 #' @return uid
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -395,7 +395,7 @@ get_ouorglevel <-
 #' @param password     Datim Account Password
 #'
 #' @return             list of uids
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -537,6 +537,7 @@ get_attributes <- function(country,
 #'
 #' @return df
 #' @export
+#'
 #' @examples
 #' \dontrun{
 #'  library(tidyverse)
@@ -610,7 +611,8 @@ extract_attributes <-
 #'
 #' @param spdf sf object
 #' @param name filename with full path
-#' @return     boolean
+#'
+#' @return boolean
 #' @export
 #'
 #' @examples
