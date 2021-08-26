@@ -73,6 +73,7 @@ terrain_map(countries = countryname,
             mask = TRUE,
             glamr::si_path("path_raster"))
 ```
+![](../docs/articles/create-terrain-basemap_files/figure-html/basemap-with-admin.png)
 
 We could also provide you own admins boundaries. This is a classic case where official country names don't match with `rnaturalearth` names. Tanzania is good example where the country name is `United Republic of Tanzania`.
 
