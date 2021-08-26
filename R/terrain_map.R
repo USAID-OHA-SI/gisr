@@ -322,30 +322,40 @@ get_basemap <-
         cntry <- {{country}}
         dta_raster <- {{terr}}
 
+        # Check for valid attributes
+        base::stopifnot(base::all(c("id",
+                                    "name",
+                                    "label",
+                                    "countryname",
+                                    "operatingunit") %in% names(spdf)))
+
         # Filter by OU / Country
         if (!is.null(cntry)) {
             df_geo <- df_geo %>%
-                filter(operatingunit == cntry)
+                dplyr::filter(countryname == cntry)
+
+            base::stopifnot(base::nrow(df_geo) == 0)
         }
 
         # Transform geodata
-        df_geo <- df_geo %>%
-            sf::st_as_sf() %>%
-            sf::st_transform(., crs = sf::st_crs(4326)) %>%
-            sf::st_zm()
+        # df_geo <- df_geo %>%
+        #     sf::st_as_sf() %>%
+        #     sf::st_transform(., crs = sf::st_crs(4326)) %>%
+        #     sf::st_zm()
 
         # Get country boundaries
         df_geo0 <- df_geo %>%
-            filter(type == "OU")
+            dplyr::filter(label == "country")
 
         # Get snu1 or psnu boundaries
         df_geo1 <- df_geo %>%
-            filter(type == "SNU1")
-
+            dplyr::filter(label == "snu1")
 
         # Terrain
-        if (is.null(dta_raster))
-            stop("Terrain rasterlayer is required.")
+        if (is.null(dta_raster)) {
+            # Get raster file
+            dta_raster <- get_raster()
+        }
 
         # Crop
         terr <- dta_raster %>%
@@ -362,7 +372,7 @@ get_basemap <-
         # Basemap
         m <- ggplot2::ggplot() +
             ggplot2::geom_tile(data = trdf, aes(x, y, alpha = value)) +
-            ggplot2::scale_alpha(name = "", range = c(0.6, 0), guide = F) +
+            ggplot2::scale_alpha(name = "", range = c(0.6, 0), guide = "none") +
             ggplot2::geom_sf(
                 data = df_geo0,
                 colour = "white",
@@ -386,9 +396,15 @@ get_basemap <-
         m <- m +
             ggplot2::geom_sf(
                 data = df_geo0,
-                colour = grey90k,
+                colour = grey10k,
                 fill = "NA",
                 size = 1
+            ) +
+            ggplot2::geom_sf(
+                data = df_geo0,
+                colour = grey90k,
+                fill = "NA",
+                size = .3
             ) +
             ggplot2::theme_void()
 

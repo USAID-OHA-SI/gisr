@@ -507,8 +507,8 @@ get_attributes <- function(country,
   df_attrs <- extract_locations(country = country, add_geom = FALSE)
 
   labels <- df_attrs %>%
-    distinct(label) %>%
-    pull()
+    dplyr::distinct(label) %>%
+    dplyr::pull()
 
   # Use psnu as snu1
   if (!"snu1" %in% labels) {
