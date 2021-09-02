@@ -580,7 +580,7 @@ download_shapefiles <-
         zfile_url <- "https://drive.google.com/uc?export=download&id="
 
         # authentication
-        if (!glamr::is_loaded("email")) {
+        if (!is.null(getOption("email"))) {
             glamr::load_secrets()
         }
 

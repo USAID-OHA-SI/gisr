@@ -54,10 +54,8 @@ terrain_map <-
 
     # Get neighbors
     if ( TRUE == {{add_neighbors}} & !is.null(cntries) ) {
-
         # Get neighbors
         nghbrs <- geo_neighbors(countries = cntries, crop = TRUE)
-
         cntries <- nghbrs
     }
 
@@ -75,7 +73,6 @@ terrain_map <-
 
         return(NULL)
     }
-
 
     # Plot the map
 
@@ -236,8 +233,8 @@ get_terrain <-
             # check if country is a character and a valid ne name
             if (base::is.character(cntries) & cntries %in% glamr::pepfar_country_xwalk$sovereignt) {
                 aoi <- get_admin0(countries = cntries)
-            }
-            else {
+
+            } else {
                 stop("Countries list does not seems to match Natural Earth Countries")
             }
         }
@@ -251,45 +248,20 @@ get_terrain <-
 
         # Locate and retrieve terrain file
         if ( base::is.null(terr) ) {
+            terr_ras <- get_raster()
 
-            terr_path = glamr::si_path("path_raster")
-
-            if ( base::is.null(terr_path) ) {
-                stop("Global Raster path is not set. Please use glamr::set_paths() and add a value for path_raster")
-
-            } else if ( !base::is.null(terr_path) & !base::dir.exists(terr_path) ) {
-                stop(base::paste0("Path: ", terr_path, " does not exist"))
-            }
+        } else if (!base::is.null(terr) & dir.exists(terr)) {
+            terr_ras <- get_raster(path = terr)
         }
 
-        # Use user provided rasterlayer
-        if ( !base::is.null(terr) & "RasterLayer" %in% base::class(terr)) {
-            terr_ras <- terr
-        }
-
-        # Read raster from local or special location
-        if ( base::is.null(terr_ras)) {
-
-            # file path
-            terr_file <- base::list.files(
-                terr_path,
-                pattern = "SR_LR.tif$",
-                recursive = TRUE,
-                full.names = TRUE
-            )
-
-            if ( length(terr_file) == 0 )
-                base::stop(base::paste0("Could not locate a TIFF file in: ",
-                                        terr_path, "\nDownload file from: ",
-                                        dem_url))
-
-            # Read raster file
-            terr_ras <- raster::raster(terr_file) %>%
-                raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
+        # Validate RasterLayer
+        if ( base::is.null(terr_ras) & !"RasterLayer" %in% base::class(terr)) {
+            base::print(glue("Terrain data: {dem_url}"))
+            base::stop("Invalid terrain data / path. Download terrain file into si_path('path_raster')")
         }
 
         # Crop raster to boundaries extent
-        terr_ras <- terr_ras %>%
+        terr_ras <- terr %>%
             raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
 
         # Crop to the exact limits if applicable
