@@ -134,6 +134,7 @@ terrain_map <-
 #'
 #' @param path Path to raster file, default will be `si_path('path_raster')`
 #' @param name Name of the raster file (with extension), default is set to terrain raster `SR_LR.tif`
+#' @param rename Should the RasterLayer be renamed? If yes, the name is changed to `value`
 #' @param ...  Additional arguments to be passed to `base::list.files`. Eg: `Use ignore.case = TRUE` for non case sensitive search
 #'
 #' @return RasterLayer
@@ -141,55 +142,77 @@ terrain_map <-
 #'
 #' @examples
 #' \dontrun{
-#' get_raster(terr_path = glamr::si_path("path_raster"))
+#'  library(glamr)
+#'  library(gisr)
+#'
+#'  get_raster()
+#'
+#'  get_raster(name = "sample.tif")
+#'  get_raster(path = "./geodata/raster", name = "sample.tif")
 #' }
 #'
-get_raster <- function(path = NULL, name = NULL, ...) {
+get_raster <- function(path = NULL,
+                       name = NULL,
+                       rename = FALSE,
+                       ...) {
 
-        # Check params
-        if (base::is.null(path)) {
-            path <- glamr::si_path("path_raster")
-        }
+    # Check parameters
 
-        if (base::is.null(name)) {
-            name <- "SR_LR.tif"
-        }
-
-        # Check directory
-        if (!base::dir.exists(path)) {
-            stop(base::cat("\nInvalid terrain directory: ",
-                           crayon::red(path),
-                           "\n"))
-        }
-
-        # Identify file path
-        terr_file <- base::list.files(
-            path = path,
-            pattern = base::paste0(name, "$"),
-            recursive = TRUE,
-            full.names = TRUE,
-            ...
-        )
-
-        # Check file
-        if (!base::file.exists(terr_file)) {
-            stop(base::cat("\nFile does not exist: ", terr_file, "\n"))
-        }
-
-        # Read file content
-        ras <- raster::raster(terr_file)
-
-        return(ras)
+    # Path
+    if (base::is.null(path)) {
+        path <- glamr::si_path("path_raster")
     }
 
+    # File name
+    if (base::is.null(name)) {
+        name <- "SR_LR.tif"
+    }
 
-#' @title Get terrain data for an AOI (Countries)
+    # Check directory
+    if (!base::dir.exists(path)) {
+        stop(base::cat("\nInvalid directory: ", crayon::red(path), "\n"))
+    }
+
+    # Identify file path
+    terr_file <- base::list.files(
+        path = path,
+        pattern = base::paste0(name, "$"),
+        recursive = TRUE,
+        full.names = TRUE,
+        ...
+    )
+
+    # Check file
+    if (base::length(terr_file) == 0) {
+        stop(base::cat(crayon::red("\nNo raster file found\n")))
+    } else if (base::length(terr_file) > 1) {
+        stop(base::cat(crayon::red("\nMultiple raster files found: ", base::paste(terr_file, collapse = ','), "\n")))
+    }
+
+    if (base::length(terr_file) == 1 & !base::file.exists(terr_file)) {
+        stop(base::cat("\nFile does not exist: ", terr_file, "\n"))
+    }
+
+    # Read file content
+    ras <- raster::raster(terr_file)
+
+    if (rename) {
+        names(ras) <- "value"
+    }
+
+    return(ras)
+}
+
+
+#' @title Extract raster data for an AOI (Countries)
 #'
 #' @param countries  List of the country names or sf object
 #' @param mask       Should the extracted data match the exact boundary limits?
 #' @param buffer     Extend AOI extent by x
-#' @param terr       RasterLayer or Path to terrain raster file
+#' @param ras        RasterLayer or Path to raster file
+#'
 #' @importFrom       methods as
+#'
 #' @return           spdf spatial dataframe
 #' @export
 #'
@@ -201,13 +224,13 @@ get_raster <- function(path = NULL, name = NULL, ...) {
 #'  get_terrain(countries = list("Zambia"))
 #'  get_terrain(countries = list("Zambia"), mask = TRUE)
 #'  get_terrain(countries = list("Zambia"), buffer = .5, terr = "../../HDX_Data")
-#'
 #' }
-get_terrain <-
-    function(countries = list("Zambia"),
+#'
+extract_raster <-
+    function(countries,
              mask = FALSE,
              buffer = .1,
-             terr = NULL) {
+             ras = NULL) {
 
         # Params
         cntries <- {{countries}}
@@ -233,7 +256,103 @@ get_terrain <-
             # check if country is a character and a valid ne name
             if (base::is.character(cntries) & cntries %in% glamr::pepfar_country_xwalk$sovereignt) {
                 aoi <- get_admin0(countries = cntries)
+            } else {
+                stop("Countries list does not seems to match Natural Earth Countries")
+            }
+        }
 
+        # Raster Data
+        dta_ras <- NULL
+        ras_path <- NULL  #"./GIS/"
+
+        # Locate and retrieve terrain file
+        if ( base::is.null(ras) ) {
+            dta_ras <- get_raster(rename = TRUE)
+        } else if (!base::is.null(ras) && "character" %in% base::class(ras) && base::dir.exists(ras)) {
+            dta_ras <- get_raster(path = ras, rename = TRUE)
+        } else if (!base::is.null(ras) && "RasterLayer" %in% base::class(ras)) {
+            dta_ras <- ras
+        }
+
+        # Validate RasterLayer
+        if ( base::is.null(dta_ras)) {
+            base::stop("Invalid raster data / path. Download raster file into si_path('path_raster')")
+        }
+
+        # Crop raster to boundaries extent
+        aoi_ras <- dta_ras %>%
+            raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
+
+        # Crop to the exact limits if applicable
+        if ( mask == TRUE ) {
+            aoi_ras <- aoi_ras %>% raster::mask(aoi)
+        }
+
+        # Rename RasterLayer
+        if (!"value" %in% names(aoi_ras)) {
+            names(aoi_ras) <- "value"
+        }
+
+        # Convert raster data into a spatial data frame
+        spdf <- aoi_ras %>%
+            as(., "SpatialPixelsDataFrame") %>%
+            base::as.data.frame()
+
+        return(spdf)
+    }
+
+
+#' @title Get terrain data for an AOI (Countries)
+#'
+#' @note `get_terrain()` will evantually be replaced by `extract_raster()`
+#'
+#' @param countries  List of the country names or sf object
+#' @param mask       Should the extracted data match the exact boundary limits?
+#' @param buffer     Extend AOI extent by x
+#' @param terr       RasterLayer or Path to terrain raster file
+#' @importFrom       methods as
+#' @return           spdf spatial dataframe
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'  library(gisr)
+#'  library(sf)
+#'
+#'  get_terrain(countries = list("Zambia"))
+#'  get_terrain(countries = list("Zambia"), mask = TRUE)
+#'  get_terrain(countries = list("Zambia"), buffer = .5, terr = "../../HDX_Data")
+#' }
+#'
+get_terrain <-
+    function(countries = list("Zambia"),
+             mask = FALSE,
+             buffer = .1,
+             terr = NULL) {
+
+        # Params
+        cntries <- {{countries}}
+
+        # SFC Object
+        aoi <- NULL
+
+        # Check AOI
+        if (base::is.null(cntries)) {
+            base::cat(
+                crayon::red(
+                    base::paste0("\ncountry(ies) is required",
+                                 " to extract Terrain RasterLayer\n")))
+
+            return(NULL)
+        }
+
+        # Country boundaries
+        if ( "sf" %in% base::class(cntries) ) {
+            aoi <- cntries
+        } else {
+            # check if country is a character and a valid ne name
+            if (base::is.character(cntries) & cntries %in% glamr::pepfar_country_xwalk$sovereignt) {
+                aoi <- get_admin0(countries = cntries)
             } else {
                 stop("Countries list does not seems to match Natural Earth Countries")
             }
@@ -244,35 +363,40 @@ get_terrain <-
         dem_url <- "https://drive.google.com/drive/u/0/folders/1M02ToX9AnkozOHtooxU7s4tCnOZBTvm_"
 
         terr_ras <- NULL
-        terr_path <- NULL  #"./GIS/"
 
         # Locate and retrieve terrain file
         if ( base::is.null(terr) ) {
-            terr_ras <- get_raster()
-
-        } else if (!base::is.null(terr) & dir.exists(terr)) {
-            terr_ras <- get_raster(path = terr)
+            terr_ras <- get_raster(rename = TRUE)
+        } else if (!base::is.null(terr) && "character" %in% base::class(terr) && dir.exists(terr)) {
+            terr_ras <- get_raster(path = terr, rename = TRUE)
+        } else if (!base::is.null(terr) && "RasterLayer" %in% base::class(terr)) {
+            terr_ras <- terr
         }
 
         # Validate RasterLayer
-        if ( base::is.null(terr_ras) & !"RasterLayer" %in% base::class(terr)) {
+        if ( base::is.null(terr_ras)) {
             base::print(glue("Terrain data: {dem_url}"))
             base::stop("Invalid terrain data / path. Download terrain file into si_path('path_raster')")
         }
 
         # Crop raster to boundaries extent
-        terr_ras <- terr %>%
+        terr_ras <- terr_ras %>%
             raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
 
         # Crop to the exact limits if applicable
-        if ( mask == TRUE )
+        if ( mask == TRUE ) {
             terr_ras <- terr_ras %>% raster::mask(aoi)
+        }
+
+        # Rename RasterLayer
+        if (!"value" %in% names(terr_ras)) {
+            names(terr_ras) <- "value"
+        }
 
         # Convert raster data into a spatial data frame
         spdf <- terr_ras %>%
             as(., "SpatialPixelsDataFrame") %>%
-            base::as.data.frame() %>%
-            dplyr::rename(value = SR_LR)
+            base::as.data.frame()
 
         return(spdf)
     }
