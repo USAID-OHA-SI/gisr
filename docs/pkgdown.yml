@@ -3,5 +3,6 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   create-terrain-basemap: create-terrain-basemap.html
-last_built: 2021-08-26T17:41Z
+  extract-geodata: extract-geodata.html
+last_built: 2021-09-13T13:10Z
 

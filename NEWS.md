@@ -8,6 +8,7 @@
 * `extract_boundaries()` extract specific boundaries from VcPolygons
 * `extract_roads` extract road networks from osm repository
 * `export_spdf()` export sf objects to shapefiles
+* `extract_raster` extract raster for AOI
 * `zip_shapefiles()` compress all shapefile component into a zipped file
 * `download_shapefeles()` download compressed shapefiles from googledrive
 

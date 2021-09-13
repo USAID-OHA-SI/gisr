@@ -20,7 +20,7 @@ download_shapefiles(
 
 \item{drive_folder}{Googledrive id for all PEPFAR Spatial files}
 
-\item{dest_file}{Local directory where to download zipped shapefile}
+\item{dest_file}{Full file name where to download zipped shapefile}
 
 \item{overwrite}{Should the process overwrite existing files}
 

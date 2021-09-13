@@ -23,8 +23,10 @@ Get an hexbins polygon feature class for country ABC
 }
 \examples{
 \dontrun{
-get_hexbins('LSO', 1)
-get_hexbins('UGA', 2)
+ library(gisr)
+
+ get_hexbins('LSO', 1)
+ get_hexbins('UGA', 2)
 }
 
 }

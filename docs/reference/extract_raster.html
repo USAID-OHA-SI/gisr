@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get an hexbins polygon feature class for country ABC — get_hexbins • gisr</title>
+<title>Extract raster data for an AOI (Countries) — extract_raster • gisr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Get an hexbins polygon feature class for country ABC — get_hexbins" />
-<meta property="og:description" content="Get an hexbins polygon feature class for country ABC" />
+<meta property="og:title" content="Extract raster data for an AOI (Countries) — extract_raster" />
+<meta property="og:description" content="Extract raster data for an AOI (Countries)" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -134,48 +134,53 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get an hexbins polygon feature class for country ABC</h1>
-    <small class="dont-index">Source: <a href='https://github.com/USAID-OHA-SI/gisr/blob/master/R/create_hexbins.R'><code>R/create_hexbins.R</code></a></small>
-    <div class="hidden name"><code>get_hexbins.Rd</code></div>
+    <h1>Extract raster data for an AOI (Countries)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/USAID-OHA-SI/gisr/blob/master/R/terrain_map.R'><code>R/terrain_map.R</code></a></small>
+    <div class="hidden name"><code>extract_raster.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Get an hexbins polygon feature class for country ABC</p>
+    <p>Extract raster data for an AOI (Countries)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_hexbins</span><span class='op'>(</span><span class='va'>country_code</span>, adm_level <span class='op'>=</span> <span class='fl'>0</span>, geo_path <span class='op'>=</span> <span class='cn'>NULL</span>, size <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>extract_raster</span><span class='op'>(</span><span class='va'>countries</span>, mask <span class='op'>=</span> <span class='cn'>FALSE</span>, buffer <span class='op'>=</span> <span class='fl'>0.1</span>, ras <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>country_code</th>
-      <td><p>iso3 code</p></td>
+      <th>countries</th>
+      <td><p>List of the country names or sf object</p></td>
     </tr>
     <tr>
-      <th>adm_level</th>
-      <td><p>country administrative unit level</p></td>
+      <th>mask</th>
+      <td><p>Should the extracted data match the exact boundary limits?</p></td>
     </tr>
     <tr>
-      <th>geo_path</th>
-      <td><p>path to geodata</p></td>
+      <th>buffer</th>
+      <td><p>Extend AOI extent by x</p></td>
     </tr>
     <tr>
-      <th>size</th>
-      <td><p>size of each hex bin in meters</p></td>
+      <th>ras</th>
+      <td><p>RasterLayer or Path to raster file</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>country hex polygon as feature class</p>
+    
+<pre>      spdf spatial dataframe
+</pre>
+
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
  <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/USAID-OHA-SI/gisr'>gisr</a></span><span class='op'>)</span>
+ <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://r-spatial.github.io/sf/'>sf</a></span><span class='op'>)</span>
 
- <span class='fu'>get_hexbins</span><span class='op'>(</span><span class='st'>'LSO'</span>, <span class='fl'>1</span><span class='op'>)</span>
- <span class='fu'>get_hexbins</span><span class='op'>(</span><span class='st'>'UGA'</span>, <span class='fl'>2</span><span class='op'>)</span>
+ <span class='fu'><a href='get_terrain.html'>get_terrain</a></span><span class='op'>(</span>countries <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"Zambia"</span><span class='op'>)</span><span class='op'>)</span>
+ <span class='fu'><a href='get_terrain.html'>get_terrain</a></span><span class='op'>(</span>countries <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"Zambia"</span><span class='op'>)</span>, mask <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+ <span class='fu'><a href='get_terrain.html'>get_terrain</a></span><span class='op'>(</span>countries <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"Zambia"</span><span class='op'>)</span>, buffer <span class='op'>=</span> <span class='fl'>.5</span>, terr <span class='op'>=</span> <span class='st'>"../../HDX_Data"</span><span class='op'>)</span>
 <span class='op'>}</span>
 
 </div></pre>

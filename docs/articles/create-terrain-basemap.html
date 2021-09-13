@@ -63,6 +63,9 @@
 <li>
       <a href="../articles/create-terrain-basemap.html">Create Terrain Basemap</a>
     </li>
+    <li>
+      <a href="../articles/extract-geodata.html">Extract Geodata from different sources</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -92,7 +95,7 @@
       <h1 data-toc-skip>Create Terrain Basemap</h1>
                         <h4 class="author">Baboyma Kagniniwa | USAID</h4>
             
-            <h4 class="date">2021-08-26</h4>
+            <h4 class="date">2021-8-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/USAID-OHA-SI/gisr/blob/master/vignettes/create-terrain-basemap.Rmd"><code>vignettes/create-terrain-basemap.Rmd</code></a></small>
       <div class="hidden name"><code>create-terrain-basemap.Rmd</code></div>
@@ -139,6 +142,7 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/terrain_map.html">terrain_map</a></span><span class="op">(</span>countries <span class="op">=</span> <span class="va">countryname</span>, 
             mask <span class="op">=</span> <span class="cn">TRUE</span>,
             <span class="fu">glamr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glamr/man/si_path.html">si_path</a></span><span class="op">(</span><span class="st">"path_raster"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="../docs/articles/create-terrain-basemap_files/figure-html/basemap-with-admin.png"></p>
 <p>We could also provide you own admins boundaries. This is a classic case where official country names don’t match with <code>rnaturalearth</code> names. Tanzania is good example where the country name is <code>United Republic of Tanzania</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/terrain_map.html">terrain_map</a></span><span class="op">(</span>countries <span class="op">=</span> <span class="va">adm0</span>,

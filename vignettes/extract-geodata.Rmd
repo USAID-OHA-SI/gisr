@@ -1,0 +1,139 @@
+---
+title: "Extract Geodata from different sources"
+author: "Baboyma Kagniniwa"
+date: "2021-09-10"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extract Geodata from different sources}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE,
+  fig.retina = 2
+)
+```
+
+## Introduction
+
+This vignette provides some guidance to USAID/OHA Data Analysts on how to extract geospatial data from different sources
+
+## Geospatial Datasets
+
+PEPFAR/ICPI GIS Cluster provides a global geospatial data set that define the boundaries of PEPFAR countries organizational units. This data set contains all country, SNU, PSNU and Community boundaries along with their respective unique identification id (uid) and have been used thematic mapping and other spatial analyses. Other external data sources such as [Naturalearh](https://www.naturalearthdata.com/downloads/) and [GADM](https://gadm.org/download_country_v3.html) have also been very helpful.
+
+Below are different ways analysts could / should be using this package to extract PEPFAR geodata for their respective countries.
+
+## Prerequisites
+
+```{r setup, echo = T, eval = T}
+library(glamr)         # OHA/SI utility package
+library(gisr)          # OHA/SI geospatial package 
+library(sf)            # Spatial data management
+```
+
+## Locate and setup vector data path
+
+Current PEPFAR Geospatial data sets can be found under OHA/SI Google Drive `SI Folder` and in `Spatial Files` sub-folder.
+
+In order to take full advantage of all the OHA/SI R packages, it's recommended to setup the location of your data directories. These should ideally be outside your github projects directory. One of the directories should be dedicated to geospatial data and should be set using `glamr::set_paths(folderpath_vector = "<my-geodata-folder>")`. 
+
+Below is an example. This assumes your R / Github projects folder is under `Documents` folder on your local computer and your working off a R Project in a sub-folder. In this example, your geospatial data folder will be a sibling of your R / Github projects folder.
+
+```{r echo = T, eval = F}
+curr_path <- "C:/Users/<username>/Documents/projects/gisr" # Windows
+#or 
+#curr_path <- "~/Documents/projects/gisr"                  # Mac or linux
+
+geopath <- "../../Geodata"
+
+glamr::set_paths(folderpath_vector = geopath)
+
+# verify path
+glamr::si_path(type = "path_vector")
+```
+
+The geospatial data path is now set. Download PEPFAR `VcPepfarPolygons.shp` file from the above mentioned Google Drive to the newly set local folder.
+
+## Read geospatial data
+
+Time to test some of the `gisr` functions. Let
+
+```{r echo = T, eval = F}
+# this works for the perfect setup with the default parameters values
+spdf_pepfar <- get_vcpolygons() 
+
+# for custom use, you will need to specify the path and name of the file
+spdf_pepfar <- get_vcpolygons(path = "../myshapefiles", name = "pepfar.shp")
+
+# Explore outputs
+spdf_pepfar %>% glimpse()
+
+spdf_pepfar
+```
+
+Now that the PEPFAR Boundaries shapefile can be accessed and read in R, how does one extract specific boundaries for their countries?
+
+## Extract country orgunit boundaries
+
+In order to extract country specific boundaries, you will need to provide the country name and the orgunit level. Below is an example for South Africa.
+
+```{r echo = T, eval = T}
+cntry <- "South Africa"
+```
+
+Extract country boundaries
+
+```{r echo = T, eval = F}
+cntry_lvl <- glamr::get_ouorglevel(
+  operatingunit = cntry,
+  country = cntry,
+  org_type = "country"
+)
+
+# Country boundaries
+spdf_cntry <- spdf_pepfar %>% 
+  extract_boundaries(country = cntry, 
+                     level = cntry_lvl)
+
+spdf_cntr
+```
+
+Extract PSNU boundaries
+
+```{r echo = T, eval = F}
+psnu_lvl <- glamr::get_ouorglevel(
+  operatingunit = cntry,
+  country = cntry,
+  org_type = "prioritization"
+)
+
+# psnu boundaries
+spdf_psnu <- spdf_pepfar %>% 
+  extract_boundaries(country = cntry, level = cntry_lvl)
+
+spdf_psnu
+```
+
+## Download pre-parsed geodata
+
+PEPFAR Geospatial dataset have already been parsed out and can be downloaded to a local directory.
+
+```{r echo = T, eval = F}
+# Download country boundaries
+download_shapefiles(country = cntry, org_label = "country")
+
+# Download PSNU boundaries
+download_shapefiles(country = cntry, org_label = "prioritization")
+```
+
+## Extract Data from other sources
+
+Contextual geospatial data sets can also be extracted from external sources using `get_admin0()`, `get_admin1()`, `get_adm_boundaries()`
+
+### Thank you!

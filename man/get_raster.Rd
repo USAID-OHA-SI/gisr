@@ -4,12 +4,14 @@
 \alias{get_raster}
 \title{Get Terrain Raster dataset}
 \usage{
-get_raster(path = NULL, name = NULL, ...)
+get_raster(path = NULL, name = NULL, rename = FALSE, ...)
 }
 \arguments{
 \item{path}{Path to raster file, default will be \code{si_path('path_raster')}}
 
 \item{name}{Name of the raster file (with extension), default is set to terrain raster \code{SR_LR.tif}}
+
+\item{rename}{Should the RasterLayer be renamed? If yes, the name is changed to \code{value}}
 
 \item{...}{Additional arguments to be passed to \code{base::list.files}. Eg: \verb{Use ignore.case = TRUE} for non case sensitive search}
 }
@@ -21,7 +23,13 @@ Get Terrain Raster dataset
 }
 \examples{
 \dontrun{
-get_raster(terr_path = glamr::si_path("path_raster"))
+ library(glamr)
+ library(gisr)
+
+ get_raster()
+
+ get_raster(name = "sample.tif")
+ get_raster(path = "./geodata/raster", name = "sample.tif")
 }
 
 }

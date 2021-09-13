@@ -105,6 +105,9 @@
     <li>
       <a href="../articles/create-terrain-basemap.html">Create Terrain Basemap</a>
     </li>
+    <li>
+      <a href="../articles/extract-geodata.html">Extract Geodata from different sources</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -181,13 +184,7 @@
 
  <span class='co'># Country + neighbors boundaries: crop to country extent</span>
  <span class='va'>cntries</span> <span class='op'>&lt;-</span> <span class='fu'>geo_neighbors</span><span class='op'>(</span>countries <span class='op'>=</span> <span class='va'>cntry</span>, crop <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Simple feature collection with 1 feature and 0 fields
-#&gt; Geometry type: POLYGON
-#&gt; Dimension:     XY
-#&gt; Bounding box:  xmin: 21.95225 ymin: -18.24369 xmax: 33.70706 ymax: -8.111828
-#&gt; Geodetic CRS:  WGS 84
-#&gt;                                x
-#&gt; 1 POLYGON ((21.95225 -17.7094...</div><div class='output co'>#&gt; <span class='warning'>Warning: attribute variables are assumed to be spatially constant throughout all geometries</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: attribute variables are assumed to be spatially constant throughout all geometries</span></div><div class='input'>
  <span class='va'>cntries</span> <span class='op'>%&gt;%</span>
    <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>name</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
    <span class='fu'><a href='attributes.html'>attributes</a></span><span class='op'>(</span><span class='op'>)</span>

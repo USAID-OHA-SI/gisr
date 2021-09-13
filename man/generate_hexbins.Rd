@@ -19,8 +19,13 @@ Generate an hexbins polygon sfc from another sfc
 }
 \examples{
 \dontrun{
-generate_hexbins(data)
-generate_hexbins(data, 10000)
+ library(gisr)
+
+ cntry <- "Nigeria"
+ data <- get_admin0(cntry)
+
+ generate_hexbins(data)
+ generate_hexbins(geodata = data, size = 10000)
 }
 
 }

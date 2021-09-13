@@ -124,12 +124,12 @@ gview <- function(geodata, ...) {
     # points
     if (geom_type %in% c("POINT", "MULTIPOINT")) {
         viz <- viz +
-        ggplot2::geom_sf(shape = 21,
-                         size = 4,
-                         stroke = .3,
-                         fill = "white",
-                         color = "#6c6463",
-                         ...)
+            ggplot2::geom_sf(shape = 21,
+                             size = 4,
+                             stroke = .3,
+                             fill = "white",
+                             color = "#6c6463",
+                             ...)
     }
 
     # collection
@@ -318,6 +318,47 @@ geo_fence <- function(aoi,
 }
 
 
+
+
+#' @title Get PEPFAR Visual Crossing Polygons
+#'
+#' @param path     Path to PEPFAR Global Shapefile
+#' @param name     Name or pattern of shapefile
+#'
+#' @return sf object
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#'  library(gisr)
+#'
+#'  shp_pepfar <- get_vcpolygons()
+#'  shp_pepfar <- get_vcpolygons(path = "./GIS")
+#'  shp_pepfar <- get_vcpolygons(path = "./GIS", name = "VcPepfarPolygons.shp")
+#' }
+#'
+get_vcpolygons <- function(path = NULL,
+                           name = NULL) {
+
+    if (base::is.null(path)) {
+        path <- glamr::si_path(type = "path_vector")
+    }
+
+    if (base::is.null(name)) {
+        name <- "^VcPepfarPolygons.*.shp$"
+    }
+
+    shp_pepfar <- glamr::return_latest(
+        folderpath = path,
+        pattern = name,
+        recursive = TRUE
+        ) %>%
+        sf::read_sf()
+
+    return(shp_pepfar)
+}
+
+
 #' @title Extract PEPFAR Orgunit Boundaries
 #'
 #' @description    PEPFAR VcPolygons are shared with orgunit uids only,
@@ -419,8 +460,8 @@ extract_boundaries <-
 
         # filter sp df
         spdf <- spdf %>%
-            left_join(orgs, by = "uid") %>%
-            filter(!is.na(orgunit))
+            dplyr::left_join(orgs, by = "uid") %>%
+            dplyr::filter(!is.na(orgunit))
 
         # Export
         if (export == TRUE & !is.null(name)) {
@@ -513,7 +554,7 @@ extract_roads <- function(aoi,
 #' @param country      PEPFAR Countryname
 #' @param org_label    Orgunit label, default is set to country
 #' @param drive_folder Googledrive id for all PEPFAR Spatial files
-#' @param dest_file    Local directory where to download zipped shapefile
+#' @param dest_file    Full file name where to download zipped shapefile
 #' @param overwrite    Should the process overwrite existing files
 #' @param unzip        Should the zipfile be unzipped
 #'
@@ -540,13 +581,15 @@ download_shapefiles <-
              unzip = FALSE) {
 
         # country
-        cntry <- stringr::str_to_lower(country)
+        #cntry <- stringr::str_to_lower(country)
+        cntry <- janitor::make_clean_names(country)
+        label <- stringr::str_to_lower(label)
 
         # default google drive folder
         sp_folder <- "1KQACKdo7b-M_Un2Fe1x0ZSJkhkNNPTqa"
 
-        # detault local folder
-        dest_folder <- "./GIS"
+        # default local folder
+        dest_folder <- glamr::si_path("path_vector") #"./GIS"
 
         gdrive <- base::ifelse(base::is.null(drive_folder),
                                sp_folder,
@@ -554,10 +597,10 @@ download_shapefiles <-
 
         # labels
         org_labels <- c("global", "region",
-                        "country", "snu1", "psnu",
+                        "country", "snu1", "psnu", "prioritization",
                         "community", "site")
 
-        if (!org_label %in% org_labels) {
+        if (!label %in% org_labels) {
             base::message(glue::glue("{org_label} is not available. Valid options are: "))
             base::message(base::paste(org_labels, collapse = ", "))
 
@@ -565,14 +608,15 @@ download_shapefiles <-
         }
 
         # target sub-folder
-        folder <- case_when(
-            org_label == "global" ~ "Global",
-            org_label == "region" ~ "Regional-Countries-Boundaries",
-            org_label == "country" ~ "OU-Country-Boundaries",
-            org_label == "snu1" ~ "SNU1",
-            org_label == "psnu" ~ "PSNU",
-            org_label == "community" ~ "Communities",
-            org_label == "site" ~ "Sites",
+        folder <- dplyr::case_when(
+            label == "global" ~ "Global",
+            label == "region" ~ "Regional-Countries-Boundaries",
+            label == "country" ~ "OU-Country-Boundaries",
+            label == "snu1" ~ "SNU1",
+            label == "psnu" ~ "PSNU",
+            label == "prioritization" ~ "PSNU",
+            label == "community" ~ "Communities",
+            label == "site" ~ "Sites",
             TRUE ~ NA_character_
         )
 
@@ -580,7 +624,7 @@ download_shapefiles <-
         zfile_url <- "https://drive.google.com/uc?export=download&id="
 
         # authentication
-        if (!is.null(getOption("email"))) {
+        if (is.null(getOption("email"))) {
             glamr::load_secrets()
         }
 
@@ -605,7 +649,7 @@ download_shapefiles <-
 
         # Identify sub-folder
         df_drive <- df_drives %>%
-            dplyr::filter(str_detect(name, folder))
+            dplyr::filter(stringr::str_detect(name, folder))
 
         if (base::nrow(df_drive) == 0) {
             base::message(glue::glue("Could not find a folder for {org_label}"))
@@ -627,13 +671,11 @@ download_shapefiles <-
 
         if (base::nrow(df_files) == 0) {
             base::message(glue::glue("Could not find a match for {country} / {org_label}. Check if item was not removed or renamed."))
-
             return(NULL)
         }
 
         if (base::nrow(df_files) != 1) {
             base::message(glue::glue("There seems to be duplicate files for {country} / {org_label}. Check if item was not duplicated."))
-
             return(NULL)
         }
 
@@ -644,9 +686,9 @@ download_shapefiles <-
         base::print(glue::glue("Download link: {zfile}"))
 
         # Generate destination file
-        if (base::is.null(dest_file) & base::dir.exists(dest_folder)) {
+        if (base::is.null(dest_file) && base::dir.exists(dest_folder)) {
             dest_file <- base::file.path(dest_folder,
-                                         glue::glue("{stringr::str_to_lower(country)}_{org_label}_shapefile.zip"))
+                                         glue::glue("{cntry}_{org_label}_shapefile.zip"))
         }
 
         if (base::is.null(dest_file)) {
@@ -668,5 +710,4 @@ download_shapefiles <-
             zip::unzip(zipfile = dest_file,
                        exdir = base::dirname(dest_file))
         }
-
     }

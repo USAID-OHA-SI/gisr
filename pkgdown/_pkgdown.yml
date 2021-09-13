@@ -21,7 +21,9 @@ reference:
   - -export_spdf
   - has_keyword("admin")
   - get_raster
+  - extract_raster
   - get_terrain
+  - get_vcpolygons
   - extract_boundaries
   - extract_roads
   - get_hexbins

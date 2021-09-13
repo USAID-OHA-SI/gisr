@@ -1,10 +1,10 @@
 ---
 title: "Create Terrain Basemap"
 author: Baboyma Kagniniwa | USAID
-date: "`r Sys.Date()`"
+date: "2021-8-26"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{create-terrain-basemap}
+  %\VignetteIndexEntry{Create Terrain Basemap}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
