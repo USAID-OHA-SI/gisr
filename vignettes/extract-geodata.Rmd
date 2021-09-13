@@ -101,7 +101,7 @@ spdf_cntry <- spdf_pepfar %>%
   extract_boundaries(country = cntry, 
                      level = cntry_lvl)
 
-spdf_cntr
+spdf_cntry
 ```
 
 Extract PSNU boundaries
@@ -135,5 +135,9 @@ download_shapefiles(country = cntry, org_label = "prioritization")
 ## Extract Data from other sources
 
 Contextual geospatial data sets can also be extracted from external sources using `get_admin0()`, `get_admin1()`, `get_adm_boundaries()`
+
+## Export Geospatial Data to local drive
+
+Take a look at `export_spdf()`
 
 ### Thank you!

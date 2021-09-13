@@ -583,7 +583,7 @@ download_shapefiles <-
         # country
         #cntry <- stringr::str_to_lower(country)
         cntry <- janitor::make_clean_names(country)
-        label <- stringr::str_to_lower(label)
+        label <- stringr::str_to_lower(org_label)
 
         # default google drive folder
         sp_folder <- "1KQACKdo7b-M_Un2Fe1x0ZSJkhkNNPTqa"
