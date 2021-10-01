@@ -31,7 +31,7 @@ Admin boundaries + neighbor countries data from [Natural Earth Data](https://www
 ```{r}
 library(tidyverse)
 library(sf)
-library(gisr)
+library(gisr) 
 
 zambia0 <- get_admin0("Zambia") 
 zambia1 <- get_admin1("Zambia") 
