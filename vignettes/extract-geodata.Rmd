@@ -125,7 +125,7 @@ Extract all country boundaries
 
 ```{r echo = T, eval = F}
 
-spdf_all <- extract_cntry_boundaries(spdf = spdf_pepfar, cntry = cntry)
+spdf_all <- cntry_polygons(spdf = spdf_pepfar, cntry = cntry)
 
 spdf_all$country
 spdf_all$snu1
