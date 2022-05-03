@@ -607,47 +607,6 @@ extract_attributes <-
   }
 
 
-#' @title Save shapefile
-#'
-#' @param spdf sf object
-#' @param name filename with full path
-#'
-#' @return boolean
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'  library(gisr)
-#'  library(sf)
-#'
-#'  shp <- get_admin0(countries = "Nigeria")
-#'
-#'  export_spdf(spdf = shp, name = "./GIS/nga_country_boundaries")
-#'  export_spdf(spdf = shp, name = "./GIS/nga_country_boundaries.shp")
-#' }
-#'
-export_spdf <- function(spdf, name) {
-
-  # Check directory
-  dir <- base::dirname(name)
-
-  if (!base::dir.exists(dir)) {
-    base::message(glue::glue("{dir} does not seem to exist."))
-  }
-
-  name <- base::ifelse(!stringr::str_detect(name, ".shp$"),
-                 base::paste0(name, ".shp"),
-                 name)
-
-  delete <- base::ifelse(file.exists(name), TRUE, FALSE)
-
-  sf::st_write(obj = spdf,
-               dsn = name,
-               delete_dsn = delete)
-
-}
-
-
 #' @title Compress all shapefile components into a zipped file
 #'
 #' @param filename    Shapefile full name
@@ -666,8 +625,8 @@ export_spdf <- function(spdf, name) {
 #'
 #'  export_spdf(spdf = shp, name = fname)
 #'
-#'  zip_shapefiles(filename = fname, dest_folder = "./GIS/)
-#' }
+#'  zip_shapefiles(filename = fname, dest_folder = "./GIS/)}
+#'
 #'
 zip_shapefiles <-
   function(filename,

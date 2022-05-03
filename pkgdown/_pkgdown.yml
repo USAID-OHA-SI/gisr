@@ -42,3 +42,4 @@ reference:
   - starts_with("zip")
   - attributes
   - export_spdf
+  - spdf_export

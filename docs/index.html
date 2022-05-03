@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">gisr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.2</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -64,6 +60,9 @@
       <a href="articles/create-terrain-basemap.html">Create Terrain Basemap</a>
     </li>
     <li>
+      <a href="articles/extract-facilities.html">Extract facilities location data</a>
+    </li>
+    <li>
       <a href="articles/extract-geodata.html">Extract Geodata from different sources</a>
     </li>
   </ul>
@@ -74,8 +73,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/USAID-OHA-SI/gisr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/USAID-OHA-SI/gisr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -93,111 +92,110 @@
   <div class="contents col-md-9">
 
 <p><img src="reference/figures/logo.png" align="right" height="120"></p>
-<p><a href="https://github.com/USAID-OHA-SI/gisr/actions"><img src="https://github.com/USAID-OHA-SI/gisr/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></p>
-<div id="gisr" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#gisr" class="anchor"></a>gisr</h1></div>
+<p><a href="https://github.com/USAID-OHA-SI/gisr/actions" class="external-link"><img src="https://github.com/USAID-OHA-SI/gisr/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></p>
+<div class="section level1">
+<div class="page-header"><h1 id="gisr">gisr<a class="anchor" aria-label="anchor" href="#gisr"></a>
+</h1></div>
 <p>OHA Geospatial Analytics Utilities</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<pre class="{r}"><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("remotes")
-remotes::install_github("USAID-OHA-SI/gisr", build_vignettes = TRUE)</a></code></pre>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<pre class="{r}"><code><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"USAID-OHA-SI/gisr"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre>
 </div>
-<div id="get-administrative-boundaries" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-administrative-boundaries" class="anchor"></a>Get administrative boundaries</h2>
-<p>Admin boundaries from <a href="https://gadm.org/download_country_v3.html">GADM</a> through Raster package</p>
-<pre class="{r}"><code><a href="https://github.com/USAID-OHA-SI/gisr">library(gisr)
+<div class="section level2">
+<h2 id="get-administrative-boundaries">Get administrative boundaries<a class="anchor" aria-label="anchor" href="#get-administrative-boundaries"></a>
+</h2>
+<p>Admin boundaries from <a href="https://gadm.org/download_country_v3.html" class="external-link">GADM</a> through Raster package</p>
+<pre class="{r}"><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/gisr" class="external-link">gisr</a></span><span class="op">)</span>
 
-tgo0 &lt;- get_adm_boundaries("TGO", adm_level=0, geo_path="./GIS")
-tgo1 &lt;- get_adm_boundaries("TGO", adm_level=1, geo_path="./GIS")
+<span class="va">tgo0</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_adm_boundaries.html">get_adm_boundaries</a></span><span class="op">(</span><span class="st">"TGO"</span>, adm_level<span class="op">=</span><span class="fl">0</span>, geo_path<span class="op">=</span><span class="st">"./GIS"</span><span class="op">)</span>
+<span class="va">tgo1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_adm_boundaries.html">get_adm_boundaries</a></span><span class="op">(</span><span class="st">"TGO"</span>, adm_level<span class="op">=</span><span class="fl">1</span>, geo_path<span class="op">=</span><span class="st">"./GIS"</span><span class="op">)</span>
 
-tgo0 %&gt;% gview()</a></code></pre>
-<p>Admin boundaries + neighbor countries data from <a href="https://www.naturalearthdata.com/">Natural Earth Data</a></p>
-<pre class="{r}"><code><a href="https://tidyverse.tidyverse.org">library(tidyverse)
-library(sf)
-library(gisr)
+<span class="va">tgo0</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="reference/gview.html">gview</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<p>Admin boundaries + neighbor countries data from <a href="https://www.naturalearthdata.com/" class="external-link">Natural Earth Data</a></p>
+<pre class="{r}"><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/gisr" class="external-link">gisr</a></span><span class="op">)</span>
 
-zambia0 &lt;- get_admin0("Zambia") 
-zambia1 &lt;- get_admin1("Zambia") 
+<span class="va">zambia0</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_admin0.html">get_admin0</a></span><span class="op">(</span><span class="st">"Zambia"</span><span class="op">)</span> 
+<span class="va">zambia1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_admin1.html">get_admin1</a></span><span class="op">(</span><span class="st">"Zambia"</span><span class="op">)</span> 
 
-zambia_neighbors &lt;- geo_neighbors("Zambia") 
+<span class="va">zambia_neighbors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/geo_neighbors.html">geo_neighbors</a></span><span class="op">(</span><span class="st">"Zambia"</span><span class="op">)</span> 
 
-ggplot(data = zambia_neighbors) +
-        geom_sf(fill = NA) +
-        geom_sf(data = zambia1, fill = gray(.92), lty = "dashed") +
-        geom_sf(data = zambia0, fill = NA) +
-        geom_sf_text(aes(label = sovereignt), size = 3) +
-        theme_void()</a></code></pre>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">zambia_neighbors</span><span class="op">)</span> <span class="op">+</span>
+        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span>
+        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">zambia1</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/gray.html" class="external-link">gray</a></span><span class="op">(</span><span class="fl">.92</span><span class="op">)</span>, lty <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span>
+        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">zambia0</span>, fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span>
+        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">sovereignt</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span>
+        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span></code></pre>
 </div>
-<div id="plot-a-terrain-map" class="section level2">
-<h2 class="hasAnchor">
-<a href="#plot-a-terrain-map" class="anchor"></a>Plot a terrain map</h2>
+<div class="section level2">
+<h2 id="plot-a-terrain-map">Plot a terrain map<a class="anchor" aria-label="anchor" href="#plot-a-terrain-map"></a>
+</h2>
 <p>Create a terrain map with vector + raster data from local DEM Tiff file</p>
-<pre class="{r}"><code><a href="https://tidyverse.tidyverse.org">library(tidyverse)
-library(sf)
-library(gisr)
+<pre class="{r}"><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/gisr" class="external-link">gisr</a></span><span class="op">)</span>
 
-dem_dir &lt;- "./GIS"
+<span class="va">dem_dir</span> <span class="op">&lt;-</span> <span class="st">"./GIS"</span>
 
-z_map1 &lt;- terrain_map("Zambia", terr_path = dir_terr)
+<span class="va">z_map1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/terrain_map.html">terrain_map</a></span><span class="op">(</span><span class="st">"Zambia"</span>, terr_path <span class="op">=</span> <span class="va">dir_terr</span><span class="op">)</span>
 
-print(z_map1)
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">z_map1</span><span class="op">)</span>
 
-z_map2 &lt;- terrain_map("Zambia", terr_path = dir_terr, add_neighbors = TRUE) 
+<span class="va">z_map2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/terrain_map.html">terrain_map</a></span><span class="op">(</span><span class="st">"Zambia"</span>, terr_path <span class="op">=</span> <span class="va">dir_terr</span>, add_neighbors <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> 
     
-print(z_map2)
-</a></code></pre>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">z_map2</span><span class="op">)</span></code></pre>
 </div>
-<div id="plot-an-admin-map" class="section level2">
-<h2 class="hasAnchor">
-<a href="#plot-an-admin-map" class="anchor"></a>Plot an admin map</h2>
+<div class="section level2">
+<h2 id="plot-an-admin-map">Plot an admin map<a class="anchor" aria-label="anchor" href="#plot-an-admin-map"></a>
+</h2>
 <p>Create an administrative map with vector data from RNaturalEarth</p>
-<pre class="{r}"><code><a href="https://github.com/wch/extrafont">library(extrafont)
-library(tidyverse)
-library(sf)
-library(glitr)
-library(gisr)
+<pre class="{r}"><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wch/extrafont" class="external-link">extrafont</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/glitr" class="external-link">glitr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/gisr" class="external-link">gisr</a></span><span class="op">)</span>
 
-z_map1 &lt;- admins_map("Zambia")
+<span class="va">z_map1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/admins_map.html">admins_map</a></span><span class="op">(</span><span class="st">"Zambia"</span><span class="op">)</span>
 
-print(z_map1)
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">z_map1</span><span class="op">)</span>
 
-z_map2 &lt;- admins_map("Zambia", add_neighbors = TRUE) 
+<span class="va">z_map2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/admins_map.html">admins_map</a></span><span class="op">(</span><span class="st">"Zambia"</span>, add_neighbors <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> 
     
-print(z_map2)
-</a></code></pre>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">z_map2</span><span class="op">)</span></code></pre>
 </div>
-<div id="apply-si-style-guide-to-maps" class="section level2">
-<h2 class="hasAnchor">
-<a href="#apply-si-style-guide-to-maps" class="anchor"></a>Apply SI Style Guide to maps</h2>
+<div class="section level2">
+<h2 id="apply-si-style-guide-to-maps">Apply SI Style Guide to maps<a class="anchor" aria-label="anchor" href="#apply-si-style-guide-to-maps"></a>
+</h2>
 <p>Create an administrative map with vector data from RNaturalEarth and apply SI Style</p>
-<pre class="{r}"><code><a href="https://github.com/wch/extrafont">library(extrafont)
-library(tidyverse)
-library(gisr)
-library(sf)
-library(glitr)
+<pre class="{r}"><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wch/extrafont" class="external-link">extrafont</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/gisr" class="external-link">gisr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/glitr" class="external-link">glitr</a></span><span class="op">)</span>
 
-sfdf &lt;- gisr::get_admin1("Nigeria") %&gt;%
- select(name) %&gt;%
- mutate(value = runif(nrow(.), 0, 1))
+<span class="va">sfdf</span> <span class="op">&lt;-</span> <span class="fu">gisr</span><span class="fu">::</span><span class="fu"><a href="reference/get_admin1.html">get_admin1</a></span><span class="op">(</span><span class="st">"Nigeria"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span>
+ <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span>
+ <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 
-ggplot() +
-   geom_sf(data = sfdf,
-           aes(fill = value),
-           color = grey10k,
-           size = .1) +
-   scale_fill_si(palette = "genoas",
-                 discrete = FALSE,
-                 limits = c(0, 1),
-                 labels = scales::percent) +
-   labs(title = "NIGERIA - % OF PLHIV BY STATE",
-        subtitle = "States from XYZ Region are the most hit by HIV/AIDS",
-        caption = base::paste0("Produced by OHA/SIEI/SI, ON ", base::Sys.Date())) +
-  si_style_map()
-  </a></code></pre>
-<p><img src="https://user-images.githubusercontent.com/3952707/125997981-73a84f04-5f23-48f4-a77a-fceb4b158f76.png" alt="image"></p>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">sfdf</span>,
+           <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">value</span><span class="op">)</span>,
+           color <span class="op">=</span> <span class="va">grey10k</span>,
+           size <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span> <span class="op">+</span>
+   <span class="fu"><a href="https://rdrr.io/pkg/glitr/man/scale_fill_si.html" class="external-link">scale_fill_si</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"genoas"</span>,
+                 discrete <span class="op">=</span> <span class="cn">FALSE</span>,
+                 limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
+                 labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/label_percent.html" class="external-link">percent</a></span><span class="op">)</span> <span class="op">+</span>
+   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"NIGERIA - % OF PLHIV BY STATE"</span>,
+        subtitle <span class="op">=</span> <span class="st">"States from XYZ Region are the most hit by HIV/AIDS"</span>,
+        caption <span class="op">=</span> <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Produced by OHA/SIEI/SI, ON "</span>, <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/glitr/man/si_style_map.html" class="external-link">si_style_map</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<div class="figure">
+<img src="https://user-images.githubusercontent.com/3952707/125997981-73a84f04-5f23-48f4-a77a-fceb4b158f76.png" alt=""><p class="caption">image</p>
+</div>
 <hr>
 <p><em>Disclaimer: The findings, interpretation, and conclusions expressed herein are those of the authors and do not necessarily reflect the views of United States Agency for International Development. All errors remain our own.</em></p>
 </div>
@@ -207,39 +205,51 @@ ggplot() +
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/USAID-OHA-SI/gisr/">https://​github.com/​USAID-OHA-SI/​gisr/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/USAID-OHA-SI/gisr/issues">https://​github.com/​USAID-OHA-SI/​gisr/​issues</a>
-</li>
+<li><a href="https://github.com/USAID-OHA-SI/gisr/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/USAID-OHA-SI/gisr/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+<a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
 </li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing gisr</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Baboyma Kagniniwa <br><small class="roles"> Author, maintainer </small>  </li>
 </ul>
 </div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Baboyma Kagniniwa.</p>
+  <p></p>
+<p>Developed by Baboyma Kagniniwa.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>
@@ -247,6 +257,8 @@ ggplot() +
 
   
 
+
+  
 
   </body>
 </html>

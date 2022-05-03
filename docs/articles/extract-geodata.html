@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gisr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.2</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -64,6 +60,9 @@
       <a href="../articles/create-terrain-basemap.html">Create Terrain Basemap</a>
     </li>
     <li>
+      <a href="../articles/extract-facilities.html">Extract facilities location data</a>
+    </li>
+    <li>
       <a href="../articles/extract-geodata.html">Extract Geodata from different sources</a>
     </li>
   </ul>
@@ -74,8 +73,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/USAID-OHA-SI/gisr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/USAID-OHA-SI/gisr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -93,41 +92,41 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Extract Geodata from different sources</h1>
-                        <h4 class="author">Baboyma Kagniniwa</h4>
+                        <h4 data-toc-skip class="author">Baboyma Kagniniwa</h4>
             
-            <h4 class="date">2021-09-10</h4>
+            <h4 data-toc-skip class="date">2021-09-10</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/USAID-OHA-SI/gisr/blob/master/vignettes/extract-geodata.Rmd"><code>vignettes/extract-geodata.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/USAID-OHA-SI/gisr/blob/HEAD/vignettes/extract-geodata.Rmd" class="external-link"><code>vignettes/extract-geodata.Rmd</code></a></small>
       <div class="hidden name"><code>extract-geodata.Rmd</code></div>
 
     </div>
 
     
     
-<div id="introduction" class="section level2">
-<h2 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h2>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
 <p>This vignette provides some guidance to USAID/OHA Data Analysts on how to extract geospatial data from different sources</p>
 </div>
-<div id="geospatial-datasets" class="section level2">
-<h2 class="hasAnchor">
-<a href="#geospatial-datasets" class="anchor"></a>Geospatial Datasets</h2>
-<p>PEPFAR/ICPI GIS Cluster provides a global geospatial data set that define the boundaries of PEPFAR countries organizational units. This data set contains all country, SNU, PSNU and Community boundaries along with their respective unique identification id (uid) and have been used thematic mapping and other spatial analyses. Other external data sources such as <a href="https://www.naturalearthdata.com/downloads/">Naturalearh</a> and <a href="https://gadm.org/download_country_v3.html">GADM</a> have also been very helpful.</p>
+<div class="section level2">
+<h2 id="geospatial-datasets">Geospatial Datasets<a class="anchor" aria-label="anchor" href="#geospatial-datasets"></a>
+</h2>
+<p>PEPFAR/ICPI GIS Cluster provides a global geospatial data set that define the boundaries of PEPFAR countries organizational units. This data set contains all country, SNU, PSNU and Community boundaries along with their respective unique identification id (uid) and have been used thematic mapping and other spatial analyses. Other external data sources such as <a href="https://www.naturalearthdata.com/downloads/" class="external-link">Naturalearh</a> and <a href="https://gadm.org/download_country_v3.html" class="external-link">GADM</a> have also been very helpful.</p>
 <p>Below are different ways analysts could / should be using this package to extract PEPFAR geodata for their respective countries.</p>
 </div>
-<div id="prerequisites" class="section level2">
-<h2 class="hasAnchor">
-<a href="#prerequisites" class="anchor"></a>Prerequisites</h2>
+<div class="section level2">
+<h2 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/glamr">glamr</a></span><span class="op">)</span>         <span class="co"># OHA/SI utility package</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/gisr">gisr</a></span><span class="op">)</span>          <span class="co"># OHA/SI geospatial package </span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span>            <span class="co"># Spatial data management</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/glamr" class="external-link">glamr</a></span><span class="op">)</span>         <span class="co"># OHA/SI utility package</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/USAID-OHA-SI/gisr" class="external-link">gisr</a></span><span class="op">)</span>          <span class="co"># OHA/SI geospatial package </span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span>            <span class="co"># Spatial data management</span></code></pre></div>
 </div>
-<div id="locate-and-setup-vector-data-path" class="section level2">
-<h2 class="hasAnchor">
-<a href="#locate-and-setup-vector-data-path" class="anchor"></a>Locate and setup vector data path</h2>
+<div class="section level2">
+<h2 id="locate-and-setup-vector-data-path">Locate and setup vector data path<a class="anchor" aria-label="anchor" href="#locate-and-setup-vector-data-path"></a>
+</h2>
 <p>Current PEPFAR Geospatial data sets can be found under OHA/SI Google Drive <code>SI Folder</code> and in <code>Spatial Files</code> sub-folder.</p>
-<p>In order to take full advantage of all the OHA/SI R packages, it’s recommended to setup the location of your data directories. These should ideally be outside your github projects directory. One of the directories should be dedicated to geospatial data and should be set using <code><a href="https://rdrr.io/pkg/glamr/man/set_paths.html">glamr::set_paths(folderpath_vector = "&lt;my-geodata-folder&gt;")</a></code>.</p>
+<p>In order to take full advantage of all the OHA/SI R packages, it’s recommended to setup the location of your data directories. These should ideally be outside your github projects directory. One of the directories should be dedicated to geospatial data and should be set using <code>glamr::set_paths(folderpath_vector = "&lt;my-geodata-folder&gt;")</code>.</p>
 <p>Below is an example. This assumes your R / Github projects folder is under <code>Documents</code> folder on your local computer and your working off a R Project in a sub-folder. In this example, your geospatial data folder will be a sibling of your R / Github projects folder.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">curr_path</span> <span class="op">&lt;-</span> <span class="st">"C:/Users/&lt;username&gt;/Documents/projects/gisr"</span> <span class="co"># Windows</span>
@@ -136,15 +135,15 @@
 
 <span class="va">geopath</span> <span class="op">&lt;-</span> <span class="st">"../../Geodata"</span>
 
-<span class="fu">glamr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glamr/man/set_paths.html">set_paths</a></span><span class="op">(</span>folderpath_vector <span class="op">=</span> <span class="va">geopath</span><span class="op">)</span>
+<span class="fu">glamr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glamr/man/set_paths.html" class="external-link">set_paths</a></span><span class="op">(</span>folderpath_vector <span class="op">=</span> <span class="va">geopath</span><span class="op">)</span>
 
 <span class="co"># verify path</span>
-<span class="fu">glamr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glamr/man/si_path.html">si_path</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"path_vector"</span><span class="op">)</span></code></pre></div>
+<span class="fu">glamr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glamr/man/si_path.html" class="external-link">si_path</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"path_vector"</span><span class="op">)</span></code></pre></div>
 <p>The geospatial data path is now set. Download PEPFAR <code>VcPepfarPolygons.shp</code> file from the above mentioned Google Drive to the newly set local folder.</p>
 </div>
-<div id="read-geospatial-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#read-geospatial-data" class="anchor"></a>Read geospatial data</h2>
+<div class="section level2">
+<h2 id="read-geospatial-data">Read geospatial data<a class="anchor" aria-label="anchor" href="#read-geospatial-data"></a>
+</h2>
 <p>Time to test some of the <code>gisr</code> functions. Let</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># this works for the perfect setup with the default parameters values</span>
@@ -154,68 +153,77 @@
 <span class="va">spdf_pepfar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_vcpolygons.html">get_vcpolygons</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"../myshapefiles"</span>, name <span class="op">=</span> <span class="st">"pepfar.shp"</span><span class="op">)</span>
 
 <span class="co"># Explore outputs</span>
-<span class="va">spdf_pepfar</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">spdf_pepfar</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">spdf_pepfar</span></code></pre></div>
 <p>Now that the PEPFAR Boundaries shapefile can be accessed and read in R, how does one extract specific boundaries for their countries?</p>
 </div>
-<div id="extract-country-orgunit-boundaries" class="section level2">
-<h2 class="hasAnchor">
-<a href="#extract-country-orgunit-boundaries" class="anchor"></a>Extract country orgunit boundaries</h2>
+<div class="section level2">
+<h2 id="extract-country-orgunit-boundaries">Extract country orgunit boundaries<a class="anchor" aria-label="anchor" href="#extract-country-orgunit-boundaries"></a>
+</h2>
 <p>In order to extract country specific boundaries, you will need to provide the country name and the orgunit level. Below is an example for South Africa.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cntry</span> <span class="op">&lt;-</span> <span class="st">"South Africa"</span></code></pre></div>
 <p>Extract country boundaries</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cntry_lvl</span> <span class="op">&lt;-</span> <span class="fu">glamr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glamr/man/get_ouorglevel.html">get_ouorglevel</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">cntry_lvl</span> <span class="op">&lt;-</span> <span class="fu">glamr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glamr/man/get_ouorglevel.html" class="external-link">get_ouorglevel</a></span><span class="op">(</span>
   operatingunit <span class="op">=</span> <span class="va">cntry</span>,
   country <span class="op">=</span> <span class="va">cntry</span>,
   org_type <span class="op">=</span> <span class="st">"country"</span>
 <span class="op">)</span>
 
 <span class="co"># Country boundaries</span>
-<span class="va">spdf_cntry</span> <span class="op">&lt;-</span> <span class="va">spdf_pepfar</span> <span class="op">%&gt;%</span> 
+<span class="va">spdf_cntry</span> <span class="op">&lt;-</span> <span class="va">spdf_pepfar</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/extract_boundaries.html">extract_boundaries</a></span><span class="op">(</span>country <span class="op">=</span> <span class="va">cntry</span>, 
                      level <span class="op">=</span> <span class="va">cntry_lvl</span><span class="op">)</span>
 
 <span class="va">spdf_cntry</span></code></pre></div>
 <p>Extract PSNU boundaries</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">psnu_lvl</span> <span class="op">&lt;-</span> <span class="fu">glamr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glamr/man/get_ouorglevel.html">get_ouorglevel</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">psnu_lvl</span> <span class="op">&lt;-</span> <span class="fu">glamr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glamr/man/get_ouorglevel.html" class="external-link">get_ouorglevel</a></span><span class="op">(</span>
   operatingunit <span class="op">=</span> <span class="va">cntry</span>,
   country <span class="op">=</span> <span class="va">cntry</span>,
   org_type <span class="op">=</span> <span class="st">"prioritization"</span>
 <span class="op">)</span>
 
 <span class="co"># psnu boundaries</span>
-<span class="va">spdf_psnu</span> <span class="op">&lt;-</span> <span class="va">spdf_pepfar</span> <span class="op">%&gt;%</span> 
+<span class="va">spdf_psnu</span> <span class="op">&lt;-</span> <span class="va">spdf_pepfar</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/extract_boundaries.html">extract_boundaries</a></span><span class="op">(</span>country <span class="op">=</span> <span class="va">cntry</span>, level <span class="op">=</span> <span class="va">cntry_lvl</span><span class="op">)</span>
 
 <span class="va">spdf_psnu</span></code></pre></div>
-</div>
-<div id="download-pre-parsed-geodata" class="section level2">
-<h2 class="hasAnchor">
-<a href="#download-pre-parsed-geodata" class="anchor"></a>Download pre-parsed geodata</h2>
-<p>PEPFAR Geospatial dataset have already been parsed out and can be downloaded to a local directory.</p>
+<p>Extract all country boundaries</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">spdf_all</span> <span class="op">&lt;-</span> <span class="fu">extract_cntry_boundaries</span><span class="op">(</span>spdf <span class="op">=</span> <span class="va">spdf_pepfar</span>, cntry <span class="op">=</span> <span class="va">cntry</span><span class="op">)</span>
+
+<span class="va">spdf_all</span><span class="op">$</span><span class="va">country</span>
+<span class="va">spdf_all</span><span class="op">$</span><span class="va">snu1</span>
+<span class="va">spdf_all</span><span class="op">$</span><span class="va">prioritization</span>
+<span class="va">spdf_all</span><span class="op">$</span><span class="va">community</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="download-pre-parsed-geodata">Download pre-parsed geodata<a class="anchor" aria-label="anchor" href="#download-pre-parsed-geodata"></a>
+</h2>
+<p>PEPFAR Geospatial dataset have already been parsed out and can be downloaded to a local directory.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Download country boundaries</span>
 <span class="fu"><a href="../reference/download_shapefiles.html">download_shapefiles</a></span><span class="op">(</span>country <span class="op">=</span> <span class="va">cntry</span>, org_label <span class="op">=</span> <span class="st">"country"</span><span class="op">)</span>
 
 <span class="co"># Download PSNU boundaries</span>
 <span class="fu"><a href="../reference/download_shapefiles.html">download_shapefiles</a></span><span class="op">(</span>country <span class="op">=</span> <span class="va">cntry</span>, org_label <span class="op">=</span> <span class="st">"prioritization"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="extract-data-from-other-sources" class="section level2">
-<h2 class="hasAnchor">
-<a href="#extract-data-from-other-sources" class="anchor"></a>Extract Data from other sources</h2>
+<div class="section level2">
+<h2 id="extract-data-from-other-sources">Extract Data from other sources<a class="anchor" aria-label="anchor" href="#extract-data-from-other-sources"></a>
+</h2>
 <p>Contextual geospatial data sets can also be extracted from external sources using <code><a href="../reference/get_admin0.html">get_admin0()</a></code>, <code><a href="../reference/get_admin1.html">get_admin1()</a></code>, <code><a href="../reference/get_adm_boundaries.html">get_adm_boundaries()</a></code></p>
 </div>
-<div id="export-geospatial-data-to-local-drive" class="section level2">
-<h2 class="hasAnchor">
-<a href="#export-geospatial-data-to-local-drive" class="anchor"></a>Export Geospatial Data to local drive</h2>
-<p>Take a look at <code><a href="../reference/export_spdf.html">export_spdf()</a></code></p>
-<div id="thank-you" class="section level3">
-<h3 class="hasAnchor">
-<a href="#thank-you" class="anchor"></a>Thank you!</h3>
+<div class="section level2">
+<h2 id="export-geospatial-data-to-local-drive">Export Geospatial Data to local drive<a class="anchor" aria-label="anchor" href="#export-geospatial-data-to-local-drive"></a>
+</h2>
+<p>Take a look at <code>export_spdf()</code></p>
+<div class="section level3">
+<h3 id="thank-you">Thank you!<a class="anchor" aria-label="anchor" href="#thank-you"></a>
+</h3>
 </div>
 </div>
   </div>
@@ -231,11 +239,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Baboyma Kagniniwa.</p>
+  <p></p>
+<p>Developed by Baboyma Kagniniwa.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>
@@ -243,6 +253,8 @@
 
   
 
+
+  
 
   </body>
 </html>

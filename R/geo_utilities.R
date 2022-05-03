@@ -19,29 +19,31 @@
 #'
 attributes <- function(geodata) {
 
-    # check of data is sf or sfc
-    #base::stopifnot(base::any(class(geodata) %in% c('sf')))
+    geodata %>%
+        sf::st_as_sf() %>%
+        sf::st_drop_geometry(x = .) %>%
+        tibble::as_tibble()
 
-    gclass <- base::class(geodata)
-
-    if (length(gclass) == 1) {
-        if (stringr::str_detect(gclass, "Spatial.*DataFrame")) {
-            # Convert to sf and drop geometry
-            geodata %>%
-                sf::st_as_sf() %>%
-                sf::st_drop_geometry(x = .) %>%
-                tibble::as_tibble()
-        }
-    }
-    else if (length(gclass) > 1 & "sf" %in% gclass) {
-        # Drop geometry and view data
-        geodata %>%
-            sf::st_drop_geometry(x = .) %>%
-            tibble::as_tibble()
-    }
-    else {
-        base::stop("Input does not seem to be a sf or sp spatial object")
-    }
+    # gclass <- base::class(geodata)
+    #
+    # if (length(gclass) == 1) {
+    #     if (stringr::str_detect(gclass, "Spatial.*DataFrame")) {
+    #         # Convert to sf and drop geometry
+    #         geodata %>%
+    #             sf::st_as_sf() %>%
+    #             sf::st_drop_geometry(x = .) %>%
+    #             tibble::as_tibble()
+    #     }
+    # }
+    # else if (length(gclass) > 1 & "sf" %in% gclass) {
+    #     # Drop geometry and view data
+    #     geodata %>%
+    #         sf::st_drop_geometry(x = .) %>%
+    #         tibble::as_tibble()
+    # }
+    # else {
+    #     base::stop("Input does not seem to be a sf or sp spatial object")
+    # }
 }
 
 #' @title View attributes from simple feature object
@@ -352,8 +354,8 @@ get_vcpolygons <- function(path = NULL,
         folderpath = path,
         pattern = name,
         recursive = TRUE
-        ) %>%
-        sf::read_sf()
+    ) %>%
+    sf::read_sf()
 
     return(shp_pepfar)
 }
@@ -455,8 +457,7 @@ extract_boundaries <-
             return(NULL)
         }
 
-        orgs <- orgs %>%
-            dplyr::mutate(org_level = lvl)
+        orgs <- orgs %>% dplyr::mutate(org_level = lvl)
 
         # filter sp df
         spdf <- spdf %>%
@@ -479,6 +480,181 @@ extract_boundaries <-
 
         return(spdf)
     }
+
+
+#' Extract Country Polygons
+#'
+#' @param spdf  VcPolygons data as Spatial Data Frame
+#' @param cntry Country name
+#'
+#' @return list of spatial data frames
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' spdf <- gisr::get_vcpolygons(path = glamr::si_path("path_vector"), name = "VcPepfarPolygons.shp")
+#'
+#' cntry_polygons(spdf = spdf, name = "Zambia")
+#' }
+#'
+cntry_polygons <- function(spdf, cntry) {
+
+    # Get cntry attributes
+    attrs <- gisr::get_attributes(country = cntry)
+
+    # Append attrs to boundaries
+    spdf <- spdf %>% dplyr::left_join(attrs, by = c("uid" = "id"))
+
+    # Get distinct labels - boundary names
+    labels <- attrs %>%
+        dplyr::distinct(label) %>%
+        dplyr::pull()
+
+    # Extract distinct boundaries
+    cntry_geo <- purrr::map(labels, function(.x) {
+        dplyr::filter(spdf, label == .x)
+    })
+
+    # a
+    names(cntry_geo) <- labels
+
+    return(cntry_geo)
+}
+
+#' @title Generate Point Spatial DataFrame
+#'
+#' @param .data  Location data as a data frame, use `extract_facilities`
+#' @param lat    Column name for latitude, default value is latitude
+#' @param long   Column name for longitude, default value is longitude
+#' @param crs    Coordinate Reference System, default value is EPSG Code for WGS 1984
+#'
+#' @return list of spatial data frames
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' cntry <- "Ethiopia"
+#' level_fac <- get_ouorglevel(operatingunit = cntry, org_type = "facility")
+#' df_facs <- extract_locations(country = cntry, level = level_fac)
+#' df_facs <- df_facs %>% extract_facilities()
+#' df_locs <- df_facs %>% select(-c(geom_type:nested))
+#'
+#' spdf <- spdf_points(.data = df_locs)
+#' }
+#'
+#'
+spdf_points <- function(.data,
+                         lat = "latitude",
+                         long = "longitude",
+                         crs = 4326) {
+
+    # Spatial file
+    spdf <- NULL
+
+    # check for lat/long columns
+    if (lat %in% names(.data)) {
+
+        spdf <- .data %>%
+            dplyr::filter(dplyr::across(dplyr::all_of(c(lat, long)), ~ !base::is.na(.x))) %>%
+            dplyr::mutate(dplyr::across(dplyr::all_of(c(lat, long)), ~ base::as.numeric(.x)))
+
+
+        spdf <- spdf %>%
+            sf::st_as_sf(coords = c(long, lat),
+                         crs = sf::st_crs(crs))
+
+        # TODO: Shapefiles columns have a max - Move this outside
+        # spdf <- spdf %>%
+        #     dplyr::rename(ou_iso = operatingunit_iso,
+        #                   ou = operatingunit,
+        #                   cntry_iso = countryname_iso,
+        #                   cntry = countryname)
+
+        return(spdf)
+
+    }
+
+    base::message("No location columns found. Consider changing lat/long default values")
+}
+
+
+#' @title Save shapefile
+#'
+#' @param spdf sf object
+#' @param name filename with full path
+#'
+#' @return boolean
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'  library(gisr)
+#'  library(sf)
+#'
+#'  shp <- get_admin0(countries = "Nigeria")
+#'
+#'  export_spdf(spdf = shp, name = "./GIS/nga_country_boundaries")
+#'  export_spdf(spdf = shp, name = "./GIS/nga_country_boundaries.shp")
+#' }
+#'
+spdf_export <- function(spdf, name) {
+
+    # Check directory
+    dir <- base::dirname(name)
+
+    if (!base::dir.exists(dir)) {
+        base::message(glue::glue("{dir} does not seem to exist."))
+    }
+
+    name <- base::ifelse(!stringr::str_detect(name, ".shp$"),
+                         base::paste0(name, ".shp"),
+                         name)
+
+    delete <- base::ifelse(file.exists(name), TRUE, FALSE)
+
+    sf::st_write(obj = spdf,
+                 dsn = name,
+                 delete_dsn = delete)
+
+}
+
+
+#' @title Save shapefile with flags
+#'
+#' @param spdf sf object
+#' @param name filename with full path
+#'
+#' @return boolean
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'  library(gisr)
+#'  library(sf)
+#'
+#'  shp <- get_admin0(countries = "Nigeria")
+#'
+#'  export_spdf(spdf = shp, name = "./GIS/nga_country_boundaries")
+#'  export_spdf(spdf = shp, name = "./GIS/nga_country_boundaries.shp")
+#' }
+#'
+spdf_export <- function(spdf, name) {
+
+    cols_check <- base::names(spdf) %>%
+        tibble::as_tibble() %>%
+        dplyr::mutate(len = nchar(value)) %>%
+        dplyr::filter(len > 10)
+
+    if (base::nrow(cols_check) > 0) {
+        base::message(base::paste0("Consider shortening these columns to 10 characters to adhere to shapefile specs: ",
+                                   base::paste0(cols_check$value, collapse = ", ")))
+    }
+
+    # Redirect
+    export_spdf(spdf, name)
+}
 
 
 #' @title Extract Road Network data from OSM

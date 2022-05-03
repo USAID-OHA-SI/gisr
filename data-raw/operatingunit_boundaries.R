@@ -15,6 +15,68 @@ library(glitr)
 library(scales)
 library(sf)
 library(zip)
+library(glue)
+
+# Functions ----
+
+#' @title Move files to another directory
+#'
+#'
+move_files <- function(from,
+                       to = "archive",
+                       add_dest = TRUE,
+                       name = ".csv$") {
+
+  # Check origin path
+  if (!dir.exists(from))
+    stop(glue("Invalid directory: {from}"))
+
+  # Check destination path
+  dest_path <- file.path(from, to)
+
+  if (!dir.exists(to) & !dir.exists(dest_path) & add_dest == TRUE)
+    dir.create(dest_path, recursive = TRUE)
+
+  if (dir.exists(to))
+    dest_path <- to
+
+  # Files to be moved
+  mfiles <- from %>% list.files(pattern = name, full.names = TRUE)
+
+  if (length(mfiles) == 0)
+    stop(glue("No matching files found from directory: {from}"))
+
+  # Move files
+  mfiles %>%
+    map_chr(~fs::file_move(
+      path = .x,
+      new_path = file.path(dest_path, basename(.x))))
+
+  # Check for errors
+  errors <- from %>% list.files(pattern = name, full.names = TRUE)
+
+  # Notifications
+  if(length(errors) > 0) {
+    message("Error - These files were not moved:")
+    print(errors)
+  }
+}
+
+#dir_ou_global %>% move_files(name = "^pepfar")
+
+#' @title Clean names for shp
+#'
+#'
+clean_names4shp <- function(.data, cols = NULL) {
+
+  .data %>%
+    rename_with(.cols = starts_with("operatingunit"),
+                .fn = ~str_replace(., "operatingunit", "ou")) %>%
+    rename_with(.cols = ends_with("countryname"),
+                .fn = ~str_replace(., "countryname", "cntry_name")) %>%
+    rename_with(.cols = starts_with("countryname_"),
+                .fn = ~str_replace(., "countryname_", "cntry"))
+}
 
 # Variables ----
 
@@ -119,6 +181,7 @@ library(zip)
       return(spdf)
     }
 
+  extract_boundaries(file_shp)
 
   #' @title Get OU/Country orgs attributes
   #'
@@ -211,23 +274,23 @@ library(zip)
 # Data ----
 
   # Get OUs
-  ouuids <- get_ouuids()
-  ouuids2 <- get_ouuids(add_details = TRUE)
+  #ouuids <- get_ouuids()
+  ouuids <- get_ouuids(add_details = TRUE)
 
   # Get OU UID
   ouuid <- get_ouuid(operatingunit = cntry)
 
 
   # Levels
-  df_levels <- get_levels(username = datim_user(),
-                       password = datim_pwd()) %>%
+  df_levels <- get_levels(username = datim_user(), password = datim_pwd()) %>%
     filter(operatingunit == cntry)
 
-  levels$country
-  levels$prioritization
-  #levels$snu1 # this does not exist in api/dataStore/dataSetAssignments/orgUnitLevels
-  levels$community
-  levels$facility
+  df_levels$country
+  df_levels$prioritization
+  # this does not exist in api/dataStore/dataSetAssignments/orgUnitLevels
+  df_levels$snu1
+  df_levels$community
+  df_levels$facility
 
   # Geodata
   pepfar_polygons <- file_shp %>% read_sf()
@@ -238,89 +301,47 @@ library(zip)
   spdf_ou %>% gview()
 
 
-  # SNU1
-  df_locs <- extract_locations(country = cntry, add_geom = FALSE) %>%
-    separate(path,
-             into = paste0("path", 0:max(.$level)),
-             sep = "/",
-             remove = FALSE) %>%
-    select(-path0)
-
-  df_locs <- df_locs %>%
+  # Org Hirarchy
+  df_cntry_locs <- ouuids %>%
+    filter(!is.na(countryname)) %>%
+    pull(countryname) %>%
+    map_dfr(~extract_locations(country = .x, add_geom = FALSE)) %>%
+    separate(path, into = paste0("path", 0:max(.$level)), sep = "/") %>%
     rename(
+      uid = id,
       global_uid = path1,
       region_uid = path2,
-      operatingunit_uid = path3) %>%
-    pivot_wider(names_from = label,
-                values_from = level)
+      ou_uid = path3) %>%
+    rename_with(.cols = starts_with("operatingunit"),
+                .fn = ~str_replace(., "operatingunit", "ou")) %>%
+    rename_with(.cols = ends_with("countryname"),
+                .fn = ~str_replace(., "countryname", "cntry_name")) %>%
+    rename_with(.cols = starts_with("countryname_"),
+                .fn = ~str_replace(., "countryname_", "cntry")) %>%
+    select(-starts_with("path")) %>%
+    relocate(level, .after = last_col())
 
 
-  df_locss <- ouuids %>%
+  df_locs <- ouuids %>%
     filter(!str_detect(operatingunit, " Region$")) %>%
     pull(operatingunit) %>%
-    map_dfr(.x, .f = ~get_attributes(country = .x))
+    map_dfr(.x, .f = ~get_attributes(country = .x)) %>%
+    filter(str_detect(name, "_Military", negate = T)) %>%
+    rename_with(.cols = starts_with("operatingunit"),
+                .fn = ~str_replace(., "operatingunit", "ou")) %>%
+    rename_with(.cols = ends_with("countryname"),
+                .fn = ~str_replace(., "countryname", "cntry_name")) %>%
+    rename_with(.cols = starts_with("countryname_"),
+                .fn = ~str_replace(., "countryname_", "cntry"))
 
-
-  # psnu boundaries: uid lookup
-  psnu_uids <- get_ouorguids(ouuid = ouuid,
-                             level = levels$prioritization)
-
-  spdf_psnu <- pepfar_polygons %>%
-    filter(uid %in% psnu_uids)
-
-  spdf_psnu %>% gview()
-
-  # psnu boundaries: join & filter
-  psnus <- get_ouorgs(
-      ouuid = ouuid,
-      level = levels$prioritization
-    ) %>%
-    mutate(ou = cntry,
-           org_type = "psnu",
-           org_level = levels$prioritization)
-
-  psnus %>% glimpse()
-
-  spdf_psnu <- pepfar_polygons %>%
-    left_join(psnus, by = "uid") %>%
-    filter(!is.na(orgunit))
-
-  spdf_psnu %>% gview()
-
-
-  # communities boundaries: uid lookup
-  comm_uids <- get_ouorguids(ouuid = ouuid,
-                             level = levels$community)
-
-  spdf_comm <- pepfar_polygons %>%
-    filter(uid %in% comm_uids)
-
-  spdf_comm %>% gview()
-
-  # communities boundaries: join & filter
-  comms <- get_ouorgs(
-      ouuid = ouuid,
-      level = levels$community
-    ) %>%
-    mutate(ou = cntry,
-           org_type = "community",
-           org_level = levels$community)
-
-  spdf_comm %>% glimpse()
-
-  spdf_comm <- pepfar_polygons %>%
-    left_join(comms, by = "uid") %>%
-    filter(!is.na(orgunit))
-
-  spdf_comm %>% gview()
 
   # Extract boundaries for all ou levels
 
   # OU Only
   extract_boundaries(
       spdf = pepfar_polygons,
-      country = "Guinea", #cntry,
-      level = 6
+      country = "Nigeria", #cntry,
+      level = 4
     ) %>%
     gview()
 
@@ -335,7 +356,6 @@ library(zip)
     map(.x, .f = ~ extract_boundaries(spdf = pepfar_polygons,
                                       country = cntry,
                                       level = .x))
-
 
   # Export all OU Boundaries
 
@@ -420,6 +440,21 @@ library(zip)
                                       paste0(str_replace_all(.x, " ", "_") %>%
                                              str_to_lower(), "_psnu"))))
 
+    # Combine all psnus
+    spdf_psnus <- list.files(
+      path = dir_psnu_bndries,
+      pattern = ".*_psnu.shp",
+      full.names = TRUE) %>%
+      map_dfr(read_sf)
+
+    spdf_psnus %>%
+      ggplot() +
+      geom_sf() +
+      si_style_map()
+
+    spdf_psnus %>%
+      export_spdf(name = file.path(dir_psnu_bndries, "global_psnus.shp"))
+
 
     # Zip shapefiles
 
@@ -432,6 +467,11 @@ library(zip)
     # PSNU Boundaries
     dir(path = dir_psnu_bndries,
         pattern = ".shp",
+        full.names = TRUE) %>%
+      map(.x, .f = ~ zip_shapefiles(filename = .x))
+
+    dir(path = dir_psnu_bndries,
+        pattern = "global_psnus.shp",
         full.names = TRUE) %>%
       map(.x, .f = ~ zip_shapefiles(filename = .x))
 
