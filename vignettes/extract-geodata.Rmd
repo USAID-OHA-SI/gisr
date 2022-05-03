@@ -2,6 +2,7 @@
 title: "Extract Geodata from different sources"
 author: "Baboyma Kagniniwa"
 date: "2021-09-10"
+updated: "2022-05-03"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Extract Geodata from different sources}
@@ -118,6 +119,19 @@ spdf_psnu <- spdf_pepfar %>%
   extract_boundaries(country = cntry, level = cntry_lvl)
 
 spdf_psnu
+```
+
+Extract all country boundaries
+
+```{r echo = T, eval = F}
+
+spdf_all <- extract_cntry_boundaries(spdf = spdf_pepfar, cntry = cntry)
+
+spdf_all$country
+spdf_all$snu1
+spdf_all$prioritization
+spdf_all$community
+
 ```
 
 ## Download pre-parsed geodata

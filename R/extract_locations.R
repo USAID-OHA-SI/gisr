@@ -43,14 +43,24 @@ extract_locations <-
                             values_to = "level") %>%
         dplyr::filter(stringr::str_to_lower(countryname) == stringr::str_to_lower(cntry))
 
+    # Check levels
+    if (base::nrow(ou_levels) == 0) {
+        base::cat(crayon::red(glue("\nUnable to retrieve org levels for [{cntry}]!\n")))
+
+                  return(NULL)
+    }
+
     # Query OU Location data
     url <- baseurl %>%
         base::paste0("api/organisationUnits?fields=id,name,path,level")
 
     # Include geometry columns if needed
+    geom_cols <- NULL
+
     if (add_geom == TRUE) {
-       url <- url %>%
-           base::paste0(",geometry")
+       url <- url %>% base::paste0(",geometry")
+
+       geom_cols <- c("geometry.type", "geometry.coordinates")
     }
 
     # filter by ou/country uid, note: regional countries will also extract region info
@@ -71,12 +81,6 @@ extract_locations <-
     url <- url %>% base::paste0("&paging=false&format=json")
 
 
-    # Check levels
-    if (base::nrow(ou_levels) == 0) {
-        base::cat(crayon::red("\nUnable to retrieve org levels for this country!\n"))
-
-        return(NULL)
-    }
 
     # Query OU Location data
     df <- url %>%
@@ -86,6 +90,12 @@ extract_locations <-
         purrr::pluck("organisationUnits") %>%
         tibble::as_tibble()
 
+    # Check presence of geom columns
+    if (add_geom == TRUE & !geom_cols[1] %in% base::names(df)) {
+        add_geom = FALSE
+    }
+
+    # Unpack geometry
     if (add_geom == TRUE) {
         df <- df %>%
             dplyr::rename(
@@ -104,8 +114,7 @@ extract_locations <-
     }
 
     # Flag org levels
-    df <- df %>%
-        dplyr::left_join(ou_levels, by = "level")
+    df <- df %>% dplyr::left_join(ou_levels, by = "level")
 
     # Parse geom
     if (add_geom == TRUE) {

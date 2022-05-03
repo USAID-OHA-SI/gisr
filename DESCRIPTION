@@ -1,6 +1,6 @@
 Package: gisr
 Title: Geospatial Analytics Utility functions
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     person(given = "Baboyma",
            family = "Kagniniwa",
@@ -13,7 +13,7 @@ LazyData: true
 URL: https://github.com/USAID-OHA-SI/gisr
 BugReports: https://github.com/USAID-OHA-SI/gisr/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Depends: 
     R (>= 3.5.0)
 Imports: 

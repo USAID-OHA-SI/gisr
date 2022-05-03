@@ -1,0 +1,139 @@
+---
+title: "Extract facilities location data"
+author: "Baboyma Kagniniwa"
+date: "2022-05-03"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extract facilities location data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE,
+  fig.retina = 2
+)
+```
+
+## Introduction
+
+This vignette provides guidance to USAID/OHA and other PEPFAR Data Analysts on how to extract location data of PEPFAR supported facilities
+
+## Facilities location datasets
+
+PEPFAR uses [DATIM](https://www.datim.org/) for Global HIV/AIDS Programs data management. Supported health facilities location data are also managed through the same data management system. Each facility has a Universal Unique Identifier (UUID), all the parent organizational units UIDs and the latitude / longitude of the site.
+
+Below is one of the many ways to extract PEPFAR facilities location data for specific countries.
+
+## Prerequisites
+
+```{r setup, echo = T, eval = F}
+library(tidyverse)     # General data management and viz library
+library(glamr)         # OHA/SI utility package
+library(gisr)          # OHA/SI geospatial package 
+library(sf)            # Spatial data management
+library(sp)            # Spatial data management
+library(glue)          # String formatting
+```
+
+## Workspace
+
+Before jumping into data extraction, we recommend preparing a directory to host data. 
+The best directory for this type of data is under the OHA/Vector path. Follow these steps.
+
+```{r echo = T, eval = F}
+# Define a folder to host data - Using FY
+dir_sites <- Sys.Date() %>%
+    glamr::convert_date_to_qtr() %>%
+    str_sub(1, 4)
+
+dir_data <- glamr::si_path("path_vector") %>%
+  paste0("../", .) %>% # This needed only with R Markdown files
+  paste0("/OU-Sites/", dir_sites)
+
+# Create the folder
+dir.create(dir_data)
+
+dir_geodata <- paste0(dir_data, "/SHP")
+
+dir.create(dir_geodata)
+```
+
+## Data Extraction
+
+There are 2 key information needed for facility data extraction: 
+a. OU/Country name, 
+b. Organizational level for Facilities
+
+```{r echo = T, eval = F}
+ou <- "Nigeria"
+level_fac <- get_ouorglevel(operatingunit = ou, org_type = "facility")
+```
+
+Now it's time to proceed with facilities data extraction 
+
+```{r echo = T, eval = F}
+# extract location data
+df_facs <- extract_locations(country = ou, level = level_fac)
+
+# Get a clean version of the facilities
+df_facs <- df_facs %>% extract_facilities()
+
+# Get ride of extract columns
+df_facs <- df_facs %>% select(-c(geom_type:nested))
+```
+
+Save the extracted data as .csv file in the pre-defined location
+
+```{r echo = T, eval = F}
+ write_csv(x = df_facs,
+           file = paste0(dir_data, "/", ou,
+                         " - facilities_locations_extract_",
+                         format(Sys.Date(), "%Y-%m-%d"), ".csv"),
+           na = "")
+```
+
+## Convert Extracted location data into a shapefile
+
+csv files are good for most data analyses but there are time when one need the location data in a shapefile format. Below is how to generate a shapefile from a .csv file.
+
+
+```{r echo = T, eval = F}
+# By default, location information is stored in these 2 columns
+loc_cols <- c("latitude", "longitude")
+
+# create a spatial dataframe - excluding data with no validate lat/long
+spdf <- df_facs %>%
+  filter(across(all_of(loc_cols), ~ !is.na(.x))) %>%
+  mutate(across(all_of(loc_cols), ~ as.numeric(.x)))
+
+# Make sure the Coofinate Reference System is in WGS 84
+spdf <- spdf %>% st_as_sf(coords = loc_cols, crs = st_crs(4326))
+
+# Shapefiles columns have a max length
+spdf <- spdf %>%
+  rename(ou_iso = operatingunit_iso,
+         ou = operatingunit,
+         cntry_iso = countryname_iso,
+         cntry = countryname)
+
+```
+
+Save the shapefile in the pre-define directory
+
+```{r echo = T, eval = F}
+export_spdf(spdf = spdf,
+            name = paste0(dir_geodata, "/", ou,
+                          " - facilities_locations_",
+                          format(Sys.Date(), "%Y-%m-%d")))
+```
+
+Give it a try and let us know how it went.
+
+Enjoy!
+
+

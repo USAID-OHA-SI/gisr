@@ -1,3 +1,12 @@
+# gisr 0.2.2
+
+* Improvement and documentation of utility functions
+* Updated vignette for Geodata extraction
+* Updated `attributes()` to convert all geodata to `sf` object before extracting data
+* `cntry_polygons()` extract all boundaries for specific country as a named list
+* `spdf_points()` generate point spatial data frame
+* `spdf_export()` a redirect to `export_spdf()` with column length checks
+
 # gisr 0.2.1
 
 * Improvement and documentation of utility functions
