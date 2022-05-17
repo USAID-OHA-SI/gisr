@@ -9,7 +9,8 @@ extract_locations(
   level = NULL,
   add_geom = TRUE,
   username = NULL,
-  password = NULL
+  password = NULL,
+  base_url = NULL
 )
 }
 \arguments{
@@ -21,7 +22,9 @@ extract_locations(
 
 \item{username}{Datim Account Username}
 
-\item{password}{Datim Account Key}
+\item{password}{Datim Account password}
+
+\item{base_url}{Datim URL}
 }
 \description{
 Extract location data

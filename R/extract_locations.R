@@ -4,7 +4,8 @@
 #' @param level    PEPFAR Org Level
 #' @param add_geom Include geometry column
 #' @param username Datim Account Username
-#' @param password Datim Account Key
+#' @param password Datim Account password
+#' @param base_url Datim URL
 #' @export
 #' @examples
 #' \dontrun{
@@ -15,10 +16,14 @@ extract_locations <-
              level = NULL,
              add_geom = TRUE,
              username = NULL,
-             password = NULL) {
+             password = NULL,
+             base_url = NULL) {
 
     # API
     baseurl = "https://final.datim.org/"
+
+    if(!base::is.null(base_url))
+        baseurl <- base_url
 
     # OU / Country / levels
     cntry <- {{country}}
@@ -45,9 +50,8 @@ extract_locations <-
 
     # Check levels
     if (base::nrow(ou_levels) == 0) {
-        base::cat(crayon::red(glue("\nUnable to retrieve org levels for [{cntry}]!\n")))
-
-                  return(NULL)
+        base::cat(crayon::red(glue::glue("\nUnable to retrieve org levels for [{cntry}]!\n")))
+        return(NULL)
     }
 
     # Query OU Location data
@@ -59,28 +63,20 @@ extract_locations <-
 
     if (add_geom == TRUE) {
        url <- url %>% base::paste0(",geometry")
-
        geom_cols <- c("geometry.type", "geometry.coordinates")
     }
 
     # filter by ou/country uid, note: regional countries will also extract region info
-    url <- url %>%
-        base::paste0("&filter=path:like:", ouuid)
+    url <- url %>% base::paste0("&filter=path:like:", ouuid)
 
     # Filter specific level
     if (!is.null(lvl)) {
-
-        url <- url %>%
-            base::paste0("&filter=level:eq:", lvl)
-
-        ou_levels <- ou_levels %>%
-            dplyr::filter(level == lvl)
+        url <- url %>% base::paste0("&filter=level:eq:", lvl)
+        ou_levels <- ou_levels %>% dplyr::filter(level == lvl)
     }
 
     # Remove pages and format as json
     url <- url %>% base::paste0("&paging=false&format=json")
-
-
 
     # Query OU Location data
     df <- url %>%
@@ -91,8 +87,10 @@ extract_locations <-
         tibble::as_tibble()
 
     # Check presence of geom columns
-    if (add_geom == TRUE & !geom_cols[1] %in% base::names(df)) {
-        add_geom = FALSE
+    if (add_geom == TRUE) {
+        if(base::is.null(geom_cols) | (!base::is.null(geom_cols) & !geom_cols[1] %in% base::names(df))) {
+            add_geom = FALSE
+        }
     }
 
     # Unpack geometry
