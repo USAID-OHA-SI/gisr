@@ -1,5 +1,6 @@
 # gisr 0.2.2
 
+* Add in package status check from `gagglr` on load [2022-08-15]
 * Improvement and documentation of utility functions
 * Updated vignette for Geodata extraction
 * Updated `attributes()` to convert all geodata to `sf` object before extracting data
