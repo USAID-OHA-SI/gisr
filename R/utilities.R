@@ -8,7 +8,6 @@
 #'
 #' @return ORG UIDS as tibble
 #'
-#'
 #' @examples
 #' \dontrun{
 #'  library(gisr)

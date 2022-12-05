@@ -16,8 +16,8 @@ get_basemap(spdf, country = NULL, terr = NULL, add_admins = FALSE)
 \item{add_admins}{Should the sub-admins be added? Default is false}
 }
 \value{
-\preformatted{       ggplot plot of base map
-}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{       ggplot plot of base map
+}\if{html}{\out{</div>}}
 }
 \description{
 Get Basemap

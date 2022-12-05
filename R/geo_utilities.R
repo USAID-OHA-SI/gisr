@@ -495,13 +495,13 @@ extract_boundaries <-
 #'
 #' spdf <- gisr::get_vcpolygons(path = glamr::si_path("path_vector"), name = "VcPepfarPolygons.shp")
 #'
-#' cntry_polygons(spdf = spdf, name = "Zambia")
+#' cntry_polygons(spdf = spdf, cntry = "Zambia")
 #' }
 #'
 cntry_polygons <- function(spdf, cntry) {
 
     # Get cntry attributes
-    attrs <- gisr::get_attributes(country = cntry)
+    attrs <- get_attributes(country = cntry)
 
     # Append attrs to boundaries
     spdf <- spdf %>% dplyr::left_join(attrs, by = c("uid" = "id"))
@@ -511,12 +511,17 @@ cntry_polygons <- function(spdf, cntry) {
         dplyr::distinct(label) %>%
         dplyr::pull()
 
-    # Extract distinct boundaries
-    cntry_geo <- purrr::map(labels, function(.x) {
-        dplyr::filter(spdf, label == .x)
-    })
+    # Check for valid columns
+    if(!"label" %in% base::names(spdf))
+        base::stop("ERROR - Unable to identify 'label' attribute")
 
-    # a
+    # Extract distinct boundaries
+    cntry_geo <- labels %>%
+        purrr::map(function(.x) {
+            dplyr::filter(spdf, label == .x)
+        })
+
+    # add labels
     names(cntry_geo) <- labels
 
     return(cntry_geo)

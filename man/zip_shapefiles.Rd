@@ -12,8 +12,8 @@ zip_shapefiles(filename, dest_folder = NULL)
 \item{dest_folder}{Where to place the zipped files}
 }
 \value{
-\preformatted{       Boolean
-}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{       Boolean
+}\if{html}{\out{</div>}}
 }
 \description{
 Compress all shapefile components into a zipped file

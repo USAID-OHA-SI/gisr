@@ -22,7 +22,7 @@ Extract Country Polygons
 
 spdf <- gisr::get_vcpolygons(path = glamr::si_path("path_vector"), name = "VcPepfarPolygons.shp")
 
-cntry_polygons(spdf = spdf, name = "Zambia")
+cntry_polygons(spdf = spdf, cntry = "Zambia")
 }
 
 }
