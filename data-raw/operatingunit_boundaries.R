@@ -8,12 +8,9 @@
 # Libraries ----
 
 library(tidyverse)
-library(ggflags)
 library(glamr)
 library(grabr)
 library(gisr)
-library(glitr)
-library(scales)
 library(sf)
 library(zip)
 library(glue)
@@ -83,7 +80,9 @@ clean_names4shp <- function(.data, cols = NULL) {
 
   #cntry <- "Nigeria"
   #cntry <- "Zambia"
-  cntry <- "Eswatini"
+  #cntry <- "Eswatini"
+  ou <- "West Africa Region"
+  cntry <- "Liberia"
 
   file_shp <- return_latest(
       folderpath = glamr::si_path("path_vector"),
@@ -161,7 +160,8 @@ clean_names4shp <- function(.data, cols = NULL) {
           ouuid = uid,
           level = lvl,
           username = user,
-          password = pass)
+          password = pass,
+          baseurl = "https://datim.org/")
 
       # Check for valid data
       if (is.null(orgs)) {
@@ -298,7 +298,7 @@ clean_names4shp <- function(.data, cols = NULL) {
   )
 
   df_ou_levels <- df_levels %>%
-    filter(operatingunit == cntry)
+    filter(operatingunit == ou, countryname == cntry)
 
   df_ou_levels$country
   df_ou_levels$prioritization
@@ -358,6 +358,19 @@ clean_names4shp <- function(.data, cols = NULL) {
       level = 4
     ) %>%
     gview()
+
+  orgs <- get_ouorgs(
+    ouuid = get_ouuid(cntry),
+    level = 5,
+    username = datim_user(),
+    password = datim_pwd(),
+    baseurl = "https://datim.org/")
+
+  orgs %>%
+    pull(uid)
+
+  pepfar_polygons %>%
+    dplyr::filter(uid %in% orgs$uid)
 
   # OU - all levels
   df_ou_levels %>%
