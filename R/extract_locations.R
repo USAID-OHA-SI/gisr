@@ -176,7 +176,7 @@ extract_facilities <- function(.data, mer_sites = NULL) {
 
     .data <- .data %>%
         dplyr::filter(label == "facility") %>%
-        tidyr::unnest_wider(coordinates) %>%
+        tidyr::unnest_wider(coordinates, names_sep = "_") %>%
         janitor::clean_names() %>%
         dplyr::rename(longitude = "x1", latitude = "x2")
 
