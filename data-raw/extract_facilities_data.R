@@ -8,6 +8,7 @@
 
   library(tidyverse)
   library(glamr)
+  library(grabr)
   library(gisr)
   library(sf)
   library(sp)
@@ -30,7 +31,7 @@
 
 # DATA - Extract OU Data ----
 
-  cntry <- "Ethiopia"
+  cntry <- "Nigeria"
 
   level_fac <- get_ouorglevel(operatingunit = cntry, org_type = "facility")
 

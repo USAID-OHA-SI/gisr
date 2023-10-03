@@ -604,7 +604,7 @@ spdf_points <- function(.data,
 #'  export_spdf(spdf = shp, name = "./GIS/nga_country_boundaries.shp")
 #' }
 #'
-spdf_export <- function(spdf, name) {
+export_spdf <- function(spdf, name) {
 
     # Check directory
     dir <- base::dirname(name)
