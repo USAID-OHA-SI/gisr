@@ -1,4 +1,5 @@
-.onLoad <- function(libname, pkgname){
-  msg <- base::paste("Loading", pkgname, "...")
-  base::cat(msg)
+.onAttach <- function(...) {
+  if(requireNamespace("gagglr", quietly = TRUE))
+    gagglr::oha_check("gisr", suppress_success = TRUE)
 }
+
