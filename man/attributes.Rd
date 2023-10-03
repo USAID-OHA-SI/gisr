@@ -10,8 +10,8 @@ attributes(geodata)
 \item{geodata}{spatial data}
 }
 \value{
-\preformatted{    attribures as data frame
-}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{    attribures as data frame
+}\if{html}{\out{</div>}}
 }
 \description{
 Get attributes from feature class

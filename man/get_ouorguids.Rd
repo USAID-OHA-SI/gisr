@@ -16,8 +16,8 @@ get_ouorguids(ouuid, level, username = NULL, password = NULL)
 \item{password}{Datim Account Password}
 }
 \value{
-\preformatted{        list of uids
-}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{        list of uids
+}\if{html}{\out{</div>}}
 }
 \description{
 Get Orgs uids by level

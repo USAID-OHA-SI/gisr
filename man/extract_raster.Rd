@@ -16,8 +16,8 @@ extract_raster(countries, mask = FALSE, buffer = 0.1, ras = NULL)
 \item{ras}{RasterLayer or Path to raster file}
 }
 \value{
-\preformatted{      spdf spatial dataframe
-}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{      spdf spatial dataframe
+}\if{html}{\out{</div>}}
 }
 \description{
 Extract raster data for an AOI (Countries)

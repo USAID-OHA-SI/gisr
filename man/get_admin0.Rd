@@ -14,8 +14,8 @@ get_admin0(countries, scale = "medium", crs = 4326)
 \item{crs}{coordinates reference system}
 }
 \value{
-\preformatted{     simple feature class
-}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{     simple feature class
+}\if{html}{\out{</div>}}
 }
 \description{
 sf boundaries data for a given country

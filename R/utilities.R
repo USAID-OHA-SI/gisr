@@ -8,7 +8,6 @@
 #'
 #' @return ORG UIDS as tibble
 #'
-#'
 #' @examples
 #' \dontrun{
 #'  library(gisr)
@@ -259,6 +258,7 @@ get_ouuid <-
 #'
 #' @param username DATIM username, recommed using `datim_user()`
 #' @param password DATIM password, recommend using `datim_pwd()`
+#' @param reshape  Reshape results to long format
 #' @param baseurl  base API url, default = https://final.datim.org/
 #'
 #' @return df
@@ -273,23 +273,19 @@ get_ouuid <-
 #'  }
 #'
 get_levels <-
-  function(username = NULL,
-           password = NULL,
-           baseurl = "https://final.datim.org/"){
+  function(username, password,
+           reshape = FALSE,
+           baseurl = NULL) {
 
-    # Params
-    user <- base::ifelse(base::is.null(username),
-                         glamr::datim_user(),
-                         {{username}})
-
-    pass <- base::ifelse(base::is.null(password),
-                         glamr::datim_pwd(),
-                         {{password}})
+    # Check baseurl
+    if (is.null(baseurl)) {
+      baseurl <- "https://final.datim.org/"
+    }
 
     # Query data
     df_levels <- baseurl %>%
-      paste0(.,"api/dataStore/dataSetAssignments/orgUnitLevels") %>%
-      httr::GET(httr::authenticate(user, pass)) %>%
+      paste0(., "api/dataStore/dataSetAssignments/orgUnitLevels") %>%
+      httr::GET(httr::authenticate(user = username, password = password)) %>%
       httr::content("text") %>%
       jsonlite::fromJSON(flatten = TRUE) %>%
       purrr::map_dfr(dplyr::bind_rows) %>%
@@ -305,11 +301,75 @@ get_levels <-
       dplyr::rename(operatingunit = name3,
                     countryname = name4,
                     operatingunit_iso = iso3,
-                    countryname_iso = iso4)
+                    country_iso = iso4)
+
+    if (reshape) {
+      df_levels <- df_levels %>%
+        tidyr::pivot_longer(
+          cols = dplyr::any_of(c("country", "prioritization", "community", "facility")),
+          names_to = "label",
+          values_to = "level")
+    }
 
     return(df_levels)
   }
 
+
+#' @title Clean org hierarchy levels
+#'
+#' @param .df_levels
+#' @return df
+#'
+#'
+#' @examples
+#' \dontrun{
+#'   library(gisr)
+#'
+#'   # Get PEPFAR Org Levels
+#'   clean_levels(df_lvls)
+#'  }
+#'
+clean_levels <-
+  function(.df_levels){
+
+    # Check for reshaped datasets
+    req_cols <- c("operatingunit", "countryname", "level", "label")
+
+    if (!all(req_cols %in% names(.df_levels))) {
+      base::cat(crayon::red(glue::glue("\nSkipped `clean_levels()` for missing key columns used for cleaning: level and label\n")))
+      return(.df_levels)
+    }
+
+    # SNU1
+    df_snu1 <- .df_levels %>%
+      dplyr::summarise(
+        level = ifelse(level[label == 'prioritization'] - level[label == 'country'] > 1,
+                       level[label == 'country'] + 1,
+                       level[label == 'prioritization']),
+        label = "snu1",
+        .by = -c(level, label))
+
+    # SNU2
+    df_snu2 <- .df_levels %>%
+      dplyr::bind_rows(df_snu1) %>%
+      dplyr::summarise(
+        level = ifelse(level[label == 'prioritization'] - level[label == 'snu1'] > 1,
+                       level[label == 'snu1'] + 1,
+                       NA_integer_),
+        label = "snu2",
+        .by = -c(level, label)) %>%
+      dplyr::filter(!is.na(level))
+
+    # Merge SNU1-2 back to the original data
+    .df_levels <- .df_levels %>%
+      dplyr::bind_rows(df_snu1, df_snu2)
+
+    # Sort
+    .df_levels %>%
+      dplyr::group_by(dplyr::across(-dplyr::all_of(c('level', 'label')))) %>%
+      dplyr::arrange(level, .by_group = TRUE) %>%
+      dplyr::ungroup()
+  }
 
 #' Get OU Org level
 #'
@@ -471,6 +531,8 @@ get_ouorguids <-
 #' }
 #'
 get_attributes <- function(country,
+                           username = NULL,
+                           password = NULL,
                            folderpath = NULL) {
 
   file_pattern <- base::paste0("^orghierarchy - ",
@@ -504,14 +566,15 @@ get_attributes <- function(country,
   base::message(country)
 
   # Get attrs from datim
-  df_attrs <- extract_locations(country = country, add_geom = FALSE)
+  df_attrs <- extract_locations(country = country,
+                                username = username,
+                                password = password,
+                                add_geom = FALSE)
 
-  labels <- df_attrs %>%
-    dplyr::distinct(label) %>%
-    dplyr::pull()
+  if (is.null(df_attrs)) return(NULL)
 
   # Use psnu as snu1
-  if (!"snu1" %in% labels) {
+  if (!"snu1" %in% df_attrs$label) {
     df_attrs <- df_attrs %>%
       dplyr::filter(label == "prioritization") %>%
       dplyr::mutate(label = "snu1") %>%
@@ -638,8 +701,7 @@ zip_shapefiles <-
 
     # Where to place the zipped file
     if (base::is.null(dest_folder)) {
-      dest_folder <- filename %>%
-        base::dirname()
+      dest_folder <- base::dirname(filename)
     }
 
     # Files to be zipped
