@@ -145,16 +145,16 @@ get_ouuids <-
            baseurl = "https://final.datim.org/"){
 
     # Params
-    user <- base::ifelse(base::is.null({{username}}),
+    username <- base::ifelse(base::is.null({{username}}),
                          glamr::datim_user(), {{username}})
 
-    pass <- base::ifelse(base::is.null({{password}}),
+    password <- base::ifelse(base::is.null({{password}}),
                          glamr::datim_pwd(), {{password}})
 
     # Query ou
     ous <- get_orguids(level = 3,
-                       username = user,
-                       password = pass,
+                       username = username,
+                       password = password,
                        baseurl = baseurl) %>%
       dplyr::rename(operatingunit = orgunit)
 
