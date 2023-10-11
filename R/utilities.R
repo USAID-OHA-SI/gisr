@@ -590,7 +590,7 @@ get_attributes <- function(country,
     dplyr::filter(label != "facility") %>%
     dplyr::select(id, level, label, name,
                   operatingunit_iso, operatingunit,
-                  countryname_iso, countryname)
+                  country_iso, countryname)
 
   return(df_attrs)
 }
