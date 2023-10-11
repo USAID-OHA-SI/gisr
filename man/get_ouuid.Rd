@@ -4,7 +4,7 @@
 \alias{get_ouuid}
 \title{Get Operatingunit / Country Org UID}
 \usage{
-get_ouuid(operatingunit, username = NULL, password = NULL)
+get_ouuid(operatingunit, username = NULL, password = NULL, baseurl = NULL)
 }
 \arguments{
 \item{operatingunit}{Operatingunit name}
@@ -12,6 +12,8 @@ get_ouuid(operatingunit, username = NULL, password = NULL)
 \item{username}{Datim Account username, recommend using \code{datim_user()}}
 
 \item{password}{Datim Account Password, recommend using \code{datim_pwd()}}
+
+\item{baseurl}{Datim Account Password, recommend using \code{datim_pwd()}}
 }
 \value{
 uid

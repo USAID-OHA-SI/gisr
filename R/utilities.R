@@ -194,6 +194,7 @@ get_ouuids <-
 #' @param operatingunit Operatingunit name
 #' @param username      Datim Account username, recommend using `datim_user()`
 #' @param password      Datim Account Password, recommend using `datim_pwd()`
+#' @param baseurl      Datim Account Password, recommend using `datim_pwd()`
 #'
 #' @return uid
 #'
@@ -209,7 +210,8 @@ get_ouuids <-
 get_ouuid <-
   function(operatingunit,
            username = NULL,
-           password = NULL) {
+           password = NULL,
+           baseurl = NULL) {
 
     # Params
     ou <- stringr::str_to_upper({{operatingunit}})
@@ -226,7 +228,8 @@ get_ouuid <-
     ous <- get_ouuids(
         add_details = TRUE,
         username = user,
-        password = pass) %>%
+        password = pass,
+        baseurl = baseurl) %>%
       dplyr::filter(
         stringr::str_to_upper(operatingunit) == ou |
           stringr::str_to_upper(countryname) == ou)
