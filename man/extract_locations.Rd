@@ -6,31 +6,36 @@
 \usage{
 extract_locations(
   country,
+  username,
+  password,
   level = NULL,
   add_geom = TRUE,
-  username = NULL,
-  password = NULL,
   base_url = NULL
 )
 }
 \arguments{
-\item{country}{PEPFAR Operatingunit}
-
-\item{level}{PEPFAR Org Level}
-
-\item{add_geom}{Include geometry column}
+\item{country}{PEPFAR Operating Unit or Country name}
 
 \item{username}{Datim Account Username}
 
 \item{password}{Datim Account password}
 
+\item{level}{PEPFAR Org Level, optional}
+
+\item{add_geom}{Include geometry column, default value is true}
+
 \item{base_url}{Datim URL}
+}
+\value{
+A dataframe or Null if not match
 }
 \description{
 Extract location data
 }
 \examples{
 \dontrun{
-extract_locations("saturn", "my_username", "my_password")
+
+extract_locations("<saturn>", "<my_username>", "<my_password>")
 }
+
 }
