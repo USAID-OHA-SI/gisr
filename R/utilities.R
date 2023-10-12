@@ -145,16 +145,16 @@ get_ouuids <-
            baseurl = "https://final.datim.org/"){
 
     # Params
-    user <- base::ifelse(base::is.null({{username}}),
+    username <- base::ifelse(base::is.null({{username}}),
                          glamr::datim_user(), {{username}})
 
-    pass <- base::ifelse(base::is.null({{password}}),
+    password <- base::ifelse(base::is.null({{password}}),
                          glamr::datim_pwd(), {{password}})
 
     # Query ou
     ous <- get_orguids(level = 3,
-                       username = user,
-                       password = pass,
+                       username = username,
+                       password = password,
                        baseurl = baseurl) %>%
       dplyr::rename(operatingunit = orgunit)
 
@@ -194,6 +194,7 @@ get_ouuids <-
 #' @param operatingunit Operatingunit name
 #' @param username      Datim Account username, recommend using `datim_user()`
 #' @param password      Datim Account Password, recommend using `datim_pwd()`
+#' @param baseurl      Datim Account Password, recommend using `datim_pwd()`
 #'
 #' @return uid
 #'
@@ -209,7 +210,8 @@ get_ouuids <-
 get_ouuid <-
   function(operatingunit,
            username = NULL,
-           password = NULL) {
+           password = NULL,
+           baseurl = NULL) {
 
     # Params
     ou <- stringr::str_to_upper({{operatingunit}})
@@ -226,7 +228,8 @@ get_ouuid <-
     ous <- get_ouuids(
         add_details = TRUE,
         username = user,
-        password = pass) %>%
+        password = pass,
+        baseurl = baseurl) %>%
       dplyr::filter(
         stringr::str_to_upper(operatingunit) == ou |
           stringr::str_to_upper(countryname) == ou)
@@ -587,7 +590,7 @@ get_attributes <- function(country,
     dplyr::filter(label != "facility") %>%
     dplyr::select(id, level, label, name,
                   operatingunit_iso, operatingunit,
-                  countryname_iso, countryname)
+                  country_iso, countryname)
 
   return(df_attrs)
 }

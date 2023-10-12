@@ -4,7 +4,7 @@
 \alias{get_attributes}
 \title{Get Attributes Data for Orgunit Boundaries}
 \usage{
-get_attributes(country, folderpath = NULL)
+get_attributes(country, username = NULL, password = NULL, folderpath = NULL)
 }
 \arguments{
 \item{country}{OU/country}
