@@ -12,38 +12,17 @@
 #'  adm0 <- get_admin0("Ghana")
 #'
 #'  # Extract attrs from geodata
-#'  df <- attributes(geodata = adm0)
+#'  .df <- gattributes(geodata = adm0)
 #'
-#'  df %>% head()
+#'  head(.df)
 #' }
 #'
-attributes <- function(geodata) {
+gattributes <- function(geodata) {
 
     geodata %>%
         sf::st_as_sf() %>%
         sf::st_drop_geometry(x = .) %>%
         tibble::as_tibble()
-
-    # gclass <- base::class(geodata)
-    #
-    # if (length(gclass) == 1) {
-    #     if (stringr::str_detect(gclass, "Spatial.*DataFrame")) {
-    #         # Convert to sf and drop geometry
-    #         geodata %>%
-    #             sf::st_as_sf() %>%
-    #             sf::st_drop_geometry(x = .) %>%
-    #             tibble::as_tibble()
-    #     }
-    # }
-    # else if (length(gclass) > 1 & "sf" %in% gclass) {
-    #     # Drop geometry and view data
-    #     geodata %>%
-    #         sf::st_drop_geometry(x = .) %>%
-    #         tibble::as_tibble()
-    # }
-    # else {
-    #     base::stop("Input does not seem to be a sf or sp spatial object")
-    # }
 }
 
 #' @title View attributes from simple feature object
@@ -68,8 +47,7 @@ dview <- function(geodata,
     base::stopifnot(base::any(class(geodata) %in% c('sf')))
 
     # Drop geometry and view data
-    geodata <- geodata %>%
-        sf::st_drop_geometry(x = .)
+    geodata <- geodata %>% gattributes()
 
     # print of view
     if (console == TRUE) {
@@ -234,14 +212,12 @@ geo_neighbors <- function(countries,
 #'
 get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 
-    admin0 <- rnaturalearth::ne_countries(country = {{countries}},
-                                          scale = {{scale}},
-                                          returnclass = "sf") %>%
-        sf::st_transform(., crs = sf::st_crs({{crs}}))
-
-    # admin0 <- rnaturalearth::ne_countries(scale = {{scale}}, returnclass = "sf") %>%
-    #     dplyr::filter(sovereignt %in% {{countries}}) %>%
-    #     sf::st_transform(., crs = sf::st_crs({{crs}}))
+    admin0 <- rnaturalearth::ne_countries(
+        country = {{countries}},
+        scale = {{scale}},
+        returnclass = "sf"
+      ) %>%
+      sf::st_transform(., crs = sf::st_crs({{crs}}))
 
     return(admin0)
 }
@@ -254,6 +230,7 @@ get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 #' @param countries list of country names
 #' @param crs coordinates reference system
 #' @return simple feature class
+#'
 #' @export
 #' @examples
 #' \donttest{
@@ -264,9 +241,11 @@ get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 #'
 get_admin1 <- function(countries, crs = 4326) {
 
-    admin1 <- rnaturalearth::ne_states(country = {{countries}},
-                                       returnclass = "sf") %>%
-        sf::st_transform(., crs = sf::st_crs({{crs}}))
+    admin1 <- rnaturalearth::ne_states(
+        country = {{countries}},
+        returnclass = "sf"
+      ) %>%
+      sf::st_transform(., crs = sf::st_crs({{crs}}))
 
     return(admin1)
 }
@@ -313,7 +292,7 @@ geo_fence <- function(aoi,
 
     # clip off input
     if (!append) {
-        aoi_area <- aoi_area %>% sf::st_difference(aoi)
+        aoi_area <- sf::st_difference(aoi_area, aoi)
     }
 
     return(aoi)
@@ -324,8 +303,8 @@ geo_fence <- function(aoi,
 
 #' @title Get PEPFAR Visual Crossing Polygons
 #'
-#' @param path     Path to PEPFAR Global Shapefile
-#' @param name     Name or pattern of shapefile
+#' @param folderpath     Path to PEPFAR Global Shapefile
+#' @param name           Name or pattern of shapefile
 #'
 #' @return sf object
 #'
@@ -339,25 +318,22 @@ geo_fence <- function(aoi,
 #'  shp_pepfar <- get_vcpolygons(path = "./GIS", name = "VcPepfarPolygons.shp")
 #' }
 #'
-get_vcpolygons <- function(path = NULL,
-                           name = NULL) {
+get_vcpolygons <- function(folderpath, name = NULL) {
 
-    if (base::is.null(path)) {
-        path <- glamr::si_path(type = "path_vector")
-    }
-
+    # filename
     if (base::is.null(name)) {
         name <- "^VcPepfarPolygons.*.shp$"
     }
 
+    # file full path
     shp_pepfar <- glamr::return_latest(
-        folderpath = path,
+        folderpath = folderpath,
         pattern = name,
         recursive = TRUE
-    ) %>%
-    sf::read_sf()
+    )
 
-    return(shp_pepfar)
+    # Read files
+    sf::read_sf(shp_pepfar)
 }
 
 
@@ -420,8 +396,8 @@ get_vcpolygons <- function(path = NULL,
 extract_boundaries <-
     function(spdf, country,
              level = 3,
-             username = NULL,
-             password = NULL,
+             username,
+             password,
              export = FALSE,
              name = NULL) {
 
@@ -430,25 +406,24 @@ extract_boundaries <-
 
         lvl <- {{level}}
 
-        user <- base::ifelse(base::is.null(username),
-                             glamr::datim_user(),
-                             {{username}})
+        accnt <- grabr::lazy_secrets(datim, username, password)
 
-        pass <- base::ifelse(base::is.null(password),
-                             glamr::datim_pwd(),
-                             {{password}})
+        user <- accnt$username
+
+        pass <- accnt$password
 
         #ou/country orgunit uid
-        uid <- get_ouuid(operatingunit = cntry,
-                         username = user,
-                         password = pass)
+        uid <- grabr::get_ouuid(operatingunit = cntry,
+                                username = user,
+                                password = pass)
 
         # list of orgs at the specified level
-        orgs <- get_ouorgs(
+        orgs <- grabr::get_ouorgs(
             ouuid = uid,
             level = lvl,
             username = user,
-            password = pass)
+            password = pass
+        )
 
         # Check for valid data
         if (base::is.null(orgs)) {
@@ -498,10 +473,7 @@ extract_boundaries <-
 #' cntry_polygons(spdf = spdf, cntry = "Zambia")
 #' }
 #'
-cntry_polygons <- function(spdf, cntry) {
-
-    # Get cntry attributes
-    attrs <- get_attributes(country = cntry)
+cntry_polygons <- function(spdf, cntry, attrs) {
 
     # Append attrs to boundaries
     spdf <- spdf %>% dplyr::left_join(attrs, by = c("uid" = "id"))
@@ -585,13 +557,12 @@ spdf_points <- function(.data,
 }
 
 
-#' @title Save shapefile
+#' @title Save spatial data as shapefile
 #'
 #' @param spdf sf object
 #' @param name filename with full path
 #'
 #' @return boolean
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -619,6 +590,7 @@ export_spdf <- function(spdf, name) {
 
     delete <- base::ifelse(file.exists(name), TRUE, FALSE)
 
+    # Write spdf to local file
     sf::st_write(obj = spdf,
                  dsn = name,
                  delete_dsn = delete)
@@ -626,7 +598,7 @@ export_spdf <- function(spdf, name) {
 }
 
 
-#' @title Save shapefile with flags
+#' @title Export spatial data as shapefile with flags
 #'
 #' @param spdf sf object
 #' @param name filename with full path
@@ -657,7 +629,7 @@ spdf_export <- function(spdf, name) {
                                    base::paste0(cols_check$value, collapse = ", ")))
     }
 
-    # Redirect
+    # Redirect to actual export after alerting user
     export_spdf(spdf, name)
 }
 

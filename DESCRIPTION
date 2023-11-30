@@ -1,6 +1,6 @@
 Package: gisr
 Title: Geospatial Analytics Utility functions
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: 
     person(given = "Baboyma",
            family = "Kagniniwa",
@@ -51,7 +51,7 @@ Suggests:
 Remotes:
     USAID-OHA-SI/glamr,
     USAID-OHA-SI/glitr,
-    USAID-OHA-SI/gagglr,
+    USAID-OHA-SI/grabr,
     ropensci/rnaturalearthhires
 BuildVignettes: true
 VignetteBuilder: knitr

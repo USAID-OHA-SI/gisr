@@ -18,16 +18,18 @@
 #' }
 #'
 extract_locations <-
-    function(country, username, password,
+    function(country,
+             username,
+             password,
              level = NULL,
              add_geom = TRUE,
-             base_url = NULL) {
+             baseurl = NULL) {
 
     # API
-    baseurl = "https://final.datim.org/"
+    burl = "https://final.datim.org/"
 
-    if(!base::is.null(base_url))
-        baseurl <- base_url
+    if(!base::is.null(baseurl))
+        baseurl <- burl
 
     # OU / Country / levels
     cntry <- {{country}}
@@ -119,7 +121,8 @@ extract_locations <-
     df <- df %>%
       dplyr::left_join(ou_levels,
                        by = "level",
-                       relationship = "many-to-many")
+                       relationship = "many-to-many") %>%
+      dplyr::rename(orgunit = name, orgunituid = id)
 
     # Parse geom
     if (add_geom == TRUE) {
@@ -128,6 +131,8 @@ extract_locations <-
                           operatingunit,
                           country_iso,
                           countryname,
+                          orgunit,
+                          orgunituid,
                           label,
                           level:coordinates) %>%
             dplyr::mutate(
@@ -172,6 +177,7 @@ extract_locations <-
 #' @param .data Datim organisation units data frame
 #' @param mer_sites Data Frame of MER Sites by IM with Results and/or Targets (cols: orgunituid, sitename)
 #' @export
+#'
 #' @examples
 #' \dontrun{
 #' extract_facilities(df_orgunits)
@@ -184,15 +190,13 @@ extract_facilities <- function(.data, mer_sites = NULL) {
         dplyr::filter(label == "facility") %>%
         tidyr::unnest_wider(coordinates, names_sep = "_") %>%
         janitor::clean_names() %>%
-        #dplyr::rename(longitude = "x1", latitude = "x2")
         dplyr::rename(longitude = "coordinates_1", latitude = "coordinates_2")
 
-    if ( !is.null(mer_sites) & ("orgunituid" %in% names(mer_sites)) & ("sitename" %in% names(mer_sites)) ) {
+    if ( !is.null(mer_sites) & all(c("orgunituid", "orgunit") %in% names(mer_sites)) ) {
 
         .data <- .data %>%
-            dplyr::left_join(mer_sites, by = c("id" = "orgunituid")) %>%
-            dplyr::filter(!is.na(sitename)) %>%
-            dplyr::select(-sitename)
+            dplyr::left_join(mer_sites, by = "orgunituid") %>%
+            dplyr::filter(!is.na(orgunit))
     }
     else {
         cat(crayon::red("\nMER Sites are missing or invalid. Make sure to include orgunituid and sitename columns."))
