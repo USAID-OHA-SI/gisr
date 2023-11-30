@@ -21,7 +21,7 @@ get_admin0(countries, scale = "medium", crs = 4326)
 sf boundaries data for a given country
 }
 \examples{
-\donttest{
+\dontrun{
   library(gisr)
 
   get_admin0(countries = list("Zambia"))

@@ -1,6 +1,6 @@
 Package: gisr
 Title: Geospatial Analytics Utility functions
-Version: 0.2.3
+Version: 0.3.0
 Authors@R: 
     person(given = "Baboyma",
            family = "Kagniniwa",
@@ -10,10 +10,10 @@ Description: R Spatial functions for HIV/AIDS related Geospatial Analytics.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/USAID-OHA-SI/gisr
+URL: https://github.com/USAID-OHA-SI/gisr, https://usaid-oha-si.github.io/gisr/
 BugReports: https://github.com/USAID-OHA-SI/gisr/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Depends: 
     R (>= 3.5.0)
 Imports: 
@@ -26,6 +26,7 @@ Imports:
     tibble,
     ggplot2,
     raster,
+    terra,
     sf,
     rnaturalearth,
     methods,
@@ -47,11 +48,13 @@ Suggests:
     glamr,
     glitr,
     googledrive,
-    googlesheets4
+    googlesheets4,
+    usethis
 Remotes:
     USAID-OHA-SI/glamr,
     USAID-OHA-SI/glitr,
     USAID-OHA-SI/grabr,
+    USAID-OHA-SI/gagglr,
     ropensci/rnaturalearthhires
 BuildVignettes: true
 VignetteBuilder: knitr

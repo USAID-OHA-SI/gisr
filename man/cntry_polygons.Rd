@@ -4,7 +4,7 @@
 \alias{cntry_polygons}
 \title{Extract Country Polygons}
 \usage{
-cntry_polygons(spdf, cntry)
+cntry_polygons(spdf, cntry, attrs)
 }
 \arguments{
 \item{spdf}{VcPolygons data as Spatial Data Frame}

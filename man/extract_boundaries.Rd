@@ -8,8 +8,8 @@ extract_boundaries(
   spdf,
   country,
   level = 3,
-  username = NULL,
-  password = NULL,
+  username,
+  password,
   export = FALSE,
   name = NULL
 )

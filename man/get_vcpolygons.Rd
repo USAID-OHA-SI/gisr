@@ -4,10 +4,10 @@
 \alias{get_vcpolygons}
 \title{Get PEPFAR Visual Crossing Polygons}
 \usage{
-get_vcpolygons(path = NULL, name = NULL)
+get_vcpolygons(folderpath, name = NULL)
 }
 \arguments{
-\item{path}{Path to PEPFAR Global Shapefile}
+\item{folderpath}{Path to PEPFAR Global Shapefile}
 
 \item{name}{Name or pattern of shapefile}
 }

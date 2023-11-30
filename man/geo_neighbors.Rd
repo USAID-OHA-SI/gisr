@@ -23,7 +23,7 @@ geo_neighbors(countries, scale = "large", crs = 4326, crop = FALSE)
 Get neighbors of a given contry
 }
 \examples{
-\donttest{
+\dontrun{
  library(gisr)
 
  cntry <- "Zambia"

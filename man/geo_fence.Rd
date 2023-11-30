@@ -20,7 +20,7 @@ simple feature class
 Generate a buffer around an Area of Interest
 }
 \examples{
-\donttest{
+\dontrun{
  library(gisr)
 
  adm <- get_admin0(countries = "Zambia")

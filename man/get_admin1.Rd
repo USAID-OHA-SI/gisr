@@ -18,7 +18,7 @@ simple feature class
 sf boundaries data for a given country
 }
 \examples{
-\donttest{
+\dontrun{
  library(gisr)
 
  get_admin1(countries = list("Zambia"))

@@ -5,7 +5,7 @@
 #'
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'  library(gisr)
 #'
 #'  # Admin level 0 [country] geodata
@@ -65,7 +65,7 @@ dview <- function(geodata,
 #'
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'  library(gisr)
 #'
 #'  adm0 <- get_admin0("Ghana")
@@ -138,7 +138,7 @@ gview <- function(geodata, ...) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'  library(gisr)
 #'
 #'  cntry <- "Zambia"
@@ -204,7 +204,7 @@ geo_neighbors <- function(countries,
 #' @return          simple feature class
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'   library(gisr)
 #'
 #'   get_admin0(countries = list("Zambia"))
@@ -233,7 +233,7 @@ get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 #'
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'  library(gisr)
 #'
 #'  get_admin1(countries = list("Zambia"))
@@ -261,7 +261,7 @@ get_admin1 <- function(countries, crs = 4326) {
 #'
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'  library(gisr)
 #'
 #'  adm <- get_admin0(countries = "Zambia")
@@ -643,7 +643,7 @@ spdf_export <- function(spdf, name) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'
 #'  library(gisr)
 #'

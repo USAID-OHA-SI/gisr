@@ -1,3 +1,9 @@
+# gisr 0.3.0
+
+* Removed duplicative functions from `grabr` [2023-11-30]
+* Update functions to use `baseurl` and `folderpath` as parameter
+* General clean up and documentation
+
 # gisr 0.2.2
 
 * Add in package status check from `gagglr` on load [2022-08-15]
