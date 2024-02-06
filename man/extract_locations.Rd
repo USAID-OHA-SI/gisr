@@ -10,7 +10,11 @@ extract_locations(
   password,
   level = NULL,
   add_geom = TRUE,
+<<<<<<< HEAD
   baseurl = NULL
+=======
+  base_url = NULL
+>>>>>>> main
 )
 }
 \arguments{

@@ -5,7 +5,7 @@
 * General clean up and documentation
 
 # gisr 0.2.2
-
+* Change instructions to install from rOpenSci [2024-01-04]
 * Add in package status check from `gagglr` on load [2022-08-15]
 * Improvement and documentation of utility functions
 * Updated vignette for Geodata extraction

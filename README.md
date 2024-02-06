@@ -1,15 +1,34 @@
-<img src='man/figures/logo.png' align="right" height="120" />
+# gisr <img src='man/figures/logo.png' align="right" height="120" />
 
-[![R-CMD-check](https://github.com/USAID-OHA-SI/gisr/workflows/R-CMD-check/badge.svg)](https://github.com/USAID-OHA-SI/gisr/actions)
-
-# gisr
 OHA Geospatial Analytics Utilities
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/USAID-OHA-SI/gisr/workflows/R-CMD-check/badge.svg)](https://github.com/USAID-OHA-SI/gisr/actions)
+[![gisr status badge](https://usaid-oha-si.r-universe.dev/badges/gisr)](https://usaid-oha-si.r-universe.dev/gisr)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![:name status badge](https://usaid-oha-si.r-universe.dev/badges/:name)](https://usaid-oha-si.r-universe.dev/)
+<!-- badges: end -->
+
 
 ## Installation
 
-```{r}
-install.packages("remotes")
-remotes::install_github("USAID-OHA-SI/gisr", build_vignettes = TRUE)
+`gisr` is not on CRAN, so you will have to install it directly from [rOpenSci](https://usaid-oha-si.r-universe.dev/packages) or [GitHub](https://github.com/USAID-OHA-SI/) using the code found below.
+
+``` r
+## SETUP
+
+  #install from rOpenSci
+    install.packages('gisr', repos = c('https://usaid-oha-si.r-universe.dev', 'https://cloud.r-project.org'))
+    
+  #alt: install from GitHub using pak
+    #install.packages("pak")
+    #pak::pak("USAID-OHA-SI/gisr")
+    
+  #load the package
+    library(gisr)
+
+## LIST TYPES OF STYLES INCLUDED WITH PACKAGE
+  ls("package:gisr")
 ```
     
 ## Get administrative boundaries 
@@ -74,7 +93,7 @@ print(z_map2)
 Create an administrative map with vector data from RNaturalEarth
 
 ```{r}
-library(extrafont)
+library(systemfonts)
 library(tidyverse)
 library(sf)
 library(glitr)
@@ -95,7 +114,7 @@ print(z_map2)
 Create an administrative map with vector data from RNaturalEarth and apply SI Style
 
 ```{r}
-library(extrafont)
+library(systemfonts)
 library(tidyverse)
 library(gisr)
 library(sf)

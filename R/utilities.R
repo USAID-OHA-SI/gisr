@@ -1,4 +1,3 @@
-
 #' @title Get Attributes Data for Orgunit Boundaries
 #' @note  This will attempt to read data from local directory when folderpath is not set to null.
 #' If null, username and password will be required
@@ -87,7 +86,7 @@ get_attributes <- function(country,
     dplyr::filter(label != "facility") %>%
     dplyr::select(id, level, label, name,
                   operatingunit_iso, operatingunit,
-                  countryname_iso, countryname)
+                  country_iso, countryname)
 
   return(df_attrs)
 }
