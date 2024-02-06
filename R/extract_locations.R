@@ -9,8 +9,6 @@
 #'
 #' @return A dataframe or Null if not match
 #'
-#' @export
-#'
 #' @examples
 #' \dontrun{
 #'
@@ -28,30 +26,29 @@ extract_locations <-
     # API
     burl = "https://final.datim.org/"
 
-    if(!base::is.null(baseurl))
-        baseurl <- burl
+    if(!base::is.null(baseurl)) baseurl <- burl
 
-    # OU / Country / levels
-    cntry <- {{country}}
-    lvl <- {{level}}
+    # account details
+    accnt <- grabr::lazy_secrets("datim", username, password)
 
     # Get country uid
-    ouuid <- get_ouuid(cntry, username, password, baseurl)
+    ouuid <- grabr::get_ouuid(country, accnt$username, accnt$password, baseurl)
 
     # Get country org levels
-    ou_levels <- get_levels(
-        username = username,
-        password = password,
+    ou_levels <- grabr::get_levels(
+        username = accnt$username,
+        password = accnt$password,
+        expand = TRUE,
         reshape = TRUE
       ) %>%
-      clean_levels() %>%
       dplyr::filter(
-        stringr::str_to_lower(countryname) == stringr::str_to_lower(cntry) |
-          stringr::str_to_lower(operatingunit) == stringr::str_to_lower(cntry))
+        stringr::str_to_lower(countryname) == stringr::str_to_lower(country) |
+          stringr::str_to_lower(operatingunit) == stringr::str_to_lower(country)
+        )
 
     # UID and Check levels
     if (is.null(ouuid) | base::nrow(ou_levels) == 0) {
-        base::cat(crayon::red(glue::glue("\nUnable to retrieve org levels for [{cntry}]!\n")))
+        base::cat(crayon::red(glue::glue("\nUnable to retrieve org levels for [{country}]!\n")))
         return(NULL)
     }
 
@@ -74,8 +71,8 @@ extract_locations <-
     if (!is.null(lvl)) {
 
       if (lvl %in% ou_levels$level) {
-        url <- url %>% base::paste0("&filter=level:eq:", lvl)
-        ou_levels <- ou_levels %>% dplyr::filter(level == lvl)
+        url <- url %>% base::paste0("&filter=level:eq:", level)
+        ou_levels <- ou_levels %>% dplyr::filter(level == level)
       }
     }
 
@@ -83,21 +80,21 @@ extract_locations <-
     url <- url %>% base::paste0("&paging=false&format=json")
 
     # Query OU Location data
-    df <- url %>%
-        httr::GET(httr::authenticate(user = username, password = password)) %>%
+    .df <- url %>%
+        httr::GET(httr::authenticate(user = accnt$username, password = accnt$password)) %>%
         httr::content("text") %>%
         jsonlite::fromJSON(flatten = T) %>%
         purrr::pluck("organisationUnits") %>%
         tibble::as_tibble()
 
     # Check presence of geom columns - some countries do not have geometry
-    if (add_geom == TRUE & !any(stringr::str_detect(names(df), "geometry"))) {
+    if (add_geom == TRUE & !any(stringr::str_detect(names(.df), "geometry"))) {
         add_geom = FALSE
     }
 
     # Unpack geometry
     if (add_geom == TRUE) {
-        df <- df %>%
+        .df <- .df %>%
             dplyr::rename(
                 geom_type = geometry.type,          # NA or Geometry Type Value
                 coordinates = geometry.coordinates  # NA, vector or list of 2 or more vectors
@@ -118,7 +115,7 @@ extract_locations <-
     }
 
     # Flag org levels
-    df <- df %>%
+    .df <- .df %>%
       dplyr::left_join(ou_levels,
                        by = "level",
                        relationship = "many-to-many") %>%
@@ -176,7 +173,6 @@ extract_locations <-
 #'
 #' @param .data Datim organisation units data frame
 #' @param mer_sites Data Frame of MER Sites by IM with Results and/or Targets (cols: orgunituid, sitename)
-#' @export
 #'
 #' @examples
 #' \dontrun{

@@ -314,8 +314,8 @@ geo_fence <- function(aoi,
 #'  library(gisr)
 #'
 #'  shp_pepfar <- get_vcpolygons()
-#'  shp_pepfar <- get_vcpolygons(path = "./GIS")
-#'  shp_pepfar <- get_vcpolygons(path = "./GIS", name = "VcPepfarPolygons.shp")
+#'  shp_pepfar <- get_vcpolygons(folderpath = glamr::si_path("path_vector"))
+#'  shp_pepfar <- get_vcpolygons(folderpath = "./GIS", name = "VcPepfarPolygons.shp")
 #' }
 #'
 get_vcpolygons <- function(folderpath, name = NULL) {
@@ -365,33 +365,16 @@ get_vcpolygons <- function(folderpath, name = NULL) {
 #'
 #'  cntry <- "Tanzania"
 #'
-#'  shp_pepfar <- return_latest(
-#'      folderpath = si_path("path_vector"),
-#'      pattern = "VcPepfarPolygons.*.shp",
-#'      recursive = TRUE
-#'    ) %>%
-#'    read_sf()
-#'
-#'  cntry_level <- get_ouorglevel(cntry, org_type = "country")
+#'  shp_pepfar <- get_vcpolygons(folderpath = glamr::si_path("path_vector")) %>%
 #'
 #'  shp_country <- extract_boundaries(
 #'    spdf = shp_pepfar,
 #'    country = cntry,
-#'    level = cntry_level
+#'    level = 3
 #'  )
 #'
 #'  shp_country %>% gview()
 #'
-#'  psnu_level <- get_ouorglevel(cntry, org_type = "prioritization")
-#'
-#'  shp_psnu <- extract_boundaries(
-#'    spdf = shp_pepfar,
-#'    country = cntry,
-#'    level = psnu_level
-#'  )
-#'
-#'  shp_psnu %>% gview()
-#' }
 #'
 extract_boundaries <-
     function(spdf, country,
@@ -401,28 +384,20 @@ extract_boundaries <-
              export = FALSE,
              name = NULL) {
 
-        # Params
-        cntry <- {{country}}
-
-        lvl <- {{level}}
-
+        # account details
         accnt <- grabr::lazy_secrets("datim", username, password)
 
-        user <- accnt$username
-
-        pass <- accnt$password
-
         #ou/country orgunit uid
-        uid <- grabr::get_ouuid(operatingunit = cntry,
-                                username = user,
-                                password = pass)
+        uid <- grabr::get_ouuid(operatingunit = country,
+                                username = accnt$username,
+                                password = accnt$password)
 
         # list of orgs at the specified level
         orgs <- grabr::get_ouorgs(
             ouuid = uid,
-            level = lvl,
-            username = user,
-            password = pass
+            level = level,
+            username = accnt$username,
+            password = accnt$username
         )
 
         # Check for valid data
@@ -432,9 +407,9 @@ extract_boundaries <-
             return(NULL)
         }
 
-        orgs <- orgs %>% dplyr::mutate(org_level = lvl)
+        orgs <- orgs %>% dplyr::mutate(orgunit_level = level)
 
-        # filter sp df
+        # filter spdf
         spdf <- spdf %>%
             dplyr::left_join(orgs, by = "uid") %>%
             dplyr::filter(!is.na(orgunit))
@@ -461,6 +436,7 @@ extract_boundaries <-
 #'
 #' @param spdf  VcPolygons data as Spatial Data Frame
 #' @param cntry Country name
+#' @param attrs Country orgunits, output of `grabr::datim_orgunits(cntry, reshape = TRUE)`
 #'
 #' @return list of spatial data frames
 #' @export
@@ -468,15 +444,20 @@ extract_boundaries <-
 #' @examples
 #' \dontrun{
 #'
+#' cntry = "Nigeria"
+#'
 #' spdf <- gisr::get_vcpolygons(path = glamr::si_path("path_vector"), name = "VcPepfarPolygons.shp")
 #'
-#' cntry_polygons(spdf = spdf, cntry = "Zambia")
+#' df_attrs <- grabr::get_attributes(cntry)
+#'
+#' cntry_polygons(spdf = spdf, cntry = "Zambia", attrs = df_attrs)
+#'
 #' }
 #'
 cntry_polygons <- function(spdf, cntry, attrs) {
 
     # Append attrs to boundaries
-    spdf <- spdf %>% dplyr::left_join(attrs, by = c("uid" = "id"))
+    spdf <- spdf %>% dplyr::left_join(attrs, by = c("uid" = "orgunituid"))
 
     # Get distinct labels - boundary names
     labels <- attrs %>%

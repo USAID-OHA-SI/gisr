@@ -18,8 +18,8 @@
 #' }
 #'
 get_attributes <- function(country,
-                           username = NULL,
-                           password = NULL,
+                           username,
+                           password,
                            folderpath = NULL) {
 
   file_pattern <- base::paste0("^orghierarchy - ",
@@ -52,22 +52,13 @@ get_attributes <- function(country,
 
   base::message(country)
 
-  # Account
-
-  if (!is.null(username) & !is.null(password)) {
-    accnt <- grabr::lazy_secrets("datim", username , password)
-
-    username <- accnt$username
-    password <- accnt$password
-  }
-  else {
-    usethis::ui_stop("username and password info are missing.")
-  }
+  # Account details
+  accnt <- grabr::lazy_secrets("datim", username , password)
 
   # Get attrs from datim
   df_attrs <- extract_locations(country = country,
-                                username = username,
-                                password = password,
+                                username = accnt$username,
+                                password = accnt$password,
                                 add_geom = FALSE)
 
   if (is.null(df_attrs)) return(NULL)
