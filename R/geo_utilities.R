@@ -406,7 +406,7 @@ extract_boundaries <-
 
         lvl <- {{level}}
 
-        accnt <- grabr::lazy_secrets(datim, username, password)
+        accnt <- grabr::lazy_secrets("datim", username, password)
 
         user <- accnt$username
 
