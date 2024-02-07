@@ -1,6 +1,6 @@
 Package: gisr
 Title: Geospatial Analytics Utility functions
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: 
     person(given = "Baboyma",
            family = "Kagniniwa",
@@ -31,18 +31,18 @@ Imports:
     rnaturalearth,
     methods,
     crayon,
-    httr,
     janitor,
     jsonlite,
     zip,
-    glue
+    glue,
+    fs
 Suggests: 
-    knitr, 
+    knitr,
     rmarkdown,
-    testthat,
+    testthat (>= 3.0.0),
     here,
-    rnaturalearthdata,
-    rnaturalearthhires,
+    rnaturalearthdata (>= 1.0.0),
+    rnaturalearthhires (>= 1.0.0),
     osmdata,
     patchwork,
     glamr,
@@ -55,6 +55,7 @@ Remotes:
     USAID-OHA-SI/glitr,
     USAID-OHA-SI/grabr,
     USAID-OHA-SI/gagglr,
-    ropensci/rnaturalearthhires
+    ropensci/rnaturalearthhires (>= 1.0.0)
 BuildVignettes: true
 VignetteBuilder: knitr
+Config/testthat/edition: 3

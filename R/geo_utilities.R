@@ -18,11 +18,10 @@
 #' }
 #'
 gattributes <- function(geodata) {
-
-    geodata %>%
-        sf::st_as_sf() %>%
-        sf::st_drop_geometry(x = .) %>%
-        tibble::as_tibble()
+  geodata %>%
+    sf::st_as_sf() %>%
+    sf::st_drop_geometry() %>%
+    tibble::as_tibble()
 }
 
 #' @title View attributes from simple feature object
@@ -40,8 +39,7 @@ gattributes <- function(geodata) {
 #'  adm0 %>% dview(console = TRUE)
 #' }
 #'
-dview <- function(geodata,
-                  console = FALSE) {
+dview <- function(geodata, console = FALSE) {
 
     # check of data is sf or sfc
     base::stopifnot(base::any(class(geodata) %in% c('sf')))
@@ -51,7 +49,7 @@ dview <- function(geodata,
 
     # print of view
     if (console == TRUE) {
-        base::print(geodata, n = Inf)
+        base::print(geodata)
     } else {
         tibble::view(geodata)
     }
@@ -84,25 +82,24 @@ gview <- function(geodata, ...) {
     geom_type <- sf::st_geometry_type(geodata, by_geometry = FALSE)
 
     # vizualize the object
-    viz <- geodata %>%
-        ggplot2::ggplot()
+    viz <- ggplot2::ggplot(geodata)
 
     # polygons
-    if (geom_type %in% c("POLYGON", "MULTIPOLYGON"))
+    if (base::toupper(geom_type) %in% c("POLYGON", "MULTIPOLYGON"))
         viz <- viz + ggplot2::geom_sf(fill = NA,
-                                      lwd = .3,
+                                      linewidth = .3,
                                       color = "#6c6463",
                                       ...)
 
     # lines
-    if (geom_type %in% c("LINESTRING", "MULTILINESTRING")) {
-        viz <- viz + ggplot2::geom_sf(size = 1,
+    if (base::toupper(geom_type)  %in% c("LINESTRING", "MULTILINESTRING")) {
+        viz <- viz + ggplot2::geom_sf(linewidth = 1,
                                       color = "#6c6463",
                                       ...)
     }
 
     # points
-    if (geom_type %in% c("POINT", "MULTIPOINT")) {
+    if (base::toupper(geom_type)  %in% c("POINT", "MULTIPOINT")) {
         viz <- viz +
             ggplot2::geom_sf(shape = 21,
                              size = 4,
@@ -113,8 +110,8 @@ gview <- function(geodata, ...) {
     }
 
     # collection
-    if (geom_type == "GEOMETRYCOLLECTION") {
-        viz <- viz + ggplot2::geom_sf()
+    if (base::toupper(geom_type) == "GEOMETRYCOLLECTION") {
+        viz <- viz + ggplot2::geom_sf(...)
     }
 
     # Apply coordinates and theme
@@ -164,7 +161,7 @@ geo_neighbors <- function(countries,
         sf::st_transform(., crs = sf::st_crs({{crs}}))
 
     # Get focus country(ies)
-    focus_country <-  world %>%
+    focus_country <- world %>%
         dplyr::filter(sovereignt %in% {{countries}})
 
     # Filter based on neighbors touched by polygons of interest
@@ -212,14 +209,14 @@ geo_neighbors <- function(countries,
 #'
 get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 
-    admin0 <- rnaturalearth::ne_countries(
-        country = {{countries}},
-        scale = {{scale}},
-        returnclass = "sf"
-      ) %>%
-      sf::st_transform(., crs = sf::st_crs({{crs}}))
+  admin0 <- rnaturalearth::ne_countries(
+      country = {{countries}},
+      scale = {{scale}},
+      returnclass = "sf"
+    ) %>%
+    sf::st_transform(., crs = sf::st_crs({{crs}}))
 
-    return(admin0)
+  return(admin0)
 }
 
 
@@ -241,13 +238,13 @@ get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 #'
 get_admin1 <- function(countries, crs = 4326) {
 
-    admin1 <- rnaturalearth::ne_states(
-        country = {{countries}},
-        returnclass = "sf"
-      ) %>%
-      sf::st_transform(., crs = sf::st_crs({{crs}}))
+  admin1 <- rnaturalearth::ne_states(
+      country = {{countries}},
+      returnclass = "sf"
+    ) %>%
+    sf::st_transform(., crs = sf::st_crs({{crs}}))
 
-    return(admin1)
+  return(admin1)
 }
 
 
@@ -275,27 +272,27 @@ geo_fence <- function(aoi,
                       radius = 1000,
                       append = TRUE) {
 
-    # CRS
-    from_crs <- aoi %>% sf::st_crs()
-    to_crs <- sf::st_crs(3857)
+  # CRS
+  from_crs <- aoi %>% sf::st_crs()
+  to_crs <- sf::st_crs(3857)
 
-    if (base::is.null(from_crs)) {
-        crayon::red("There are no coordinates system attached to your spatial data")
-        return(NULL)
-    }
+  if (base::is.null(from_crs)) {
+      crayon::red("There are no coordinates system attached to your spatial data")
+      return(NULL)
+  }
 
-    # Create buffer
-    aoi_area <- aoi %>%
-        sf::st_transform(crs = to_crs) %>%
-        sf::st_buffer(dist = radius) %>%
-        sf::st_transform(crs = from_crs)
+  # Create buffer
+  aoi_area <- aoi %>%
+      sf::st_transform(crs = to_crs) %>%
+      sf::st_buffer(dist = radius) %>%
+      sf::st_transform(crs = from_crs)
 
-    # clip off input
-    if (!append) {
-        aoi_area <- sf::st_difference(aoi_area, aoi)
-    }
+  # clip off input
+  if (!append) {
+      aoi_area <- sf::st_difference(aoi_area, aoi)
+  }
 
-    return(aoi)
+  return(aoi)
 }
 
 
@@ -320,20 +317,23 @@ geo_fence <- function(aoi,
 #'
 get_vcpolygons <- function(folderpath, name = NULL) {
 
-    # filename
-    if (base::is.null(name)) {
-        name <- "^VcPepfarPolygons.*.shp$"
-    }
+  # filename
+  if (base::is.null(name)) {
+      name <- "^VcPepfarPolygons.*.shp$"
+  }
 
-    # file full path
-    shp_pepfar <- glamr::return_latest(
-        folderpath = folderpath,
-        pattern = name,
-        recursive = TRUE
-    )
+  # file full path
+  shp_pepfar <- glamr::return_latest(
+      folderpath = folderpath,
+      pattern = name,
+      recursive = TRUE
+  )
 
-    # Read files
-    sf::read_sf(shp_pepfar)
+  if (is.null(shp_pepfar) | !fs::file_exists(shp_pepfar))
+    usethis::ui_stop("No VcPepfarPolygons file found - double check the path and/or name")
+
+  # Read files
+  sf::read_sf(shp_pepfar)
 }
 
 
@@ -494,7 +494,7 @@ cntry_polygons <- function(spdf, cntry, attrs) {
 #' \dontrun{
 #'
 #' cntry <- "Ethiopia"
-#' level_fac <- get_ouorglevel(operatingunit = cntry, org_type = "facility")
+#' level_fac <- grabr::get_ouorglevel(operatingunit = cntry, org_type = "facility")
 #' df_facs <- extract_locations(country = cntry, level = level_fac)
 #' df_facs <- df_facs %>% extract_facilities()
 #' df_locs <- df_facs %>% select(-c(geom_type:nested))
@@ -512,29 +512,20 @@ spdf_points <- function(.data,
     spdf <- NULL
 
     # check for lat/long columns
-    if (lat %in% names(.data)) {
+    if (!all(c(lat, long) %in% names(.data)))
+      base::stop("No location columns found. Consider changing lat/long default values")
 
-        spdf <- .data %>%
-            dplyr::filter(dplyr::across(dplyr::all_of(c(lat, long)), ~ !base::is.na(.x))) %>%
-            dplyr::mutate(dplyr::across(dplyr::all_of(c(lat, long)), ~ base::as.numeric(.x)))
+    # filter and mutate
+    spdf <- .data %>%
+        dplyr::filter(dplyr::across(dplyr::all_of(c(lat, long)), ~ !base::is.na(.x))) %>%
+        dplyr::mutate(dplyr::across(dplyr::all_of(c(lat, long)), ~ base::as.numeric(.x)))
 
+    # Convert data to sf feature
+    spdf <- spdf %>%
+        sf::st_as_sf(coords = c(long, lat),
+                     crs = sf::st_crs(crs))
 
-        spdf <- spdf %>%
-            sf::st_as_sf(coords = c(long, lat),
-                         crs = sf::st_crs(crs))
-
-        # TODO: Shapefiles columns have a max - Move this outside
-        # spdf <- spdf %>%
-        #     dplyr::rename(ou_iso = operatingunit_iso,
-        #                   ou = operatingunit,
-        #                   cntry_iso = countryname_iso,
-        #                   cntry = countryname)
-
-        return(spdf)
-
-    }
-
-    base::message("No location columns found. Consider changing lat/long default values")
+    return(spdf)
 }
 
 
@@ -600,14 +591,11 @@ export_spdf <- function(spdf, name) {
 #'
 spdf_export <- function(spdf, name) {
 
-    cols_check <- base::names(spdf) %>%
-        tibble::as_tibble() %>%
-        dplyr::mutate(len = nchar(value)) %>%
-        dplyr::filter(len > 10)
+    cols_check <- check_columns(spdf)
 
-    if (base::nrow(cols_check) > 0) {
+    if (base::length(cols_check) > 0) {
         base::message(base::paste0("Consider shortening these columns to 10 characters to adhere to shapefile specs: ",
-                                   base::paste0(cols_check$value, collapse = ", ")))
+                                   base::paste0(cols_check, collapse = ", ")))
     }
 
     # Redirect to actual export after alerting user
@@ -647,8 +635,7 @@ extract_roads <- function(aoi,
     }
 
     # Get area bounding box
-    aoi_bbox <- aoi %>%
-        sf::st_bbox()
+    aoi_bbox <- sf::st_bbox(aoi)
 
     # Build query
     aoi_query <- aoi_bbox %>%
@@ -657,8 +644,7 @@ extract_roads <- function(aoi,
         osmdata::add_osm_feature(key = "highway")
 
     # Query data
-    sfdf <- aoi_query %>%
-        osmdata::osmdata_sf()
+    sfdf <- osmdata::osmdata_sf(aoi_query)
 
     # Extract lines only
     sldf <- NULL
@@ -670,8 +656,7 @@ extract_roads <- function(aoi,
 
     # Extract data matching aoi
     if (!base::is.null(sfdf) & clip == TRUE) {
-        sldf <- sldf %>%
-            sf::st_intersection(aoi)
+        sldf <- sf::st_intersection(sldf, aoi)
     }
 
     # Notification for no-data
@@ -691,8 +676,6 @@ extract_roads <- function(aoi,
 #' @param dest_file    Full file name where to download zipped shapefile
 #' @param overwrite    Should the process overwrite existing files
 #' @param unzip        Should the zipfile be unzipped
-#'
-#' @export
 #'
 #' @examples
 #' \dontrun{

@@ -5,7 +5,7 @@
 #' @param password Datim Account password
 #' @param level    PEPFAR Org Level, optional
 #' @param add_geom Include geometry column, default value is true
-#' @param base_url Datim URL
+#' @param baseurl Datim URL
 #'
 #' @return A dataframe or Null if not match
 #'

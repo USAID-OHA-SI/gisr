@@ -22,8 +22,8 @@ Get PEPFAR Visual Crossing Polygons
  library(gisr)
 
  shp_pepfar <- get_vcpolygons()
- shp_pepfar <- get_vcpolygons(path = "./GIS")
- shp_pepfar <- get_vcpolygons(path = "./GIS", name = "VcPepfarPolygons.shp")
+ shp_pepfar <- get_vcpolygons(folderpath = glamr::si_path("path_vector"))
+ shp_pepfar <- get_vcpolygons(folderpath = "./GIS", name = "VcPepfarPolygons.shp")
 }
 
 }

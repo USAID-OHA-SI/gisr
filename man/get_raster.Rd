@@ -4,10 +4,10 @@
 \alias{get_raster}
 \title{Get Terrain Raster dataset}
 \usage{
-get_raster(path = NULL, name = NULL, rename = FALSE, ...)
+get_raster(folderpath, name = NULL, rename = FALSE, ...)
 }
 \arguments{
-\item{path}{Path to raster file, default will be \code{si_path('path_raster')}}
+\item{folderpath}{Path to raster file, default will be \code{si_path('path_raster')}}
 
 \item{name}{Name of the raster file (with extension), default is set to terrain raster \code{SR_LR.tif}}
 

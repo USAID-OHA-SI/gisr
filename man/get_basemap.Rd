@@ -4,14 +4,14 @@
 \alias{get_basemap}
 \title{Get Basemap}
 \usage{
-get_basemap(spdf, country = NULL, terr = NULL, add_admins = FALSE)
+get_basemap(spdf, terr, country = NULL, add_admins = FALSE)
 }
 \arguments{
 \item{spdf}{PEPFAR ORGs Spatial Data}
 
-\item{country}{OU or Country Name}
-
 \item{terr}{RasterLayer}
+
+\item{country}{OU or Country Name}
 
 \item{add_admins}{Should the sub-admins be added? Default is false}
 }

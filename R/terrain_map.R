@@ -132,7 +132,7 @@ terrain_map <-
 
 #' @title Get Terrain Raster dataset
 #'
-#' @param path Path to raster file, default will be `si_path('path_raster')`
+#' @param folderpath Path to raster file, default will be `si_path('path_raster')`
 #' @param name Name of the raster file (with extension), default is set to terrain raster `SR_LR.tif`
 #' @param rename Should the RasterLayer be renamed? If yes, the name is changed to `value`
 #' @param ...  Additional arguments to be passed to `base::list.files`. Eg: `Use ignore.case = TRUE` for non case sensitive search
@@ -151,17 +151,12 @@ terrain_map <-
 #'  get_raster(path = "./geodata/raster", name = "sample.tif")
 #' }
 #'
-get_raster <- function(path = NULL,
+get_raster <- function(folderpath,
                        name = NULL,
                        rename = FALSE,
                        ...) {
 
     # Check parameters
-
-    # Path
-    if (base::is.null(path)) {
-        path <- glamr::si_path("path_raster")
-    }
 
     # File name
     if (base::is.null(name)) {
@@ -169,13 +164,13 @@ get_raster <- function(path = NULL,
     }
 
     # Check directory
-    if (!base::dir.exists(path)) {
-        stop(base::cat("\nInvalid directory: ", crayon::red(path), "\n"))
+    if (!base::dir.exists(folderpath)) {
+        stop(base::cat("\nInvalid directory: ", crayon::red(folderpath), "\n"))
     }
 
     # Identify file path
     terr_file <- base::list.files(
-        path = path,
+        path = folderpath,
         pattern = base::paste0(name, "$"),
         recursive = TRUE,
         full.names = TRUE,
@@ -194,7 +189,7 @@ get_raster <- function(path = NULL,
     }
 
     # Read file content
-    ras <- raster::raster(terr_file)
+    ras <- tarra::rast(terr_file)
 
     if (rename) {
         names(ras) <- "value"
@@ -227,10 +222,9 @@ get_raster <- function(path = NULL,
 #' }
 #'
 extract_raster <-
-    function(countries,
+    function(countries, ras,
              mask = FALSE,
-             buffer = .1,
-             ras = NULL) {
+             buffer = .1) {
 
         # Params
         cntries <- {{countries}}
@@ -266,10 +260,8 @@ extract_raster <-
         ras_path <- NULL  #"./GIS/"
 
         # Locate and retrieve terrain file
-        if ( base::is.null(ras) ) {
-            dta_ras <- get_raster(rename = TRUE)
-        } else if (!base::is.null(ras) && "character" %in% base::class(ras) && base::dir.exists(ras)) {
-            dta_ras <- get_raster(path = ras, rename = TRUE)
+        if (!base::is.null(ras) && "character" %in% base::class(ras) && base::dir.exists(ras)) {
+            dta_ras <- get_raster(folderpath = ras, rename = TRUE)
         } else if (!base::is.null(ras) && "RasterLayer" %in% base::class(ras)) {
             dta_ras <- ras
         }
@@ -281,11 +273,11 @@ extract_raster <-
 
         # Crop raster to boundaries extent
         aoi_ras <- dta_ras %>%
-            raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
+            terra::crop(terra::extend(terra::ext(aoi), {{buffer}}))
 
         # Crop to the exact limits if applicable
         if ( mask == TRUE ) {
-            aoi_ras <- aoi_ras %>% raster::mask(aoi)
+            aoi_ras <- aoi_ras %>% terra::mask(aoi)
         }
 
         # Rename RasterLayer
@@ -325,10 +317,9 @@ extract_raster <-
 #' }
 #'
 get_terrain <-
-    function(countries = list("Zambia"),
+    function(countries, terr,
              mask = FALSE,
-             buffer = .1,
-             terr = NULL) {
+             buffer = .1) {
 
         # Params
         cntries <- {{countries}}
@@ -365,10 +356,8 @@ get_terrain <-
         terr_ras <- NULL
 
         # Locate and retrieve terrain file
-        if ( base::is.null(terr) ) {
-            terr_ras <- get_raster(rename = TRUE)
-        } else if (!base::is.null(terr) && "character" %in% base::class(terr) && dir.exists(terr)) {
-            terr_ras <- get_raster(path = terr, rename = TRUE)
+        if (!base::is.null(terr) && "character" %in% base::class(terr) && dir.exists(terr)) {
+            terr_ras <- get_raster(folderpath = terr, rename = TRUE)
         } else if (!base::is.null(terr) && "RasterLayer" %in% base::class(terr)) {
             terr_ras <- terr
         }
@@ -381,11 +370,11 @@ get_terrain <-
 
         # Crop raster to boundaries extent
         terr_ras <- terr_ras %>%
-            raster::crop(raster::extend(raster::extent(aoi), {{buffer}}))
+            terra::crop(terra::extend(terra::ext(aoi), {{buffer}}))
 
         # Crop to the exact limits if applicable
         if ( mask == TRUE ) {
-            terr_ras <- terr_ras %>% raster::mask(aoi)
+            terr_ras <- terr_ras %>% terra::mask(aoi)
         }
 
         # Rename RasterLayer
@@ -422,9 +411,8 @@ get_terrain <-
 #' }
 #'
 get_basemap <-
-    function(spdf,
+    function(spdf, terr,
              country = NULL,
-             terr = NULL,
              add_admins = FALSE) {
 
         # Params
@@ -462,15 +450,15 @@ get_basemap <-
             dplyr::filter(label == "snu1")
 
         # Terrain
-        if (is.null(dta_raster)) {
+        if (is.null(dta_raster) && "character" %in% base::class(dta_raster) && dir.exists(dta_raster) ) {
             # Get raster file
-            dta_raster <- get_raster()
+            dta_raster <- get_raster(folderpath = terr)
         }
 
         # Crop
         terr <- dta_raster %>%
-            raster::crop(x = ., y = raster::extend(raster::extent(df_geo0), .2)) %>%
-            raster::mask(x = ., mask = df_geo0)
+            terra::crop(x = ., y = terra::extend(terra::ext(df_geo0), .2)) %>%
+            terra::mask(x = ., mask = df_geo0)
 
         # Convert raster data into a spatial data frame
         trdf <- terr %>%

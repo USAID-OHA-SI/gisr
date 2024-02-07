@@ -2,11 +2,7 @@
 % Please edit documentation in R/geo_utilities.R
 \name{export_spdf}
 \alias{export_spdf}
-<<<<<<< HEAD
 \title{Save spatial data as shapefile}
-=======
-\title{Save shapefile}
->>>>>>> main
 \usage{
 export_spdf(spdf, name)
 }
@@ -19,11 +15,7 @@ export_spdf(spdf, name)
 boolean
 }
 \description{
-<<<<<<< HEAD
 Save spatial data as shapefile
-=======
-Save shapefile
->>>>>>> main
 }
 \examples{
 \dontrun{

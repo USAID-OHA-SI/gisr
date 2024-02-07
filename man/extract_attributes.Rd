@@ -4,12 +4,27 @@
 \alias{extract_attributes}
 \title{Extract Orgunit Boundaries Attributes}
 \usage{
-extract_attributes(country, folderpath = NULL)
+extract_attributes(
+  country,
+  username,
+  password,
+  folderpath,
+  prefix = "orghierarchy",
+  baseurl = NULL
+)
 }
 \arguments{
 \item{country}{OU/country}
 
+\item{username}{Datim username}
+
+\item{password}{Datim password}
+
 \item{folderpath}{Local directory of files}
+
+\item{prefix}{Prefix for filename}
+
+\item{baseurl}{Datim URL}
 }
 \value{
 df
@@ -19,7 +34,6 @@ Extract Orgunit Boundaries Attributes
 }
 \examples{
 \dontrun{
- library(tidyverse)
  library(gisr)
 
  extract_attributes(country = "Nigeria")

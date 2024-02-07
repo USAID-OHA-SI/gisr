@@ -1,3 +1,17 @@
+#' @title Check columns length
+#'
+#' @param spdf input spatial data frame
+#'
+#' @return list of columns with more than 10 characters
+#'
+check_columns <- function(spdf) {
+  base::names(spdf) %>%
+    tibble::as_tibble() %>%
+    dplyr::mutate(len = nchar(value)) %>%
+    dplyr::filter(len > 10) %>%
+    dplyr::pull(value)
+}
+
 #' @title Get Attributes Data for Orgunit Boundaries
 #' @note  This will attempt to read data from local directory when folderpath is not set to null.
 #' If null, username and password will be required
@@ -6,6 +20,8 @@
 #' @param username   Datim username
 #' @param password   Datim password
 #' @param folderpath Local directory of files
+#' @param search     Search keyword
+#' @param baseurl    Datim URL
 #'
 #' @return           OU Orgunit level as df
 #' @export
@@ -70,14 +86,17 @@ get_attributes <- function(country,
 #' @title Extract Orgunit Boundaries Attributes
 #'
 #' @param country    OU/country
+#' @param username   Datim username
+#' @param password   Datim password
 #' @param folderpath Local directory of files
+#' @param prefix     Prefix for filename
+#' @param baseurl    Datim URL
 #'
 #' @return df
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#'  library(tidyverse)
 #'  library(gisr)
 #'
 #'  extract_attributes(country = "Nigeria")
@@ -85,35 +104,21 @@ get_attributes <- function(country,
 #' }
 #'
 extract_attributes <-
-  function(country,
-           folderpath = NULL) {
+  function(country, username, password, folderpath,
+           prefix = "orghierarchy",
+           baseurl = NULL) {
+
+    # Account details
+    accnt <- grabr::lazy_secrets("datim", username, password)
 
     # local dir & filename
-    dir <- folderpath
-
-    if (!base::is.null(dir) && !base::dir.exists(dir)) {
+    if (!base::dir.exists(folderpath)) {
       base::message(glue::glue("Directory does not exist: {folderpath}"))
       base::stop("Invalid folderpath")
     }
 
-    # Default folder
-    path_vector <- glamr::si_path("path_vector")
-
-    if (base::is.null(dir) && !base::is.null(path_vector) && base::dir.exists(path_vector)) {
-      base::message(glue::glue("Data will be extracted to: {path_vector}"))
-      dir <- path_vector
-    }
-
-    # No folder identified
-    if (is.null(dir)) {
-
-      base::message("Destination folder is not set")
-      base::message("Consider using glamr::set_paths(folderpath_vector = '../<folder>')")
-
-      stop("folderpath is not set")
-    }
-
-    filename <- base::file.path(dir,
+    # filename
+    filename <- base::file.path(folderpath,
                                 glue::glue("orghierarchy - ",
                                 "{stringr::str_to_lower(country)} - ",
                                 "{base::format(base::Sys.Date(), '%Y%m%d')}",
@@ -121,7 +126,13 @@ extract_attributes <-
 
     #get and save country attributes
     df_attrs <- base::tryCatch(
-      get_attributes(country = country),
+      grabr::datim_orgunits(
+        cntry = country,
+        username = accnt$username,
+        password = accnt$password,
+        reshape = TRUE,
+        baseurl = baseurl
+      ),
       error = function(err) {
         base::message("See error(s) below:")
         base::print(err)
@@ -135,8 +146,6 @@ extract_attributes <-
 
     #Write to csv file
     if (!base::is.null(df_attrs) && base::nrow(df_attrs) > 0) {
-      base::message(glue::glue("Found {base::nrow(df_attrs)} records for {country}"))
-      base::message(glue::glue("Writing data to: {base::basename(filename)}"))
       readr::write_csv(x = df_attrs, file = filename)
     } else {
       base::message(glue::glue("No data found for: {country}"))
@@ -146,8 +155,8 @@ extract_attributes <-
 
 #' @title Compress all shapefile components into a zipped file
 #'
-#' @param filename    Shapefile full name
-#' @param dest_folder Where to place the zipped files
+#' @param filename    Shapefile full path and name
+#' @param folderpath Where to place the zipped files
 #'
 #' @return            Boolean
 #' @export
@@ -155,24 +164,31 @@ extract_attributes <-
 
 zip_shapefiles <-
   function(filename,
-           dest_folder = NULL) {
+           folderpath = NULL) {
+
+    # Check file exist
+    if (!fs::file_exists(filename))
+      base::stop("Input file does not exist.")
+
+    if (stringr::str_detect(filename, ".shp$", negate = TRUE))
+      base::stop("Input file does not seem to be a shafile.")
 
     # File pattern
     fileparts <- base::basename(filename) %>%
       stringr::str_remove(".shp$")
 
     # Where to place the zipped file
-    if (base::is.null(dest_folder)) {
-      dest_folder <- base::dirname(filename)
+    if (base::is.null(folderpath)) {
+      folderpath <- base::dirname(filename)
     }
 
     # Files to be zipped
-    zipfiles <- base::list.files(path = dest_folder,
+    zipfiles <- base::list.files(path = folderpath,
                                  pattern = fileparts,
                                  full.names = TRUE)
 
     # Zip files
-    zip::zip(zipfile = base::file.path(dest_folder, base::paste0(fileparts, ".zip")),
+    zip::zip(zipfile = base::file.path(folderpath, base::paste0(fileparts, ".zip")),
              files = zipfiles,
              mode = "cherry-pick")
 

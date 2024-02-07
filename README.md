@@ -1,6 +1,6 @@
 # gisr <img src='man/figures/logo.png' align="right" height="120" />
 
-OHA Geospatial Analytics Utilities
+Geospatial Analytics Utilities
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/USAID-OHA-SI/gisr/workflows/R-CMD-check/badge.svg)](https://github.com/USAID-OHA-SI/gisr/actions)
@@ -16,6 +16,10 @@ OHA Geospatial Analytics Utilities
 
 ``` r
 ## SETUP
+  
+  # Pre-requisits - gisr user rnaturalearthdata and rnaturalearthhires 
+    remotes::install_github("ropensci/rnaturalearth")
+    remotes::install_github("ropensci/rnaturalearthhires")
 
   #install from rOpenSci
     install.packages('gisr', repos = c('https://usaid-oha-si.r-universe.dev', 'https://cloud.r-project.org'))
@@ -33,17 +37,6 @@ OHA Geospatial Analytics Utilities
     
 ## Get administrative boundaries 
  
-Admin boundaries from [GADM](https://gadm.org/download_country_v3.html) through Raster package
-
-```{r}
-library(gisr)
-
-tgo0 <- get_adm_boundaries("TGO", adm_level=0, geo_path="./GIS")
-tgo1 <- get_adm_boundaries("TGO", adm_level=1, geo_path="./GIS")
-
-tgo0 %>% gview()
-```
-
 Admin boundaries + neighbor countries data from [Natural Earth Data](https://www.naturalearthdata.com/)
 
 

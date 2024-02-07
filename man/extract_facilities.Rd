@@ -4,20 +4,18 @@
 \alias{extract_facilities}
 \title{Extract facility sites}
 \usage{
-extract_facilities(.data, mer_sites = NULL)
+extract_facilities(.data)
 }
 \arguments{
-\item{.data}{Datim organisation units data frame}
-
-\item{mer_sites}{Data Frame of MER Sites by IM with Results and/or Targets (cols: orgunituid, sitename)}
+\item{.data}{Datim organisation units data frame - with label and coordinates columns}
 }
 \description{
 Extract facility sites
 }
 \examples{
 \dontrun{
-extract_facilities(df_orgunits)
-df_orgunits \%>\% extract_facilities()
+  grabr::datim_pull_hierarchy(...) \%>\%
+    extract_facilities()
 }
 
 }
