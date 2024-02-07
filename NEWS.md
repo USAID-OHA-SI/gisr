@@ -1,3 +1,10 @@
+# gisr 0.3.1
+
+* Soft depreciation of extact_locations - recommend using grabr::datim_pull_hierarchy
+* Update extract_facilities - dropping mer_sites parameter
+* Update extract_boundaries - leveraging grabr::get_ouorgs + clean up
+* Update get_attributes - switched to datim_orgunits and adding new params: search, baseurl
+
 # gisr 0.3.0
 
 * Removed duplicative functions from `grabr` [2023-11-30]

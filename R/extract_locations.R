@@ -23,182 +23,56 @@ extract_locations <-
              add_geom = TRUE,
              baseurl = NULL) {
 
-    # API
-    burl = "https://final.datim.org/"
-
-    if(!base::is.null(baseurl)) baseurl <- burl
-
-    # account details
+    # Account details
     accnt <- grabr::lazy_secrets("datim", username, password)
 
-    # Get country uid
-    ouuid <- grabr::get_ouuid(country, accnt$username, accnt$password, baseurl)
+    # Depreciation
+    .Deprecated(
+      new = "datim_pull_hierarchy",
+      package = "gisr",
+      msg = "All DATIM API related functions have been moved to `grabr` package"
+    )
 
-    # Get country org levels
-    ou_levels <- grabr::get_levels(
-        username = accnt$username,
-        password = accnt$password,
-        expand = TRUE,
-        reshape = TRUE
-      ) %>%
-      dplyr::filter(
-        stringr::str_to_lower(countryname) == stringr::str_to_lower(country) |
-          stringr::str_to_lower(operatingunit) == stringr::str_to_lower(country)
-        )
+  # Ignore level param
+  if (!is.null(level)) usethis::ui_warn("`level` filter is being disregarded at the moment. Consider filtering the output.")
 
-    # UID and Check levels
-    if (is.null(ouuid) | base::nrow(ou_levels) == 0) {
-        base::cat(crayon::red(glue::glue("\nUnable to retrieve org levels for [{country}]!\n")))
-        return(NULL)
-    }
+  # get country uid
+  uid <- grabr::get_ouuid(country)
 
-    # Query OU Location data
-    url <- baseurl %>%
-        base::paste0("api/organisationUnits?fields=id,name,path,level")
-
-    # Include geometry columns if needed
-    geom_cols <- NULL
-
-    if (add_geom == TRUE) {
-       url <- url %>% base::paste0(",geometry")
-       geom_cols <- c("geometry.type", "geometry.coordinates")
-    }
-
-    # filter by ou/country uid, note: regional countries will also extract region info
-    url <- url %>% base::paste0("&filter=path:like:", ouuid)
-
-    # Filter specific level
-    if (!is.null(lvl)) {
-
-      if (lvl %in% ou_levels$level) {
-        url <- url %>% base::paste0("&filter=level:eq:", level)
-        ou_levels <- ou_levels %>% dplyr::filter(level == level)
-      }
-    }
-
-    # Remove pages and format as json
-    url <- url %>% base::paste0("&paging=false&format=json")
-
-    # Query OU Location data
-    .df <- url %>%
-        httr::GET(httr::authenticate(user = accnt$username, password = accnt$password)) %>%
-        httr::content("text") %>%
-        jsonlite::fromJSON(flatten = T) %>%
-        purrr::pluck("organisationUnits") %>%
-        tibble::as_tibble()
-
-    # Check presence of geom columns - some countries do not have geometry
-    if (add_geom == TRUE & !any(stringr::str_detect(names(.df), "geometry"))) {
-        add_geom = FALSE
-    }
-
-    # Unpack geometry
-    if (add_geom == TRUE) {
-        .df <- .df %>%
-            dplyr::rename(
-                geom_type = geometry.type,          # NA or Geometry Type Value
-                coordinates = geometry.coordinates  # NA, vector or list of 2 or more vectors
-            ) %>%
-            dplyr::mutate(
-                gid = dplyr::row_number(),  # Geom ID (unique accross gid1 & gid2)
-                # gid1 = row_number(), # Geom ID
-                # gid2 = 1,            # Sub Geom ID (for MultiPolygon or MultiPoint)
-                nodes = base::as.integer(base::lengths(coordinates) / 2), # Geom is a pair of lon / lat
-                nested = base::lapply(coordinates, function(x) return(is.list(x))),
-                geom_type = base::ifelse(
-                  nested == TRUE & geom_type != "MultiPolygon",
-                  'MultiPolygon',
-                  geom_type
-                )
-            ) %>%
-            dplyr::relocate(coordinates, .after = last_col())
-    }
-
-    # Flag org levels
-    .df <- .df %>%
-      dplyr::left_join(ou_levels,
-                       by = "level",
-                       relationship = "many-to-many") %>%
-      dplyr::rename(orgunit = name, orgunituid = id)
-
-    # Parse geom
-    if (add_geom == TRUE) {
-        df <- df %>%
-            dplyr::select(operatingunit_iso,
-                          operatingunit,
-                          country_iso,
-                          countryname,
-                          orgunit,
-                          orgunituid,
-                          label,
-                          level:coordinates) %>%
-            dplyr::mutate(
-                geom_type = dplyr::case_when(
-                    base::is.na(geom_type) & label == "facility" ~ "Point",
-                    base::is.na(geom_type) & label != "facility" ~ "Polygon",
-                    TRUE ~ geom_type
-                ),
-                geom_type = dplyr::case_when(
-                  label != "facility" & nested == TRUE ~ "MultiPolygon",
-                  TRUE ~ geom_type
-                )
-            )
-    }
-
-    # iso code
-    iso <- df %>%
-        dplyr::distinct(operatingunit_iso) %>%
-        dplyr::pull() %>%
-        dplyr::first()
-
-    ou <- df %>%
-        dplyr::filter(!is.na(operatingunit)) %>%
-        dplyr::distinct(operatingunit) %>%
-        dplyr::pull() %>%
-        dplyr::first()
-
-    # Cleanup data
-    df <- df %>%
-        dplyr::mutate(
-            operatingunit = dplyr::if_else(base::is.na(operatingunit), ou, operatingunit),
-            countryname = dplyr::if_else(base::is.na(countryname), cntry, countryname),
-            operatingunit_iso = dplyr::if_else(base::is.na(operatingunit_iso), iso, operatingunit_iso),
-            country_iso = dplyr::if_else(base::is.na(country_iso), iso, country_iso))
-
-    return(df)
+  # pass request to grabr
+  grabr::datim_pull_hierarchy(ou_uid = uid,
+                              username = username,
+                              password = password,
+                              add_geom = add_geom)
 }
 
 
 #' Extract facility sites
 #'
-#' @param .data Datim organisation units data frame
-#' @param mer_sites Data Frame of MER Sites by IM with Results and/or Targets (cols: orgunituid, sitename)
+#' @param .data Datim organisation units data frame - with label and coordinates columns
 #'
 #' @examples
 #' \dontrun{
-#' extract_facilities(df_orgunits)
-#' df_orgunits %>% extract_facilities()
+#'   grabr::datim_pull_hierarchy(...) %>%
+#'     extract_facilities()
 #' }
 #'
-extract_facilities <- function(.data, mer_sites = NULL) {
+extract_facilities <- function(.data) {
 
-    .data <- .data %>%
-        dplyr::filter(label == "facility") %>%
-        tidyr::unnest_wider(coordinates, names_sep = "_") %>%
-        janitor::clean_names() %>%
-        dplyr::rename(longitude = "coordinates_1", latitude = "coordinates_2")
+  ## Check input df structure
+  req_cols <- c("label", "coordinates")
 
-    if ( !is.null(mer_sites) & all(c("orgunituid", "orgunit") %in% names(mer_sites)) ) {
+  if (!all(req_cols %in% req_cols))
+    usethis::ui_warn("Input dataset is missing key variable(s): label, coordinates")
 
-        .data <- .data %>%
-            dplyr::left_join(mer_sites, by = "orgunituid") %>%
-            dplyr::filter(!is.na(orgunit))
-    }
-    else {
-        cat(crayon::red("\nMER Sites are missing or invalid. Make sure to include orgunituid and sitename columns."))
-    }
+  return(.data)
 
-    return(.data)
+  # Filter dataset and unpack coordinates
+  .data %>%
+    dplyr::filter(label == "facility") %>%
+    tidyr::unnest_wider(coordinates, names_sep = "_") %>%
+    janitor::clean_names() %>%
+    dplyr::rename(longitude = "coordinates_1", latitude = "coordinates_2")
 }
 
 

@@ -20,11 +20,11 @@
 get_attributes <- function(country,
                            username,
                            password,
-                           folderpath = NULL) {
+                           folderpath = NULL,
+                           search = "orghierarchy",
+                           baseurl = NULL) {
 
-  file_pattern <- base::paste0("^orghierarchy - ",
-                         stringr::str_to_lower(country),
-                         " - \\d{8}.csv$")
+  file_pattern <- glue::glue("{search}.*{stringr::str_to_lower(country)}.*.csv$|{stringr::str_to_lower(country)}.*{search}.*.csv$")
 
   file_attrs <- NULL
 
@@ -45,41 +45,25 @@ get_attributes <- function(country,
     base::message(glue::glue("Reading from: {basename(file_attrs)}"))
 
     df_attrs <- file_attrs %>%
-      readr::read_csv(file = ., col_types = c(.default = "c"))
+      purrr::map(~readr::read_csv(file = .x, col_types = c(.default = "c"))) %>%
+      dplyr::bind_rows()
 
     return(df_attrs)
   }
 
-  base::message(country)
-
   # Account details
   accnt <- grabr::lazy_secrets("datim", username , password)
 
+  if (is.null(baseurl)) baseurl <- "https://final.datim.org/"
+
   # Get attrs from datim
-  df_attrs <- extract_locations(country = country,
-                                username = accnt$username,
-                                password = accnt$password,
-                                add_geom = FALSE)
-
-  if (is.null(df_attrs)) return(NULL)
-
-  # Use psnu as snu1
-  if (!"snu1" %in% df_attrs$label) {
-    df_attrs <- df_attrs %>%
-      dplyr::filter(label == "prioritization") %>%
-      dplyr::mutate(label = "snu1") %>%
-      dplyr::bind_rows(df_attrs, .)
-  }
-
-  # Filter out facilities and communities
-  df_attrs <- df_attrs %>%
-    dplyr::select(-path) %>%
-    dplyr::filter(label != "facility") %>%
-    dplyr::select(id, level, label, name,
-                  operatingunit_iso, operatingunit,
-                  country_iso, countryname)
-
-  return(df_attrs)
+  grabr::datim_orgunits(
+    cntry = country,
+    username = accnt$username,
+    password = accnt$password,
+    reshape = TRUE,
+    baseurl = baseurl
+  )
 }
 
 
