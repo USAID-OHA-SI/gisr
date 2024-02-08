@@ -312,6 +312,7 @@ geo_fence <- function(aoi,
   # Create buffer
   aoi_area <- aoi %>%
     sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
     sf::st_transform(crs = to_crs) %>%
     sf::st_buffer(dist = radius) %>%
     sf::st_transform(crs = from_crs)
