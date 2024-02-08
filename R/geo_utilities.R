@@ -166,7 +166,7 @@ geo_neighbors <- function(src, countries,
 
   # Get the world boundaries
   src_spdf <- src %>%
-    sf::st_as_s2() %>%
+    sf::st_make_valid() %>%
     sf::st_transform(., crs = sf::st_crs(3857))
 
   # Get focus country(ies)
@@ -220,16 +220,21 @@ geo_neighbors <- function(src, countries,
 #'   get_admin0(countries = list("Zambia"))
 #' }
 #'
-get_admin0 <- function(countries, scale = "medium", crs = 4326) {
+get_admin0 <- function(countries,
+                       scale = c('medium', 'large', 'small'),
+                       crs = 4326) {
 
-  admin0 <- rnaturalearth::ne_countries(
+  # validate options
+  ne_scale <- base::match.arg(scale)
+
+  # Get country boundaries
+  rnaturalearth::ne_countries(
       country = {{countries}},
-      scale = {{scale}},
+      scale = ne_scale,
       returnclass = "sf"
     ) %>%
+    sf::st_make_valid() %>%
     sf::st_transform(., crs = sf::st_crs({{crs}}))
-
-  return(admin0)
 }
 
 
@@ -251,13 +256,12 @@ get_admin0 <- function(countries, scale = "medium", crs = 4326) {
 #'
 get_admin1 <- function(countries, crs = 4326) {
 
-  admin1 <- rnaturalearth::ne_states(
+  rnaturalearth::ne_states(
       country = {{countries}},
       returnclass = "sf"
     ) %>%
+    sf::st_make_valid() %>%
     sf::st_transform(., crs = sf::st_crs({{crs}}))
-
-  return(admin1)
 }
 
 
@@ -285,8 +289,11 @@ geo_fence <- function(aoi,
                       radius = 1000,
                       append = TRUE) {
 
+  # Correct any errors
+  aoi <- sf::st_make_valid(aoi)
+
   # CRS
-  from_crs <- aoi %>% sf::st_crs()
+  from_crs <- sf::st_crs(aoi)
   to_crs <- sf::st_crs(3857)
 
   if (base::is.null(from_crs)) {
@@ -296,16 +303,17 @@ geo_fence <- function(aoi,
 
   # Create buffer
   aoi_area <- aoi %>%
-      sf::st_transform(crs = to_crs) %>%
-      sf::st_buffer(dist = radius) %>%
-      sf::st_transform(crs = from_crs)
+    sf::st_make_valid() %>%
+    sf::st_transform(crs = to_crs) %>%
+    sf::st_buffer(dist = radius) %>%
+    sf::st_transform(crs = from_crs)
 
   # clip off input
   if (!append) {
-      aoi_area <- sf::st_difference(aoi_area, aoi)
+    aoi_area <- sf::st_difference(aoi_area, aoi)
   }
 
-  return(aoi)
+  return(aoi_area)
 }
 
 
@@ -334,10 +342,11 @@ get_nepolygons <- function(scale = c('large', 'small', 'medium'),
 
   # Get the world boundaries
   rnaturalearth::ne_countries(
-      scale = {{scale}},
-      type = {{type}},
+      scale = ne_scale,
+      type = ne_type,
       returnclass = "sf"
     ) %>%
+    sf::st_make_valid() %>%
     dplyr::select(adm0_a3, sovereignt, admin, name, level, geounit)
 }
 
