@@ -32,6 +32,8 @@
   # Global polygons
   shp_ne <- get_nepolygons()
 
+  shp_pepfar <- get_vcpolygons(folderpath = si_path("path_vector"))
+
   # Country boundaries
   adm0 <- gisr::get_admin0(cntry)
   adm1 <- gisr::get_admin1(cntry)
@@ -59,8 +61,7 @@
     geom_sf_text(data = nghbrs2,
                  aes(label = sovereignt),
                  color = glitr::grey80k,
-                 size = 4) +
-    stat_sf_coordinates()
+                 size = 4)
 
   # Get country specific terrain data
   ras_aoi <- get_terrain(countries = cntry, terr = si_path("path_raster"))
@@ -75,19 +76,29 @@
               mask = TRUE,
               terr = si_path("path_raster"))
 
-  # Mask terrain and provide your own rasterlayer
+  # Mask terrain and provide your own RastLayer
   terrain_map(countries = cntry,
               mask = TRUE,
               terr = ras)
 
-  # Provide your own polygons and rasterlayer
+  # Provide your own polygons and RastLayer
   terrain_map(countries = cntry,
               adm0 = adm0,
-              #adm1 = adm1,
+              mask = TRUE,
+              terr = ras)
+
+  terrain_map(countries = cntry,
+              adm0 = adm0,
+              adm1 = adm1,
               mask = TRUE,
               terr = ras)
 
   # Add neighbor countries
+  terrain_map(countries = cntry,
+              add_neighbors = TRUE,
+              mask = TRUE,
+              terr = si_path("path_raster"))
+
   terrain_map(countries = cntry,
               add_neighbors = TRUE,
               mask = TRUE,

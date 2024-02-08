@@ -52,17 +52,18 @@ terrain_map <-
       return(NULL)
     }
 
-    # Get neighbors
-    if ( TRUE == {{add_neighbors}} & !is.null(cntries) ) {
-      # Get neighbors
-      nghbrs <- geo_neighbors(countries = cntries, crop = TRUE)
-      cntries <- nghbrs
-    }
-
     # Get terrain raster
     spdf <- get_terrain(countries = cntries,
                         terr = {{terr}},
                         mask = {{mask}})
+
+    # Get neighbors
+    if ( TRUE == {{add_neighbors}} & !is.null(cntries) ) {
+      # Get neighbors
+      adms <- get_nepolygons()
+      nghbrs <- geo_neighbors(src = adms, countries = cntries, crop = TRUE)
+      cntries <- nghbrs
+    }
 
     # check
     if (base::is.null(spdf)) {
@@ -351,21 +352,17 @@ get_terrain <-
     }
 
     # Raster Data
-    # DEM File location
-    dem_url <- "https://drive.google.com/drive/u/0/folders/1M02ToX9AnkozOHtooxU7s4tCnOZBTvm_"
-
     terr_ras <- NULL
 
     # Locate and retrieve terrain file
     if (!base::is.null(terr) && "character" %in% base::class(terr) && dir.exists(terr)) {
       terr_ras <- get_raster(folderpath = terr, rename = TRUE)
-    } else if (!base::is.null(terr) && "RasterLayer" %in% base::class(terr)) {
+    } else if (!base::is.null(terr) && "SpatRaster" %in% base::class(terr)) {
       terr_ras <- terr
     }
 
     # Validate RasterLayer
     if ( base::is.null(terr_ras)) {
-      base::print(glue("Terrain data: {dem_url}"))
       base::stop("Invalid terrain data / path. Download terrain file into si_path('path_raster')")
     }
 
