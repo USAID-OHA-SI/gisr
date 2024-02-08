@@ -11,6 +11,8 @@
 * Replaced `raster` with `terra` per maintenance recommendation
 * Removed `sp` in favor of `sf` per maintenance recommendation
 * Removed `get_adm_boundaries` given depreciation of `raster`
+* Updated `geo_neighbors` to require source as an external dataset
+* Adding `get_nepolygons` as a common way of extracting naturalearth database
 
 # gisr 0.3.0
 

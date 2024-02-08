@@ -126,8 +126,9 @@ gview <- function(geodata, ...) {
 
 #' @title Get neighbors of a given contry
 #'
-#' @param countries  Country or list of countries names
-#' @param scale      Spatial resolution of the geodata
+#' @param src        Source spatial data frame
+#' @param countries  countries of interest
+#' @param var        Variable name
 #' @param crs        Coordinates reference system, default is WGS84 (EPGS:4326)
 #' @param crop       Crop sfc to focus countries extent?
 #'
@@ -140,53 +141,65 @@ gview <- function(geodata, ...) {
 #'
 #'  cntry <- "Zambia"
 #'
+#'  shp_ne <- get_necountries()
+#'
 #'  # Country + neighbors boundaries
-#'  cntries <- geo_neighbors(countries = cntry)
+#'  cntries <- geo_neighbors(src = shp_ne, countries = cntry)
 #'
 #'  # Country + neighbors boundaries: crop to country extent
-#'  cntries <- geo_neighbors(countries = cntry, crop = TRUE)
+#'  cntries <- geo_neighbors(src = shp_ne, countries = cntry, crop = TRUE)
 #'
-#'  cntries %>%
-#'    dplyr::select(name) %>%
-#'    attributes()
+#'  cntries %>% gview()
 #' }
 #'
-geo_neighbors <- function(countries,
-                          scale = "large",
+geo_neighbors <- function(src, countries,
+                          var = "sovereignt",
                           crs = 4326,
                           crop = FALSE) {
 
-    # Get the world boundaries
-    world <- rnaturalearth::ne_countries(scale = {{scale}}, returnclass = "sf") %>%
-        sf::st_transform(., crs = sf::st_crs({{crs}}))
+  # validate input
+  if (!var %in% names(src))
+    usethis::ui_stop(glue::glue("{var} is not part of the source dataset"))
 
-    # Get focus country(ies)
-    focus_country <- world %>%
-        dplyr::filter(sovereignt %in% {{countries}})
+  if (!all(countries %in% unique(src[[var]])))
+    usethis::ui_stop("Some, if not all of your countries are not in the source dataset")
 
-    # Filter based on neighbors touched by polygons of interest
-    neighbors <- world %>%
-        dplyr::filter(base::lengths(sf::st_touches(., focus_country)) > 0)
+  # Get the world boundaries
+  src_spdf <- src %>%
+    sf::st_as_s2() %>%
+    sf::st_transform(., crs = sf::st_crs(3857))
 
+  # Get focus country(ies)
+  focus_countries <- src_spdf %>%
+      dplyr::filter(!!var %in% {{countries}})
 
-    # Crop specific extend of focus countries
-    if (crop == TRUE) {
-        # Focus country extent
-        box <- sf::st_bbox(focus_country) %>%
-            sf::st_as_sfc() %>%
-            sf::st_buffer(
-                dist = 1,
-                endCapStyle = "SQUARE",
-                joinStyle = "MITRE",
-                mitreLimit = 2) %>%
-            sf::st_as_sf()
+  # Filter based on neighbors touched by polygons of interest
+  neighbors <- src_spdf %>%
+      dplyr::filter(base::lengths(sf::st_touches(., focus_countries)) > 0)
 
-        # Crop neighbors to extent
-        neighbors <- neighbors %>%
-            sf::st_crop(box)
-    }
+  # Crop specific extend of focus countries
+  if (crop == TRUE) {
 
-    return(neighbors)
+    # Check neighbors
+    if (nrow(neighbors) == 0)
+      usethis::ui_stop("Was not able to identify neighors for your country(ies)")
+
+    # Focus country extent
+    box <- sf::st_bbox(focus_countries) %>%
+        sf::st_as_sfc() %>%
+        sf::st_buffer(
+            dist = 1,
+            endCapStyle = "SQUARE",
+            joinStyle = "MITRE",
+            mitreLimit = 2) %>%
+        sf::st_as_sf()
+
+    # Crop neighbors to extent
+    neighbors <- sf::st_crop(neighbors, box)
+  }
+
+  # Re-project spatial data set
+  sf::st_transform(neighbors, crs = sf::st_crs({{crs}}))
 }
 
 
@@ -296,6 +309,37 @@ geo_fence <- function(aoi,
 }
 
 
+#' @title Get Natural Earth Polygons
+#'
+#' @param scale  Scale of the map - options are 'large', 'small', 'medium'
+#' @param type   country type - options are 'countries', 'map_units', 'sovereignty', 'tiny_countries'
+#'
+#' @return world countries as sf object
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#'  library(gisr)
+#'
+#'  shp_ne <- get_nepolygons()
+#'  shp_ne <- get_nepolygons(scale = "large", type = "countries")
+#' }
+#'
+get_nepolygons <- function(scale = c('large', 'small', 'medium'),
+                           type = c('countries', 'map_units', 'sovereignty', 'tiny_countries')) {
+
+  # validate options
+  ne_scale <- base::match.arg(scale)
+  ne_type <- base::match.arg(type)
+
+  # Get the world boundaries
+  rnaturalearth::ne_countries(
+      scale = {{scale}},
+      type = {{type}},
+      returnclass = "sf"
+    ) %>%
+    dplyr::select(adm0_a3, sovereignt, admin, name, level, geounit)
+}
 
 
 #' @title Get PEPFAR Visual Crossing Polygons
