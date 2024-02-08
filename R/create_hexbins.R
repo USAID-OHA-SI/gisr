@@ -1,59 +1,52 @@
 #' Get an hexbins polygon feature class for country ABC
 #'
-#' @param country_code iso3 code
-#' @param adm_level country administrative unit level
-#' @param geo_path path to geodata
-#' @param size size of each hex bin in meters
+#' @param spdf input spatial data frame
+#' @param size size of each hex bin in meters, default set to 15K meters (15KM)
 #' @return country hex polygon as feature class
 #' @export
 #' @examples
 #' \dontrun{
 #'  library(gisr)
 #'
-#'  get_hexbins('LSO', 1)
-#'  get_hexbins('UGA', 2)
+#'  shp <- get_admin0(countries = "Nigeria")
+#'
+#'  get_hexbins(shp, 10000)
 #' }
 #'
-get_hexbins <- function(country_code,
-                        adm_level=0,
-                        geo_path=NULL,
-                        size=NULL) {
+get_hexbins <- function(spdf, size = 15000) {
 
-    # Set up path for geodata
-    path <- ""
+  # CRS
 
-    if (!is.null(geo_path)) {
-        path <- geo_path
-    }
+  from_crs <- sf::st_crs(spdf) # Source CRS
+  to_crs <- sf::st_crs(3857)   # Projected CRS
 
-    # Get admin boundaries
-    cntry_adm <- get_adm_boundaries(country_code, adm_level=adm_level, geo_path = path) %>%
-        sf::st_transform(crs = sf::st_crs(3857))
+  # Dissolve if boundaries
 
-    cntry_adm0 <- cntry_adm
+  if ( nrow(spdf) > 0 ) {
+    spdf <- spdf %>%
+      dplyr::mutate(
+        id = dplyr::row_number(),
+        area = sf::st_area(.)
+      ) %>%
+      dplyr::group_by(id) %>%
+      dplyr::summarise(area = sum(area))
+  }
 
-    # Dissolve if boundaries
-    if ( adm_level != 0 ) {
-        cntry_adm0 <- cntry_adm %>%
-            dplyr::mutate(
-                id = dplyr::row_number(),
-                area = sf::st_area(.)
-            ) %>%
-            dplyr::group_by(id) %>%
-            dplyr::summarise(area = sum(area))
-    }
+  # Make any corrections
 
-    # Generate hexbins
-    if (!is.null(size) & is.numeric(size)) {
-        cntry_hex <- cntry_adm0 %>%
-            sf::st_make_grid(what = "polygones", square = FALSE, cellsize = size) %>%
-            sf::st_intersection(cntry_adm0)
+  spdf <- spdf %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf()
 
-    } else {
-        cntry_hex <- cntry_adm0 %>%
-            sf::st_make_grid(what = "polygones", square = FALSE) %>%
-            sf::st_intersection(cntry_adm0)
-    }
+  # Create hexbins
 
-    return(cntry_hex)
+  spdf_hex <- spdf %>%
+    sf::st_transform(crs = to_crs) %>%
+    sf::st_make_grid(what = "polygones", square = FALSE, cellsize = size) %>%
+    sf::st_intersection(spdf) %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
+    sf::st_transform(crs = from_crs)
+
+  return(spdf_hex)
 }
