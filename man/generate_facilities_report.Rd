@@ -6,7 +6,6 @@
 \usage{
 generate_facilities_report(
   cntry,
-  mer_sites,
   user,
   pass,
   terr_path = NULL,
@@ -15,8 +14,6 @@ generate_facilities_report(
 }
 \arguments{
 \item{cntry}{Country name}
-
-\item{mer_sites}{Latest MER Sites Results / Targets (cols: orgunituid, sitename)}
 
 \item{user}{Datim account username}
 
