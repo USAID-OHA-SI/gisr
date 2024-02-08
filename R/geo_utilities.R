@@ -110,7 +110,7 @@ gview <- function(geodata, ...) {
     }
 
     # collection
-    if (base::toupper(geom_type) == "GEOMETRYCOLLECTION") {
+    if (base::toupper(geom_type) %in% c("GEOMETRY", "GEOMETRYCOLLECTION")) {
         viz <- viz + ggplot2::geom_sf(...)
     }
 
@@ -167,39 +167,47 @@ geo_neighbors <- function(src, countries,
   # Get the world boundaries
   src_spdf <- src %>%
     sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
     sf::st_transform(., crs = sf::st_crs(3857))
 
   # Get focus country(ies)
   focus_countries <- src_spdf %>%
-      dplyr::filter(!!var %in% {{countries}})
+    dplyr::filter(
+      dplyr::if_any(.cols = dplyr::all_of(var),
+                    .fns = ~ . %in% {{countries}}))
+
+  if (nrow(focus_countries) == 0)
+    usethis::ui_stop("Not able to identify the targeted country(ies)")
 
   # Filter based on neighbors touched by polygons of interest
   neighbors <- src_spdf %>%
-      dplyr::filter(base::lengths(sf::st_touches(., focus_countries)) > 0)
+    dplyr::filter(base::lengths(sf::st_touches(., focus_countries)) > 0)
+
+  if (nrow(neighbors) == 0)
+    usethis::ui_stop("Not able to extract neighboring countries)")
 
   # Crop specific extend of focus countries
   if (crop == TRUE) {
 
-    # Check neighbors
-    if (nrow(neighbors) == 0)
-      usethis::ui_stop("Was not able to identify neighors for your country(ies)")
-
     # Focus country extent
     box <- sf::st_bbox(focus_countries) %>%
-        sf::st_as_sfc() %>%
-        sf::st_buffer(
-            dist = 1,
-            endCapStyle = "SQUARE",
-            joinStyle = "MITRE",
-            mitreLimit = 2) %>%
-        sf::st_as_sf()
+      sf::st_as_sfc() %>%
+      sf::st_buffer(
+        dist = 1,
+        endCapStyle = "SQUARE",
+        joinStyle = "MITRE",
+        mitreLimit = 2) %>%
+      sf::st_as_sf()
 
     # Crop neighbors to extent
     neighbors <- sf::st_crop(neighbors, box)
   }
 
   # Re-project spatial data set
-  sf::st_transform(neighbors, crs = sf::st_crs({{crs}}))
+  neighbors %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
+    sf::st_transform(, crs = sf::st_crs({{crs}}))
 }
 
 
@@ -342,8 +350,8 @@ get_nepolygons <- function(scale = c('large', 'small', 'medium'),
 
   # Get the world boundaries
   rnaturalearth::ne_countries(
-      scale = ne_scale,
-      type = ne_type,
+      scale = {{ne_scale}},
+      type = {{ne_type}},
       returnclass = "sf"
     ) %>%
     sf::st_make_valid() %>%

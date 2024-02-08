@@ -4,7 +4,7 @@
 \alias{get_admin0}
 \title{Get admin level 0 boundary}
 \usage{
-get_admin0(countries, scale = "medium", crs = 4326)
+get_admin0(countries, scale = c("medium", "large", "small"), crs = 4326)
 }
 \arguments{
 \item{countries}{list of country names}
