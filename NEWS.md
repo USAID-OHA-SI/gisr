@@ -13,7 +13,8 @@
 * Removed `get_adm_boundaries` given depreciation of `raster`
 * Updated `geo_neighbors` to require source as an external dataset
 * Adding `get_nepolygons` as a common way of extracting naturalearth database
-* Updated `get_hexbins` to require spdf as input + redius
+* Updated `get_hexbins` to require spdf as input + radius
+* Remove `generate_hexbins` - use `get_hexbins` instead.
 
 # gisr 0.3.0
 
