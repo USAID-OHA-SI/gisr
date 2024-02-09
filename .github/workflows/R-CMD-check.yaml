@@ -16,15 +16,6 @@ jobs:
   R-CMD-check:
     runs-on: macOS-latest
 
-    #name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-
-    #strategy:
-    #  fail-fast: false
-    #  matrix:
-    #    config:
-    #      - {os: windows-latest, r: 'release'}
-    #      - {os: macOS-latest, r: 'release'}
-
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
