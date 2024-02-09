@@ -27,29 +27,40 @@ get_hexbins <- function(spdf, size = 15000, clip = TRUE) {
   # Merge all features into one
   spdf <- spdf %>%
     dplyr::mutate(
-      id = dplyr::row_number(),
+      pid = dplyr::row_number(),
       area = sf::st_area(.)
     ) %>%
-    dplyr::group_by(id) %>%
-    dplyr::summarise(area = sum(area))
+    dplyr::group_by(pid) %>%
+    dplyr::summarise(area = sum(area)) %>%
+    dplyr::ungroup()
 
   # Make any corrections
   spdf <- spdf %>%
+    sf::st_transform(crs = to_crs) %>%
     sf::st_make_valid() %>%
     sf::st_as_sf()
 
   # Create hexbins
   spdf_hex <- spdf %>%
-    sf::st_transform(crs = to_crs) %>%
-    sf::st_make_grid(what = "polygons", square = FALSE, cellsize = size)
+    sf::st_make_grid(what = "polygons", square = FALSE, cellsize = size) %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
+    dplyr::mutate(id = dplyr::row_number())%>%
+    sf::st_join(spdf,
+                by = sf::st_contains,
+                left = TRUE,
+                largest = TRUE)
 
   # Clip the edges
-  if (clip)
-    spdf_hex <- sf::st_intersection(spdf_hex, sf::st_transform(spdf, to_crs))
+  if (clip) {
+    spdf_hex <- sf::st_intersection(spdf_hex, spdf)
+  }
 
+  # Update and filter
   spdf_hex <- spdf_hex %>%
     sf::st_make_valid() %>%
     sf::st_as_sf() %>%
+    dplyr::filter(!is.na(area)) %>%
     sf::st_transform(crs = from_crs)
 
   return(spdf_hex)
@@ -89,25 +100,36 @@ get_grids <- function(spdf, size = 15000, clip = TRUE) {
       area = sf::st_area(.)
     ) %>%
     dplyr::group_by(id) %>%
-    dplyr::summarise(area = sum(area))
+    dplyr::summarise(area = sum(area)) %>%
+    dplyr::ungroup()
 
   # Make any corrections
   spdf <- spdf %>%
+    sf::st_transform(crs = to_crs) %>%
     sf::st_make_valid() %>%
     sf::st_as_sf()
 
   # Create hexbins
   spdf_hex <- spdf %>%
-    sf::st_transform(crs = to_crs) %>%
-    sf::st_make_grid(what = "polygons", square = TRUE, cellsize = c(size, size))
+    sf::st_make_grid(what = "polygons", square = TRUE, cellsize = c(size, size)) %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
+    dplyr::mutate(id = dplyr::row_number())%>%
+    sf::st_join(spdf,
+                by = sf::st_contains,
+                left = TRUE,
+                largest = TRUE)
 
   # Clip the edges
-  if (clip)
-    spdf_hex <- sf::st_intersection(spdf_hex, sf::st_transform(spdf, to_crs))
+  if (clip) {
+    spdf_hex <- sf::st_intersection(spdf_hex, spdf)
+  }
 
+  # Update and filter
   spdf_hex <- spdf_hex %>%
     sf::st_make_valid() %>%
     sf::st_as_sf() %>%
+    dplyr::filter(!is.na(area)) %>%
     sf::st_transform(crs = from_crs)
 
   return(spdf_hex)
