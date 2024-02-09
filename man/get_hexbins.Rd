@@ -2,31 +2,28 @@
 % Please edit documentation in R/create_hexbins.R
 \name{get_hexbins}
 \alias{get_hexbins}
-\title{Get an hexbins polygon feature class for country ABC}
+\title{Create hexagonal grids}
 \usage{
-get_hexbins(country_code, adm_level = 0, geo_path = NULL, size = NULL)
+get_hexbins(spdf, size = 15000)
 }
 \arguments{
-\item{country_code}{iso3 code}
+\item{spdf}{input spatial data frame}
 
-\item{adm_level}{country administrative unit level}
-
-\item{geo_path}{path to geodata}
-
-\item{size}{size of each hex bin in meters}
+\item{size}{size of each hex bin in meters, default set to 15K meters (15KM)}
 }
 \value{
 country hex polygon as feature class
 }
 \description{
-Get an hexbins polygon feature class for country ABC
+Create hexagonal grids
 }
 \examples{
 \dontrun{
  library(gisr)
 
- get_hexbins('LSO', 1)
- get_hexbins('UGA', 2)
+ shp <- get_admin0(countries = "Nigeria")
+
+ get_hexbins(shp, 10000)
 }
 
 }

@@ -1,18 +1,19 @@
 # gisr 0.4.0
 
 * Soft depreciation of extact_locations - recommend using grabr::datim_pull_hierarchy
-* Update extract_facilities - dropping mer_sites parameter
-* Update extract_boundaries - leveraging grabr::get_ouorgs + clean up
-* Update get_attributes - switched to datim_orgunits and adding new params: search, baseurl
-* Update extract_attributes - switching to datim_orgunits with the use of prefix
-* Update zip_shapefiles - switch to folderpath instead of dest_folder
+* Updated extract_facilities - dropping mer_sites parameter
+* Updated extract_boundaries - leveraging grabr::get_ouorgs + clean up
+* Updated get_attributes - switched to datim_orgunits and adding new params: search, baseurl
+* Updated extract_attributes - switching to datim_orgunits with the use of prefix
+* Updated zip_shapefiles - switch to folderpath instead of dest_folder
 * Adding `check_columns()` for shapefile column names restrictions
-* Update get_terrain, extract_raster, get_raster to use folderpath and be required
+* Updated get_terrain, extract_raster, get_raster to use folderpath and be required
 * Replaced `raster` with `terra` per maintenance recommendation
 * Removed `sp` in favor of `sf` per maintenance recommendation
 * Removed `get_adm_boundaries` given depreciation of `raster`
 * Updated `geo_neighbors` to require source as an external dataset
 * Adding `get_nepolygons` as a common way of extracting naturalearth database
+* Adding `get_grids` for square grids, similar to get_hexbins
 * Updated `get_hexbins` to require spdf as input + radius
 * Remove `generate_hexbins` - use `get_hexbins` instead
 
