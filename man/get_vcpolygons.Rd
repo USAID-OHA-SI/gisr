@@ -4,10 +4,10 @@
 \alias{get_vcpolygons}
 \title{Get PEPFAR Visual Crossing Polygons}
 \usage{
-get_vcpolygons(path = NULL, name = NULL)
+get_vcpolygons(folderpath, name = NULL)
 }
 \arguments{
-\item{path}{Path to PEPFAR Global Shapefile}
+\item{folderpath}{Path to PEPFAR Global Shapefile}
 
 \item{name}{Name or pattern of shapefile}
 }
@@ -22,8 +22,8 @@ Get PEPFAR Visual Crossing Polygons
  library(gisr)
 
  shp_pepfar <- get_vcpolygons()
- shp_pepfar <- get_vcpolygons(path = "./GIS")
- shp_pepfar <- get_vcpolygons(path = "./GIS", name = "VcPepfarPolygons.shp")
+ shp_pepfar <- get_vcpolygons(folderpath = glamr::si_path("path_vector"))
+ shp_pepfar <- get_vcpolygons(folderpath = "./GIS", name = "VcPepfarPolygons.shp")
 }
 
 }

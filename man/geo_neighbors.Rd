@@ -4,12 +4,14 @@
 \alias{geo_neighbors}
 \title{Get neighbors of a given contry}
 \usage{
-geo_neighbors(countries, scale = "large", crs = 4326, crop = FALSE)
+geo_neighbors(src, countries, var = "sovereignt", crs = 4326, crop = FALSE)
 }
 \arguments{
-\item{countries}{Country or list of countries names}
+\item{src}{Source spatial data frame}
 
-\item{scale}{Spatial resolution of the geodata}
+\item{countries}{countries of interest}
+
+\item{var}{Variable name}
 
 \item{crs}{Coordinates reference system, default is WGS84 (EPGS:4326)}
 
@@ -23,20 +25,20 @@ geo_neighbors(countries, scale = "large", crs = 4326, crop = FALSE)
 Get neighbors of a given contry
 }
 \examples{
-\donttest{
+\dontrun{
  library(gisr)
 
  cntry <- "Zambia"
 
+ shp_ne <- get_necountries()
+
  # Country + neighbors boundaries
- cntries <- geo_neighbors(countries = cntry)
+ cntries <- geo_neighbors(src = shp_ne, countries = cntry)
 
  # Country + neighbors boundaries: crop to country extent
- cntries <- geo_neighbors(countries = cntry, crop = TRUE)
+ cntries <- geo_neighbors(src = shp_ne, countries = cntry, crop = TRUE)
 
- cntries \%>\%
-   dplyr::select(name) \%>\%
-   attributes()
+ cntries \%>\% gview()
 }
 
 }

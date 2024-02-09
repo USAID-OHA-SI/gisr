@@ -4,12 +4,12 @@
 \alias{zip_shapefiles}
 \title{Compress all shapefile components into a zipped file}
 \usage{
-zip_shapefiles(filename, dest_folder = NULL)
+zip_shapefiles(filename, folderpath = NULL)
 }
 \arguments{
-\item{filename}{Shapefile full name}
+\item{filename}{Shapefile full path and name}
 
-\item{dest_folder}{Where to place the zipped files}
+\item{folderpath}{Where to place the zipped files}
 }
 \value{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{       Boolean

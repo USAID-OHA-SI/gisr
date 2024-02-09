@@ -2,7 +2,7 @@
 % Please edit documentation in R/geo_utilities.R
 \name{spdf_export}
 \alias{spdf_export}
-\title{Save shapefile with flags}
+\title{Export spatial data as shapefile with flags}
 \usage{
 spdf_export(spdf, name)
 }
@@ -15,7 +15,7 @@ spdf_export(spdf, name)
 boolean
 }
 \description{
-Save shapefile with flags
+Export spatial data as shapefile with flags
 }
 \examples{
 \dontrun{

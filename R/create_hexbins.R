@@ -1,59 +1,136 @@
-#' Get an hexbins polygon feature class for country ABC
+#' @title Create hexagonal grids
 #'
-#' @param country_code iso3 code
-#' @param adm_level country administrative unit level
-#' @param geo_path path to geodata
-#' @param size size of each hex bin in meters
+#' @param spdf input spatial data frame
+#' @param size size of each hex bin in meters, default set to 15K meters (15KM)
+#' @param clip Should the output be cliped to the input boundaries? Default is TRUE
 #' @return country hex polygon as feature class
 #' @export
 #' @examples
 #' \dontrun{
 #'  library(gisr)
 #'
-#'  get_hexbins('LSO', 1)
-#'  get_hexbins('UGA', 2)
+#'  shp <- get_admin0(countries = "Nigeria")
+#'
+#'  get_hexbins(shp, 10000)
 #' }
 #'
-get_hexbins <- function(country_code,
-                        adm_level=0,
-                        geo_path=NULL,
-                        size=NULL) {
+get_hexbins <- function(spdf, size = 15000, clip = TRUE) {
 
-    # Set up path for geodata
-    path <- ""
+  # CRS
+  from_crs <- sf::st_crs(spdf) # Source CRS
+  to_crs <- sf::st_crs(3857)   # Projected CRS
 
-    if (!is.null(geo_path)) {
-        path <- geo_path
-    }
+  # Dissolve if boundaries
+  if ( nrow(spdf) == 0 )
+    usethis::ui_stop("Input spatial data is empty.")
 
-    # Get admin boundaries
-    cntry_adm <- get_adm_boundaries(country_code, adm_level=adm_level, geo_path = path) %>%
-        sf::st_transform(crs = sf::st_crs(3857))
+  # Merge all features into one
+  spdf <- spdf %>%
+    dplyr::mutate(
+      pid = dplyr::row_number(),
+      area = sf::st_area(.)
+    ) %>%
+    dplyr::group_by(pid) %>%
+    dplyr::summarise(area = sum(area)) %>%
+    dplyr::ungroup()
 
-    cntry_adm0 <- cntry_adm
+  # Make any corrections
+  spdf <- spdf %>%
+    sf::st_transform(crs = to_crs) %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf()
 
-    # Dissolve if boundaries
-    if ( adm_level != 0 ) {
-        cntry_adm0 <- cntry_adm %>%
-            dplyr::mutate(
-                id = dplyr::row_number(),
-                area = sf::st_area(.)
-            ) %>%
-            dplyr::group_by(id) %>%
-            dplyr::summarise(area = sum(area))
-    }
+  # Create hexbins
+  spdf_hex <- spdf %>%
+    sf::st_make_grid(what = "polygons", square = FALSE, cellsize = size) %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
+    dplyr::mutate(id = dplyr::row_number())%>%
+    sf::st_join(spdf,
+                by = sf::st_contains,
+                left = TRUE,
+                largest = TRUE)
 
-    # Generate hexbins
-    if (!is.null(size) & is.numeric(size)) {
-        cntry_hex <- cntry_adm0 %>%
-            sf::st_make_grid(what = "polygones", square = FALSE, cellsize = size) %>%
-            sf::st_intersection(cntry_adm0)
+  # Clip the edges
+  if (clip) {
+    spdf_hex <- sf::st_intersection(spdf_hex, spdf)
+  }
 
-    } else {
-        cntry_hex <- cntry_adm0 %>%
-            sf::st_make_grid(what = "polygones", square = FALSE) %>%
-            sf::st_intersection(cntry_adm0)
-    }
+  # Update and filter
+  spdf_hex <- spdf_hex %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
+    dplyr::filter(!is.na(area)) %>%
+    sf::st_transform(crs = from_crs)
 
-    return(cntry_hex)
+  return(spdf_hex)
+}
+
+
+#' @title Create square grids
+#'
+#' @param spdf input spatial data frame
+#' @param size size of each hex bin in meters, default set to 15K meters (15KM)
+#' @param clip Should the output be cliped to the input boundaries? Default is TRUE
+#' @return country hex polygon as feature class
+#' @export
+#' @examples
+#' \dontrun{
+#'  library(gisr)
+#'
+#'  shp <- get_admin0(countries = "Nigeria")
+#'
+#'  get_grids(shp, 10000)
+#' }
+#'
+get_grids <- function(spdf, size = 15000, clip = TRUE) {
+
+  # CRS
+  from_crs <- sf::st_crs(spdf) # Source CRS
+  to_crs <- sf::st_crs(3857)   # Projected CRS
+
+  # Dissolve if boundaries
+  if ( nrow(spdf) == 0 )
+    usethis::ui_stop("Input spatial data is empty.")
+
+  # Merge all features into one
+  spdf <- spdf %>%
+    dplyr::mutate(
+      pid = dplyr::row_number(),
+      area = sf::st_area(.)
+    ) %>%
+    dplyr::group_by(pid) %>%
+    dplyr::summarise(area = sum(area)) %>%
+    dplyr::ungroup()
+
+  # Make any corrections
+  spdf <- spdf %>%
+    sf::st_transform(crs = to_crs) %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf()
+
+  # Create hexbins
+  spdf_hex <- spdf %>%
+    sf::st_make_grid(what = "polygons", square = TRUE, cellsize = c(size, size)) %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
+    dplyr::mutate(id = dplyr::row_number())%>%
+    sf::st_join(spdf,
+                by = sf::st_contains,
+                left = TRUE,
+                largest = TRUE)
+
+  # Clip the edges
+  if (clip) {
+    spdf_hex <- sf::st_intersection(spdf_hex, spdf)
+  }
+
+  # Update and filter
+  spdf_hex <- spdf_hex %>%
+    sf::st_make_valid() %>%
+    sf::st_as_sf() %>%
+    dplyr::filter(!is.na(area)) %>%
+    sf::st_transform(crs = from_crs)
+
+  return(spdf_hex)
 }

@@ -25,7 +25,7 @@ Generate Point Spatial DataFrame
 \dontrun{
 
 cntry <- "Ethiopia"
-level_fac <- get_ouorglevel(operatingunit = cntry, org_type = "facility")
+level_fac <- grabr::get_ouorglevel(operatingunit = cntry, org_type = "facility")
 df_facs <- extract_locations(country = cntry, level = level_fac)
 df_facs <- df_facs \%>\% extract_facilities()
 df_locs <- df_facs \%>\% select(-c(geom_type:nested))

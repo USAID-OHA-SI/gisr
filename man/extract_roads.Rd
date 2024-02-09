@@ -17,7 +17,7 @@ extract_roads(aoi, radius = NULL, clip = FALSE)
 Extract Road Network data from OSM
 }
 \examples{
-\donttest{
+\dontrun{
 
  library(gisr)
 

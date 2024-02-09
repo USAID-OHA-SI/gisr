@@ -1,3 +1,28 @@
+# gisr 0.4.0
+
+* Soft depreciation of extact_locations - recommend using grabr::datim_pull_hierarchy
+* Updated extract_facilities - dropping mer_sites parameter
+* Updated extract_boundaries - leveraging grabr::get_ouorgs + clean up
+* Updated get_attributes - switched to datim_orgunits and adding new params: search, baseurl
+* Updated extract_attributes - switching to datim_orgunits with the use of prefix
+* Updated zip_shapefiles - switch to folderpath instead of dest_folder
+* Adding `check_columns()` for shapefile column names restrictions
+* Updated get_terrain, extract_raster, get_raster to use folderpath and be required
+* Replaced `raster` with `terra` per maintenance recommendation
+* Removed `sp` in favor of `sf` per maintenance recommendation
+* Removed `get_adm_boundaries` given depreciation of `raster`
+* Updated `geo_neighbors` to require source as an external dataset
+* Adding `get_nepolygons` as a common way of extracting naturalearth database
+* Adding `get_grids` for square grids, similar to get_hexbins
+* Updated `get_hexbins` to require spdf as input + radius
+* Remove `generate_hexbins` - use `get_hexbins` instead
+
+# gisr 0.3.0
+
+* Removed duplicative functions from `grabr` [2023-11-30]
+* Update functions to use `baseurl` and `folderpath` as parameter
+* General clean up and documentation
+
 # gisr 0.2.2
 * Change instructions to install from rOpenSci [2024-01-04]
 * Add in package status check from `gagglr` on load [2022-08-15]

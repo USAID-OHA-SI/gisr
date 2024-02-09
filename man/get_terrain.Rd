@@ -4,21 +4,16 @@
 \alias{get_terrain}
 \title{Get terrain data for an AOI (Countries)}
 \usage{
-get_terrain(
-  countries = list("Zambia"),
-  mask = FALSE,
-  buffer = 0.1,
-  terr = NULL
-)
+get_terrain(countries, terr, mask = FALSE, buffer = 0.1)
 }
 \arguments{
 \item{countries}{List of the country names or sf object}
 
+\item{terr}{RasterLayer or Path to terrain raster file}
+
 \item{mask}{Should the extracted data match the exact boundary limits?}
 
 \item{buffer}{Extend AOI extent by x}
-
-\item{terr}{RasterLayer or Path to terrain raster file}
 }
 \value{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{      spdf spatial dataframe

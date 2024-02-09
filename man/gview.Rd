@@ -15,7 +15,7 @@ gview(geodata, ...)
 Plot sf features
 }
 \examples{
-\donttest{
+\dontrun{
  library(gisr)
 
  adm0 <- get_admin0("Ghana")

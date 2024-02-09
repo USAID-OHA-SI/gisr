@@ -4,16 +4,16 @@
 \alias{extract_raster}
 \title{Extract raster data for an AOI (Countries)}
 \usage{
-extract_raster(countries, mask = FALSE, buffer = 0.1, ras = NULL)
+extract_raster(countries, ras, mask = FALSE, buffer = 0.1)
 }
 \arguments{
 \item{countries}{List of the country names or sf object}
 
+\item{ras}{RasterLayer or Path to raster file}
+
 \item{mask}{Should the extracted data match the exact boundary limits?}
 
 \item{buffer}{Extend AOI extent by x}
-
-\item{ras}{RasterLayer or Path to raster file}
 }
 \value{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{      spdf spatial dataframe

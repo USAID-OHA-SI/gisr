@@ -20,10 +20,12 @@
     glamr::convert_date_to_qtr() %>%
     str_sub(1, 4)
 
+  dir_sites <- "FY23"
+
   dir_data <- si_path("path_vector") %>%
     paste0("/OU-Sites/", dir_sites)
 
-  dir.create(dir_data)
+  dir.create(dir_data, recursive = T)
 
   dir_geodata <- paste0(dir_data, "/SHP")
 
@@ -31,11 +33,14 @@
 
 # DATA - Extract OU Data ----
 
-  cntry <- "Nigeria"
+  cntry <- "Malawi"
 
   level_fac <- get_ouorglevel(operatingunit = cntry, org_type = "facility")
 
-  df_facs <- extract_locations(country = cntry, level = level_fac)
+  df_facs <- extract_locations(country = cntry,
+                               username = datim_user(),
+                               password = datim_pwd(),
+                               level = level_fac)
 
   df_facs <- df_facs %>% extract_facilities()
 
@@ -50,7 +55,7 @@
 
 # Batch Locations ----
 
-  pull_facilities <- function(ou, cntry = NULL, dest = NULL) {
+  pull_facilities <- function(ou, cntry = NULL, username, password, dest = NULL) {
 
     print(glue("Ou = {ou}, Cntry = {cntry}"))
 
@@ -59,20 +64,26 @@
     }
 
     # Facility org level
-    lvl <- get_ouorglevel(operatingunit = ou, country = cntry, org_type = "facility")
+    lvl <- get_ouorglevel(operatingunit = ou,
+                          country = cntry,
+                          username = username,
+                          password = password,
+                          org_type = "facility")
 
     print(glue("Facility level = {lvl}"))
 
     # Location Data
-    locs <- extract_locations(country = cntry, level = lvl)
+    locs <- extract_locations(country = cntry,
+                              username = username,
+                              password = password,
+                              level = lvl)
 
     # check location details
     if (any(str_detect(names(locs), "coordinates"))) {
       print("unpacking coordinates")
 
       locs <- locs %>%
-        extract_facilities() %>%
-        select(-c(path:nested))
+        extract_facilities()
     }
 
     # Export
@@ -92,29 +103,34 @@
     return(locs)
   }
 
-  pull_facilities("Nigeria")
+  pull_facilities(ou = "Nigeria",
+                  username = datim_user(),
+                  password = datim_pwd())
 
 
 # Export OU / Country Facilities Locations data ----
 
   glamr::pepfar_country_list %>%
-    select(operatingunit, countryname) %>%
-    pwalk(.f = ~pull_facilities(ou = .x, cntry = .y, dest = dir_data))
+    select(operatingunit, country) %>%
+    pwalk(.f = ~pull_facilities(ou = .x, cntry = .y,
+                                username = datim_user(),
+                                password = datim_pwd(),
+                                dest = dir_data))
 
 # Create Shapefiles ----
 
   generate_shp <- function(df_locs,
-                         lat = "latitude",
-                         long = "longitude") {
+                           lat = "latitude",
+                           long = "longitude") {
 
     # Spatial file
     spdf <- NULL
 
     # check for lat/long columns
-    if (lat %in% names(df_locs)) {
+    if (all(c(lat, long) %in% names(df_locs))) {
 
       spdf <- df_locs %>%
-        filter(across(all_of(c(lat, long)), ~ !is.na(.x))) %>%
+        filter(if_all(.cols = c(lat, long), .fns = ~ !is.na(.x))) %>%
         mutate(across(all_of(c(lat, long)), ~ as.numeric(.x)))
 
 
@@ -122,13 +138,14 @@
 
       # Shapefiles columns have a max
       spdf <- spdf %>%
+        select(-any_of(c("geom_type", "gid", "nodes", "nested"))) %>%
         rename(ou_iso = operatingunit_iso,
                ou = operatingunit,
-               cntry_iso = countryname_iso,
+               cntry_iso = country_iso,
                cntry = countryname)
 
     } else {
-      print("No location columns found. Consider changing lat/long default values")
+      usethis::ui_stop("No location columns found. Consider changing lat/long parameter default values")
     }
 
     return(spdf)

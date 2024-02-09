@@ -4,12 +4,14 @@
 \alias{cntry_polygons}
 \title{Extract Country Polygons}
 \usage{
-cntry_polygons(spdf, cntry)
+cntry_polygons(spdf, cntry, attrs)
 }
 \arguments{
 \item{spdf}{VcPolygons data as Spatial Data Frame}
 
 \item{cntry}{Country name}
+
+\item{attrs}{Country orgunits, output of \code{grabr::datim_orgunits(cntry, reshape = TRUE)}}
 }
 \value{
 list of spatial data frames
@@ -20,9 +22,14 @@ Extract Country Polygons
 \examples{
 \dontrun{
 
+cntry = "Nigeria"
+
 spdf <- gisr::get_vcpolygons(path = glamr::si_path("path_vector"), name = "VcPepfarPolygons.shp")
 
-cntry_polygons(spdf = spdf, cntry = "Zambia")
+df_attrs <- grabr::get_attributes(cntry)
+
+cntry_polygons(spdf = spdf, cntry = "Zambia", attrs = df_attrs)
+
 }
 
 }

@@ -8,8 +8,8 @@ extract_boundaries(
   spdf,
   country,
   level = 3,
-  username = NULL,
-  password = NULL,
+  username,
+  password,
   export = FALSE,
   name = NULL
 )
@@ -38,42 +38,4 @@ making hard for analysts to identify specific polygon
 each orgunit level. This function extract orgunt attributes
 from Datim and append them to the global shapefile, allowing
 analysts to filter and work only with subset.
-}
-\examples{
-\dontrun{
-
- library(gisr)
- library(sf)
- library(glamr)
-
- cntry <- "Tanzania"
-
- shp_pepfar <- return_latest(
-     folderpath = si_path("path_vector"),
-     pattern = "VcPepfarPolygons.*.shp",
-     recursive = TRUE
-   ) \%>\%
-   read_sf()
-
- cntry_level <- get_ouorglevel(cntry, org_type = "country")
-
- shp_country <- extract_boundaries(
-   spdf = shp_pepfar,
-   country = cntry,
-   level = cntry_level
- )
-
- shp_country \%>\% gview()
-
- psnu_level <- get_ouorglevel(cntry, org_type = "prioritization")
-
- shp_psnu <- extract_boundaries(
-   spdf = shp_pepfar,
-   country = cntry,
-   level = psnu_level
- )
-
- shp_psnu \%>\% gview()
-}
-
 }

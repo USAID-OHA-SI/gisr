@@ -16,6 +16,7 @@ admins_map <- function(countries,
                        add_neighbors = FALSE) {
 
     cntries <- {{countries}}
+    admins <- get_nepolygons()
     admin0 <- get_admin0(cntries)
     admin1 <- get_admin1(cntries)
 
@@ -23,7 +24,7 @@ admins_map <- function(countries,
 
     if ( TRUE == {{add_neighbors}} ) {
 
-        nghbrs <- geo_neighbors(cntries)
+        nghbrs <- geo_neighbors(src = admins, countries = cntries)
 
         cntries <- nghbrs %>%
             sf::st_drop_geometry() %>%
@@ -49,7 +50,7 @@ admins_map <- function(countries,
         ggplot2::geom_sf(data = admin0,
                          colour = "white",
                          fill = "grey93",
-                         size = 2,
+                         linewidth = 2,
                          alpha = 0.25) +
         ggplot2::geom_sf(data = admin0,
                          colour = "black",

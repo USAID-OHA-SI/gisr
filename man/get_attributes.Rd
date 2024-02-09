@@ -4,12 +4,27 @@
 \alias{get_attributes}
 \title{Get Attributes Data for Orgunit Boundaries}
 \usage{
-get_attributes(country, username = NULL, password = NULL, folderpath = NULL)
+get_attributes(
+  country,
+  username,
+  password,
+  folderpath = NULL,
+  search = "orghierarchy",
+  baseurl = NULL
+)
 }
 \arguments{
 \item{country}{OU/country}
 
+\item{username}{Datim username}
+
+\item{password}{Datim password}
+
 \item{folderpath}{Local directory of files}
+
+\item{search}{Search keyword}
+
+\item{baseurl}{Datim URL}
 }
 \value{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{      OU Orgunit level as df
@@ -17,6 +32,10 @@ get_attributes(country, username = NULL, password = NULL, folderpath = NULL)
 }
 \description{
 Get Attributes Data for Orgunit Boundaries
+}
+\note{
+This will attempt to read data from local directory when folderpath is not set to null.
+If null, username and password will be required
 }
 \examples{
 \dontrun{

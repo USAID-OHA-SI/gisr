@@ -10,7 +10,7 @@ extract_locations(
   password,
   level = NULL,
   add_geom = TRUE,
-  base_url = NULL
+  baseurl = NULL
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ extract_locations(
 
 \item{add_geom}{Include geometry column, default value is true}
 
-\item{base_url}{Datim URL}
+\item{baseurl}{Datim URL}
 }
 \value{
 A dataframe or Null if not match

@@ -20,6 +20,10 @@ explore_facilities <- function(.data, cntry, terr_path = NULL) {
         TRUE ~ {{cntry}}
     )
 
+    # Check column names
+    if (!all(c("latitude", "longitude") %in% names(.data)))
+      base::stop("Missing required columns: latitude, longitude")
+
     # Count non valid lat/lon
     na_sites <- .data %>%
         dplyr::filter(is.na(longitude) | is.na(latitude)) %>%
@@ -111,7 +115,7 @@ assess_facilities <- function(.data) {
         ggplot2::geom_label(aes(label = format(n, big.mark = ",", scientific = FALSE)),
                             color = "white", show.legend = FALSE) +
         ggplot2::scale_y_continuous(labels = function(n){base::paste0(n, "%")}) +
-        ggplot2::scale_fill_manual(values = c("#66c2a5", "#fc8d62")) +
+        ggplot2::scale_fill_manual(values = c("#287c6f", "#c43d4d")) +
         ggplot2::labs(title = "", x = "", y = "") +
         ggplot2::theme_minimal() +
         ggplot2::theme(

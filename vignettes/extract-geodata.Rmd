@@ -67,10 +67,10 @@ Time to test some of the `gisr` functions. Let
 
 ```{r echo = T, eval = F}
 # this works for the perfect setup with the default parameters values
-spdf_pepfar <- get_vcpolygons() 
+spdf_pepfar <- get_vcpolygons(folderpath = geopath) 
 
 # for custom use, you will need to specify the path and name of the file
-spdf_pepfar <- get_vcpolygons(path = "../myshapefiles", name = "pepfar.shp")
+spdf_pepfar <- get_vcpolygons(folderpath = "../myshapefiles", name = "pepfar.shp")
 
 # Explore outputs
 spdf_pepfar %>% glimpse()
@@ -91,16 +91,20 @@ cntry <- "South Africa"
 Extract country boundaries
 
 ```{r echo = T, eval = F}
-cntry_lvl <- glamr::get_ouorglevel(
+cntry_lvl <- grabr::get_ouorglevel(
   operatingunit = cntry,
   country = cntry,
-  org_type = "country"
+  org_type = "country",
+  username = datim_user(),
+  password = datim_pwd()
 )
 
 # Country boundaries
 spdf_cntry <- spdf_pepfar %>% 
   extract_boundaries(country = cntry, 
-                     level = cntry_lvl)
+                     level = cntry_lvl,
+                     username = datim_user(),
+                     password = datim_pwd())
 
 spdf_cntry
 ```
@@ -108,15 +112,20 @@ spdf_cntry
 Extract PSNU boundaries
 
 ```{r echo = T, eval = F}
-psnu_lvl <- glamr::get_ouorglevel(
+psnu_lvl <- grabr::get_ouorglevel(
   operatingunit = cntry,
   country = cntry,
-  org_type = "prioritization"
+  org_type = "prioritization",
+  username = datim_user(),
+  password = datim_pwd()
 )
 
 # psnu boundaries
 spdf_psnu <- spdf_pepfar %>% 
-  extract_boundaries(country = cntry, level = cntry_lvl)
+  extract_boundaries(country = cntry, 
+                     level = cntry_lvl,
+                     username = datim_user(),
+                     password = datim_pwd())
 
 spdf_psnu
 ```
@@ -152,6 +161,6 @@ Contextual geospatial data sets can also be extracted from external sources usin
 
 ## Export Geospatial Data to local drive
 
-Take a look at `export_spdf()`
+Take a look at `spdf_export()`
 
 ### Thank you!
