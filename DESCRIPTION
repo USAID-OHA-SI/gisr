@@ -41,8 +41,8 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     here,
-    rnaturalearthdata (>= 1.0.0),
-    rnaturalearthhires (>= 1.0.0),
+    rnaturalearthdata,
+    rnaturalearthhires,
     osmdata,
     patchwork,
     glamr,
@@ -56,8 +56,5 @@ Remotes:
     USAID-OHA-SI/grabr,
     USAID-OHA-SI/gagglr,
     ropensci/rnaturalearthhires
-BuildVignettes: true
 VignetteBuilder: knitr
-Depends: 
-    R (>= 4.0)
 Config/testthat/edition: 3
