@@ -4,12 +4,14 @@
 \alias{get_grids}
 \title{Create square grids}
 \usage{
-get_grids(spdf, size = 15000)
+get_grids(spdf, size = 15000, clip = TRUE)
 }
 \arguments{
 \item{spdf}{input spatial data frame}
 
 \item{size}{size of each hex bin in meters, default set to 15K meters (15KM)}
+
+\item{clip}{Should the output be cliped to the input boundaries? Default is TRUE}
 }
 \value{
 country hex polygon as feature class

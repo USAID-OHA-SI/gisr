@@ -96,10 +96,10 @@ get_grids <- function(spdf, size = 15000, clip = TRUE) {
   # Merge all features into one
   spdf <- spdf %>%
     dplyr::mutate(
-      id = dplyr::row_number(),
+      pid = dplyr::row_number(),
       area = sf::st_area(.)
     ) %>%
-    dplyr::group_by(id) %>%
+    dplyr::group_by(pid) %>%
     dplyr::summarise(area = sum(area)) %>%
     dplyr::ungroup()
 

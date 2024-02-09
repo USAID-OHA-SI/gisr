@@ -4,12 +4,14 @@
 \alias{get_hexbins}
 \title{Create hexagonal grids}
 \usage{
-get_hexbins(spdf, size = 15000)
+get_hexbins(spdf, size = 15000, clip = TRUE)
 }
 \arguments{
 \item{spdf}{input spatial data frame}
 
 \item{size}{size of each hex bin in meters, default set to 15K meters (15KM)}
+
+\item{clip}{Should the output be cliped to the input boundaries? Default is TRUE}
 }
 \value{
 country hex polygon as feature class
