@@ -41,6 +41,8 @@ jobs:
         run: |
           install.packages(c("remotes", "rcmdcheck"))
           install.packages("https://cran.r-project.org/src/contrib/Archive/sf/sf_1.0-13.tar.gz", type="source")
+          install.packages("https://cran.r-project.org/src/contrib/rnaturalearthdata_1.0.0.tar.gz", type="source")
+          install.packages("https://github.com/ropensci/rnaturalearthhires/archive/refs/heads/master.zip", type="source")
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
 
