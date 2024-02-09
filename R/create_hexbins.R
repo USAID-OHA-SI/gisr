@@ -22,15 +22,17 @@ get_hexbins <- function(spdf, size = 15000) {
 
   # Dissolve if boundaries
 
-  if ( nrow(spdf) > 0 ) {
-    spdf <- spdf %>%
-      dplyr::mutate(
-        id = dplyr::row_number(),
-        area = sf::st_area(.)
-      ) %>%
-      dplyr::group_by(id) %>%
-      dplyr::summarise(area = sum(area))
-  }
+  if ( nrow(spdf) == 0 )
+    usethis::ui_stop("Input spatial data is empty.")
+
+  # Merge all features into one
+  spdf <- spdf %>%
+    dplyr::mutate(
+      id = dplyr::row_number(),
+      area = sf::st_area(.)
+    ) %>%
+    dplyr::group_by(id) %>%
+    dplyr::summarise(area = sum(area))
 
   # Make any corrections
 
