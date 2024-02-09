@@ -54,8 +54,7 @@ Remotes:
     USAID-OHA-SI/glamr,
     USAID-OHA-SI/glitr,
     USAID-OHA-SI/grabr,
-    USAID-OHA-SI/gagglr,
-    ropensci/rnaturalearthhires (>= 1.0.0)
+    USAID-OHA-SI/gagglr
 BuildVignettes: true
 VignetteBuilder: knitr
 Config/testthat/edition: 3
