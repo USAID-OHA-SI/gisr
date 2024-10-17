@@ -13,7 +13,7 @@ LazyData: true
 URL: https://github.com/USAID-OHA-SI/gisr, https://usaid-oha-si.github.io/gisr/
 BugReports: https://github.com/USAID-OHA-SI/gisr/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Depends: 
     R (>= 3.6.0)
 Imports: 
@@ -29,6 +29,9 @@ Imports:
     terra,
     sf,
     rnaturalearth,
+    rnaturalearthdata,
+    rnaturalearthhires,
+    osmdata,
     methods,
     crayon,
     janitor,
@@ -41,9 +44,6 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     here,
-    rnaturalearthdata,
-    rnaturalearthhires,
-    osmdata,
     patchwork,
     glamr,
     glitr,

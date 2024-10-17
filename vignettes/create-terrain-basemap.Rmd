@@ -64,14 +64,19 @@ adm1 %>%
 
 Let's create a basemap for Nigeria. 
 
-For this, We will need to downlaod the raster file into `si_path("path_raster")`
+For this, We will need to download the [raster file](https://www.naturalearthdata.com/downloads/50m-raster-data/50m-shaded-relief/) into `si_path("path_raster")`
 
 This option uses `rnaturalearth` to extract admin0 and admin1 boundaries as `sf` objects.
 
 ```{r warning=FALSE, echo = T, eval = F}
+
+dir_ras <- file.path("..", glamr::si_path("path_raster"))
+
+ras <- get_raster(folderpath = dir_ras, name = "SR_LR.tif")
+
 terrain_map(countries = countryname, 
             mask = TRUE,
-            glamr::si_path("path_raster"))
+            terr = ras)
 ```
 ![](../docs/articles/create-terrain-basemap_files/figure-html/basemap-with-admin.png)
 
@@ -81,7 +86,7 @@ We could also provide you own admins boundaries. This is a classic case where of
 terrain_map(countries = adm0,
             adm0 = adm0,
             adm1 = adm1,
-            terr = glamr::si_path("path_raster"))
+            terr = ras)
 ```
 
 ![](../docs/articles/create-terrain-basemap_files/figure-html/basemap-with-admin.png)
@@ -91,7 +96,7 @@ We could also decide to use only the country boundaries
 ```{r warning=FALSE, echo = T, eval = F}
 terrain_map(countries = adm0,
             adm0 = adm0,
-            terr = glamr::si_path("path_raster"))
+            terr = ras)
 ```
 
 ![](../docs/articles/create-terrain-basemap_files/figure-html/basemap-with-no-admin.png)
@@ -100,11 +105,7 @@ terrain_map(countries = adm0,
 It's also possible to add neighbor countries to your basemap. See below.
 
 ```{r warning=FALSE, echo = T, eval = F}
-ras <- glamr::si_path("path_raster")
-
-terrain_map(countries = adm0,
-            adm0 = adm0,
-            adm1 = adm1,
+terrain_map(countries = countryname,
             add_neighbors = TRUE,
             add_labels = TRUE,
             terr = ras)

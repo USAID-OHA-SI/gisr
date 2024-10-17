@@ -579,7 +579,7 @@ spdf_points <- function(.data,
 
     # filter and mutate
     spdf <- .data %>%
-        dplyr::filter(dplyr::across(dplyr::all_of(c(lat, long)), ~ !base::is.na(.x))) %>%
+        dplyr::filter(dplyr::if_any(dplyr::all_of(c(lat, long)), ~ !base::is.na(.x))) %>%
         dplyr::mutate(dplyr::across(dplyr::all_of(c(lat, long)), ~ base::as.numeric(.x)))
 
     # Convert data to sf feature

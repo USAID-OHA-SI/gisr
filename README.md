@@ -18,7 +18,7 @@ Geospatial Analytics Utilities
 ## SETUP
   
   # Pre-requisits - gisr user rnaturalearthdata and rnaturalearthhires 
-    remotes::install_github("ropensci/rnaturalearth")
+    remotes::install_github("ropensci/rnaturalearthdata")
     remotes::install_github("ropensci/rnaturalearthhires")
 
   #install from rOpenSci
