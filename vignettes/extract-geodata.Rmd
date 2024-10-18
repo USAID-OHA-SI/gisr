@@ -2,7 +2,7 @@
 title: "Extract Geodata from different sources"
 author: "Baboyma Kagniniwa"
 date: "2021-09-10"
-updated: "2022-05-03"
+updated: "2024-10-18"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Extract Geodata from different sources}
@@ -44,12 +44,12 @@ Current PEPFAR Geospatial data sets can be found under OHA/SI Google Drive `SI F
 
 In order to take full advantage of all the OHA/SI R packages, it's recommended to setup the location of your data directories. These should ideally be outside your github projects directory. One of the directories should be dedicated to geospatial data and should be set using `glamr::set_paths(folderpath_vector = "<my-geodata-folder>")`. 
 
-Below is an example. This assumes your R / Github projects folder is under `Documents` folder on your local computer and your working off a R Project in a sub-folder. In this example, your geospatial data folder will be a sibling of your R / Github projects folder.
+Below is an example. This assumes your R / Github projects folder is under `Documents` folder on your local computer and you are working off a R Project in a sub-folder. In this example, your geospatial data folder will be a sibling of your R / Github projects folder.
 
 ```{r echo = T, eval = F}
-curr_path <- "C:/Users/<username>/Documents/projects/gisr" # Windows
+curr_path <- "C:/Users/<username>/Documents/geodata/vector" # Windows
 #or 
-#curr_path <- "~/Documents/projects/gisr"                  # Mac or linux
+#curr_path <- "~/Documents/Documents/geodata/vector"        # Mac or linux
 
 geopath <- "../../Geodata"
 
@@ -67,7 +67,7 @@ Time to test some of the `gisr` functions. Let
 
 ```{r echo = T, eval = F}
 # this works for the perfect setup with the default parameters values
-spdf_pepfar <- get_vcpolygons(folderpath = geopath) 
+spdf_pepfar <- get_vcpolygons(folderpath = si_path(type = "path_vector")) 
 
 # for custom use, you will need to specify the path and name of the file
 spdf_pepfar <- get_vcpolygons(folderpath = "../myshapefiles", name = "pepfar.shp")
@@ -88,7 +88,7 @@ In order to extract country specific boundaries, you will need to provide the co
 cntry <- "South Africa"
 ```
 
-Extract country boundaries
+Extract country boundaries from VcPepfarPolygons and GHSD/DATIM orgunits
 
 ```{r echo = T, eval = F}
 cntry_lvl <- grabr::get_ouorglevel(
@@ -109,7 +109,7 @@ spdf_cntry <- spdf_pepfar %>%
 spdf_cntry
 ```
 
-Extract PSNU boundaries
+Extract PSNU boundaries from VcPepfarPolygons and GHSD/DATIM orgunits
 
 ```{r echo = T, eval = F}
 psnu_lvl <- grabr::get_ouorglevel(
@@ -134,7 +134,11 @@ Extract all country boundaries
 
 ```{r echo = T, eval = F}
 
-spdf_all <- cntry_polygons(spdf = spdf_pepfar, cntry = cntry)
+df_attrs <- grabr::get_attributes(country = cntry,
+                                  username = datim_user(),
+                                  password = datim_pwd())
+
+spdf_all <- cntry_polygons(spdf = spdf_pepfar, cntry = cntry, attrs = df_attrs)
 
 spdf_all$country
 spdf_all$snu1

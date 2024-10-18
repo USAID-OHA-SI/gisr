@@ -2,6 +2,7 @@
 title: "Create Terrain Basemap"
 author: Baboyma Kagniniwa | USAID
 date: "2021-8-26"
+updated: "2024-10-17"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Create Terrain Basemap}
