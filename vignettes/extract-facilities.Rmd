@@ -2,6 +2,7 @@
 title: "Extract facilities location data"
 author: "Baboyma Kagniniwa"
 date: "2022-05-03"
+updated: "2024-10-18"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Extract facilities location data}
@@ -52,7 +53,6 @@ dir_sites <- Sys.Date() %>%
     str_sub(1, 4)
 
 dir_data <- glamr::si_path("path_vector") %>%
-  paste0("../", .) %>% # This needed only with R Markdown files
   paste0("/OU-Sites/", dir_sites)
 
 # Create the folder
@@ -70,21 +70,32 @@ a. OU/Country name,
 b. Organizational level for Facilities
 
 ```{r echo = T, eval = F}
+
 ou <- "Nigeria"
-level_fac <- get_ouorglevel(operatingunit = ou, org_type = "facility")
+
+level_fac <- get_ouorglevel(operatingunit = ou, 
+                            org_type = "facility",
+                            username = datim_user(),
+                            password = datim_pwd())
+
 ```
 
 Now it's time to proceed with facilities data extraction 
 
 ```{r echo = T, eval = F}
+
 # extract location data
-df_facs <- extract_locations(country = ou, level = level_fac)
+df_facs <- extract_locations(country = ou, 
+                             level = level_fac,
+                             username = datim_user(),
+                             password = datim_pwd())
 
 # Get a clean version of the facilities
 df_facs <- df_facs %>% extract_facilities()
 
 # Get ride of extract columns
 df_facs <- df_facs %>% select(-c(geom_type:nested))
+
 ```
 
 Save the extracted data as .csv file in the pre-defined location
