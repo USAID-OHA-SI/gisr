@@ -39,3 +39,24 @@ each orgunit level. This function extract orgunt attributes
 from Datim and append them to the global shapefile, allowing
 analysts to filter and work only with subset.
 }
+\examples{
+\dontrun{
+
+ library(gisr)
+ library(sf)
+ library(glamr)
+
+ cntry <- "Tanzania"
+
+ shp_pepfar <- get_vcpolygons(folderpath = glamr::si_path("path_vector")) \%>\%
+
+ shp_country <- extract_boundaries(
+   spdf = shp_pepfar,
+   country = cntry,
+   level = 3
+ )
+
+ shp_country \%>\% gview()}
+
+
+}

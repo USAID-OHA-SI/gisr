@@ -435,7 +435,7 @@ get_vcpolygons <- function(folderpath, name = NULL) {
 #'    level = 3
 #'  )
 #'
-#'  shp_country %>% gview()
+#'  shp_country %>% gview()}
 #'
 #'
 extract_boundaries <-
@@ -787,15 +787,24 @@ download_shapefiles <-
         }
 
         # target sub-folder
+        # folder <- dplyr::case_when(
+        #   label == "global" ~ "Global",
+        #   label == "region" ~ "Regional-Countries-Boundaries",
+        #   label == "country" ~ "OU and Country-Boundaries",
+        #   label == "snu1" ~ "SNU1",
+        #   label == "psnu" ~ "PSNU",
+        #   label == "prioritization" ~ "PSNU",
+        #   label == "community" ~ "Communities",
+        #   label == "site" ~ "Facilities",
+        #   label == "facility" ~ "Facilities",
+        #   TRUE ~ NA_character_
+        # )
+
         folder <- dplyr::case_when(
             label == "global" ~ "Global",
-            label == "region" ~ "Regional-Countries-Boundaries",
-            label == "country" ~ "OU-Country-Boundaries",
-            label == "snu1" ~ "SNU1",
-            label == "psnu" ~ "PSNU",
-            label == "prioritization" ~ "PSNU",
-            label == "community" ~ "Communities",
-            label == "site" ~ "Sites",
+            label == "country" ~ "OU and Country-Boundaries",
+            label == "attributes" ~ "OU and Country-Attributes",
+            label == "sites" ~ "OU-Sites",
             TRUE ~ NA_character_
         )
 
@@ -890,3 +899,182 @@ download_shapefiles <-
                        exdir = base::dirname(dest_file))
         }
     }
+
+download_shapefiless <-
+  function(gdrive, country, dest_folder,
+           org_level = "country",
+           overwrite = TRUE,
+           unzip = FALSE) {
+
+    # Download URL
+    dfile_baseurl <- "https://drive.google.com/uc?export=download&id="
+
+    # country
+
+    cntry <- janitor::make_clean_names(country)
+    label <- stringr::str_to_lower(org_level)
+
+    if (label == "psnu") {
+      label = "prioritization"
+    }
+
+    # check dest folder
+    if (!fs::dir_exists(dest_folder)) {
+      base::message(glue::glue("[{dest_folder}] folder does not seem to exist"))
+      return(NULL)
+    }
+
+    # org levels/labels
+    org_labels <- c("country",
+                    "snu1",
+                    "psnu",
+                    "prioritization",
+                    "community",
+                    "sites",
+                    "facilities",
+                    "attributes")
+
+    if (!label %in% org_labels) {
+      base::message(glue::glue("{label} is not available. Valid options are: "))
+      base::message(base::paste(org_labels, collapse = ", "))
+      return(NULL)
+    }
+
+    # Map sub-folders
+    folder <- dplyr::case_when(
+      label %in% c("country", "snu1", "snu", "psnu",
+                   "prioritization", "community")  ~ "OU and Country-Boundaries",
+      label == "attributes" ~ "OU and Country-Attributes",
+      label == "sites" ~ "OU-Sites",
+      label == "facilities" ~ "OU-Sites",
+      TRUE ~ NA_character_
+    )
+
+    base::message(glue::glue("Mapping [{org_level}] to [{folder}] googledrive sub-folder ..."))
+
+    # authentication
+    if (is.null(getOption("email"))) {
+      glamr::load_secrets()
+    }
+
+    user <- base::getOption("email")
+
+    if (base::is.null(user)) {
+      base::message("Unable to identify current user. Please make your googledrive account is set to email")
+      return(NULL)
+    }
+
+    googledrive::drive_auth(email = user)
+    googlesheets4::gs4_auth(email = user)
+
+    # List gdrive objects
+    df_drives <- googledrive::drive_ls(path = googledrive::as_id(gdrive))
+
+    if (base::nrow(df_drives) == 0) {
+      base::message(glue::glue("[{drive_folder}] seems to be empty"))
+      return(NULL)
+    }
+
+    # Identify sub-folder
+    df_drive <- df_drives %>%
+      dplyr::filter(stringr::str_detect(name, folder))
+
+    if (base::nrow(df_drive) == 0) {
+      base::message(glue::glue("Could not find a folder for {folder}"))
+      return(NULL)
+    }
+
+    if (base::nrow(df_drive) != 1) {
+      base::message(glue::glue("There seems to be duplicate folder for [{org_level}]"))
+      return(NULL)
+    }
+
+    # Identify latest fiscal year
+    df_fy <- df_drive %>%
+      dplyr::pull(id) %>%
+      googledrive::as_id() %>%
+      googledrive::drive_ls(path = .) %>%
+      dplyr::filter(stringr::str_detect(name, "^FY")) %>%
+      dplyr::arrange(desc(name)) %>%
+      dplyr::filter(dplyr::row_number() == 1)
+
+    if (base::nrow(df_fy) == 0) {
+      base::message(glue::glue("Could not find a fiscal year folder. Check if item was not removed or renamed."))
+      #return(NULL)
+      df_fy <- df_drive
+    }
+
+    base::message(glue::glue("checking [{df_fy$name}] folder..."))
+
+    # Identify country folders
+    df_cntry <- df_fy %>%
+      dplyr::pull(id) %>%
+      googledrive::as_id() %>%
+      googledrive::drive_ls(path = .) %>%
+      dplyr::filter(stringr::str_to_lower(name) == cntry)
+
+    if (base::nrow(df_cntry) == 0) {
+      base::message(glue::glue("Could not find a folder for [{country}]. Check if item was not removed or renamed."))
+      #return(NULL)
+      df_cntry <- df_fy
+    }
+
+    base::message(glue::glue("checking [{df_cntry$name}] folder..."))
+
+    # List out files
+    df_files <- df_cntry %>%
+      dplyr::pull(id) %>%
+      googledrive::as_id() %>%
+      googledrive::drive_ls(path = .)
+
+    if (base::nrow(df_files) == 0) {
+      base::message(glue::glue("Could not find any files within [{country}] folder. Check if item was not removed or renamed."))
+      #return(NULL)
+      df_files <- df_cntry
+    }
+
+    # Identify files
+    if (label %in% c("sites", "facilities", "attributes")) {
+      df_file <- df_files %>%
+        dplyr::filter(stringr::str_detect(stringr::str_to_lower(name), cntry))
+    }
+    else {
+
+      df_file <- df_files %>%
+        dplyr::filter(stringr::str_detect(stringr::str_to_lower(name), label))
+    }
+
+    if (base::nrow(df_file) == 0) {
+      base::message(glue::glue("Could not find any matching files for [{country}] / [{org_level}]. Check if item was not duplicated."))
+      return(NULL)
+    }
+
+    dfiles <- df_file %>%
+      glamr::gdrive_metadata() %>%
+      dplyr::mutate(url = base::paste0(dfile_baseurl, id)) %>%
+      dplyr::select(name, url)
+
+
+    ## downloading files
+    dfiles %>%
+      purrr::pwalk(function(name, url) {
+        base::print(glue::glue("SOURCE URL: {url}"))
+
+        dest_file <- base::file.path(dest_folder, glue::glue("{name}"))
+
+        # download files
+        googledrive::drive_download(
+          file = url,
+          path = dest_file,
+          overwrite = overwrite
+        )
+
+        # Unzip file
+        if (unzip == TRUE & base::file.exists(dest_file)) {
+          zip::unzip(zipfile = dest_file, exdir = base::dirname(dest_file))
+        }
+
+      })
+  }
+
+
